@@ -23,7 +23,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <algorithm>
 
-#include <QByteArray>
 #include <QDebug>
 
 static void genAsymSd_1d(int dim, bool *comp)
@@ -136,12 +135,6 @@ Hypersimplex::Hypersimplex(int d, int k)
 {
     qDebug() << "Create H:" << d << k;
 
-    if (d == 2 * k) {
-        initSym();
-    } else {
-        initAsym();
-    }
-
     initGraph();
     initGroup();
 
@@ -153,32 +146,72 @@ Hypersimplex::Hypersimplex(int d, int k)
 
 Hypersimplex::~Hypersimplex()
 {
-    delete[] m_genAsymSd_1d;
-    delete[] m_genAsymSd_12;
-
-    delete[] m_genSymS2_12;
-    delete[] m_genSymSd_1d;
-    delete[] m_genSymSd_12;
-
     delete m_graph;
     delete m_group;
 }
 
-void Hypersimplex::initSym()
+AsymHypers::AsymHypers(int d, int k)
+    : Hypersimplex(d, k)
 {
-    int vcnt = m_vertexCount;
+//    calcVtxTrnsSubgroups();
+//    qDebug() << "vtxtrns subs:";
+//    for (auto s : m_vtxTrnsSubgroups)
+//        qDebug() << QString(s.c_str());
 
-    m_genSymS2_12 = new int[vcnt];
-    m_genSymSd_1d = new int[vcnt];
-    m_genSymSd_12 = new int[vcnt];
+    m_genAsymSd_1d = new int[m_vertexCount];
+    m_genAsymSd_12 = new int[m_vertexCount];
 
-    bool genSymS2_12_result[vcnt][m_d];
-    bool genSymSd_1d_result[vcnt][m_d];
-    bool genSymSd_12_result[vcnt][m_d];
+    bool genAsymSd_1d_result[m_vertexCount][m_d];
+    bool genAsymSd_12_result[m_vertexCount][m_d];
 
-//    qDebug() << "initSym:" << vcnt;
+    for (int i = 0; i < m_vertexCount; i++) {
+        bool comps[m_d] = {false};
+        combinadicComb(m_k, i, comps);
 
-    for (int i = 0; i < vcnt; i++) {
+        std::copy(comps, comps + m_d, genAsymSd_1d_result[i]);
+        std::copy(comps, comps + m_d, genAsymSd_12_result[i]);
+
+        genAsymSd_1d(m_d, genAsymSd_1d_result[i]);
+        genAsymSd_12(m_d, genAsymSd_12_result[i]);
+
+//        qDebug() << "---------------";
+//        qDebug() << "------" << i << "------";
+//        for (int j = 0; j < m_d; j++) {
+//            qDebug() << j << ":" << comps[j]
+//                        << genAsymSd_1d_result[i][j]
+//                           << genAsymSd_12_result[i][j];
+//        }
+//        qDebug() << "---------------";
+//        qDebug() << "TEST:" << combinadicN(m_d, comps);
+//        qDebug() << "---------------";
+    }
+
+    for (int i = 0; i < m_vertexCount; i++) {
+        m_genAsymSd_1d[i] = combinadicN(m_d, genAsymSd_1d_result[i]);
+        m_genAsymSd_12[i] = combinadicN(m_d, genAsymSd_12_result[i]);
+    }
+}
+
+AsymHypers::~AsymHypers()
+{
+    delete[] m_genAsymSd_1d;
+    delete[] m_genAsymSd_12;
+}
+
+SymHypers::SymHypers(int d, int k)
+    : Hypersimplex(d, k)
+{
+    m_genSymS2_12 = new int[m_vertexCount];
+    m_genSymSd_1d = new int[m_vertexCount];
+    m_genSymSd_12 = new int[m_vertexCount];
+
+    bool genSymS2_12_result[m_vertexCount][m_d];
+    bool genSymSd_1d_result[m_vertexCount][m_d];
+    bool genSymSd_12_result[m_vertexCount][m_d];
+
+//    qDebug() << "initSym:" << m_vertexCount;
+
+    for (int i = 0; i < m_vertexCount; i++) {
         bool comps[m_d] = {false};
         combinadicComb(m_k, i, comps);
 
@@ -202,51 +235,18 @@ void Hypersimplex::initSym()
 //        qDebug() << "---------------";
     }
 
-    for (int i = 0; i < vcnt; i++) {
+    for (int i = 0; i < m_vertexCount; i++) {
         m_genSymS2_12[i] = combinadicN(m_d, genSymS2_12_result[i]);
         m_genSymSd_1d[i] = combinadicN(m_d, genSymSd_1d_result[i]);
         m_genSymSd_12[i] = combinadicN(m_d, genSymSd_12_result[i]);
     }
 }
 
-void Hypersimplex::initAsym()
+SymHypers::~SymHypers()
 {
-    int vcnt = m_vertexCount;
-
-    m_genAsymSd_1d = new int[vcnt];
-    m_genAsymSd_12 = new int[vcnt];
-
-    bool genAsymSd_1d_result[vcnt][m_d];
-    bool genAsymSd_12_result[vcnt][m_d];
-
-//    qDebug() << "initAsym:" << vcnt;
-
-    for (int i = 0; i < vcnt; i++) {
-        bool comps[m_d] = {false};
-        combinadicComb(m_k, i, comps);
-
-        std::copy(comps, comps + m_d, genAsymSd_1d_result[i]);
-        std::copy(comps, comps + m_d, genAsymSd_12_result[i]);
-
-        genAsymSd_1d(m_d, genAsymSd_1d_result[i]);
-        genAsymSd_12(m_d, genAsymSd_12_result[i]);
-
-//        qDebug() << "---------------";
-//        qDebug() << "------" << i << "------";
-//        for (int j = 0; j < m_d; j++) {
-//            qDebug() << j << ":" << comps[j]
-//                        << genAsymSd_1d_result[i][j]
-//                           << genAsymSd_12_result[i][j];
-//        }
-//        qDebug() << "---------------";
-//        qDebug() << "TEST:" << combinadicN(m_d, comps);
-//        qDebug() << "---------------";
-    }
-
-    for (int i = 0; i < vcnt; i++) {
-        m_genAsymSd_1d[i] = combinadicN(m_d, genAsymSd_1d_result[i]);
-        m_genAsymSd_12[i] = combinadicN(m_d, genAsymSd_12_result[i]);
-    }
+    delete[] m_genSymS2_12;
+    delete[] m_genSymSd_1d;
+    delete[] m_genSymSd_12;
 }
 
 void Hypersimplex::initGraph()
@@ -322,7 +322,7 @@ void Hypersimplex::permutateVertices(std::string factoredPerm, int *vertices)
     }
 }
 
-std::vector<int *> Hypersimplex::parsePermutation(std::string perm)
+std::vector<int *> AsymHypers::parsePermutation(std::string perm)
 {
     std::vector<int *> ret;
     if (perm[0] == '<') {
@@ -351,16 +351,32 @@ std::vector<int *> Hypersimplex::parsePermutation(std::string perm)
     }
 }
 
-//Vertex::Vertex(int dim, bool *components)
-//    : m_dim(dim)
-//{
-//    m_comp = new bool[dim];
-//    for (int i = 0; i < dim; i++) {
-//        m_comp[i] = components[i];
-//    }
-//}
+std::vector<int *> SymHypers::parsePermutation(std::string perm)
+{
+    std::vector<int *> ret;
+    if (perm[0] == '<') {
+        return ret;
+    }
 
-//Vertex::~Vertex()
-//{
-//    delete[] m_comp;
-//}
+    bool cont = true;
+    while (cont) {
+        if (perm[0] == 'x') {
+            if (perm[1] != '^') {
+                ret.push_back(m_genSymSd_1d);
+            } else {
+                if (perm[2] == '-') {
+                    int times = perm[3] - '0';
+                    while (times > 0) {
+                        ret.push_back(m_genSymSd_1d_inv);
+                    }
+                } else {
+
+                }
+            }
+
+        } else if (perm[0] == 'y') {
+
+        }
+    }
+}
+

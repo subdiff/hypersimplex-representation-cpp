@@ -21,58 +21,99 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <array>
 #include <vector>
 
-//#include <QString>
-
 class Graph;
 class AutGroup;
-//class Vertex;
 
 class Hypersimplex {
 public:
+    virtual ~Hypersimplex();
+protected:
     Hypersimplex(int d, int k);
-    ~Hypersimplex();
-
-private:
-    int m_d;
-    int m_k;
-
-    void initSym();
-    void initAsym();
 
     void initGraph();
     void initGroup();
 
     void startPermutate(std::string factoredPerm, int *result);
     void permutateVertices(std::string factor, int *vertices);
-    std::vector<int *> parsePermutation(std::string perm);
+    virtual std::vector<int *> parsePermutation(std::string perm) = 0;
 
     void calcVtxTrnsSubgroups();
     bool isVtxTrnsSubgroup(std::string sub);
 
+    int m_d;
+    int m_k;
     Graph *m_graph;
     AutGroup *m_group;
     std::vector<std::string> m_vtxTrnsSubgroups;
     bool **m_vertices;
     int m_vertexCount;
 
+private:
+};
+
+class AsymHypers : public Hypersimplex {
+public:
+    AsymHypers(int d, int k);
+    ~AsymHypers();
+
+private:
+    void initSym();
+    void initAsym();
+
+    void initGraph();
+    void initGroup();
+
+//    void startPermutate(std::string factoredPerm, int *result);
+//    void permutateVertices(std::string factor, int *vertices);
+    virtual std::vector<int *> parsePermutation(std::string perm) override;
+
+    void calcVtxTrnsSubgroups();
+    bool isVtxTrnsSubgroup(std::string sub);
+
     /*
      * Associates which combinadic vertex is
      * mapped to which other cominadic vertex.
      */
-    // case d != 2k
     int *m_genAsymSd_1d = nullptr;
     int *m_genAsymSd_1d_inv = nullptr;
     int *m_genAsymSd_12 = nullptr;
-    // case d = 2k
+};
+
+class SymHypers : public Hypersimplex {
+public:
+    SymHypers(int d, int k);
+    ~SymHypers();
+
+private:
+    void initSym();
+    void initAsym();
+
+    void initGraph();
+    void initGroup();
+
+//    void startPermutate(std::string factoredPerm, int *result);
+//    void permutateVertices(std::string factor, int *vertices);
+    virtual std::vector<int *> parsePermutation(std::string perm) override;
+
+    void calcVtxTrnsSubgroups();
+    bool isVtxTrnsSubgroup(std::string sub);
+
+    /*
+     * Associates which combinadic vertex is
+     * mapped to which other cominadic vertex.
+     */
     int *m_genSymS2_12 = nullptr;
     int *m_genSymSd_1d = nullptr;
     int *m_genSymSd_1d_inv = nullptr;
     int *m_genSymSd_12 = nullptr;
 };
 
-//struct Vertex{
-//    Vertex(int dim, bool *components);
-//    ~Vertex();
-//    int m_dim;
-//    bool *m_comp;
-//};
+static Hypersimplex *createHypersimplex(int d, int k)
+{
+    if (d == 2 * k) {
+        return new SymHypers(d, k);
+    } else {
+        return new AsymHypers(d, k);
+    }
+}
+
