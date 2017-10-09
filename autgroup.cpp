@@ -112,8 +112,8 @@ AutGroup::AutGroup(int d, int k)
 //    gap_eval("1+2+3;\n");
 //      gap_eval("g:=FreeGroup(2);\n");
 
-    gap_eval(gapCreateGroupCmd(d, d == 2*k));
-
+    gapCreateGroup(d, d == 2*k);
+    gap_eval("G;\n", true);
 
     createFactoredElements();
 }
@@ -131,10 +131,8 @@ void AutGroup::calcSubgroups()
 void AutGroup::createFactoredElements()
 {
     m_factorizations.clear();
-//    std::string elementList = gap_eval("AsList(G);\n");
 
     gap_eval("hom:=EpimorphismFromFreeGroup(G:names:=[\"x\",\"y\"]);\n", true);
-
     gap_eval("l:=[];\n", false);
     gap_eval("for g in G do Add(l, PreImagesRepresentative(hom,g)); od;\n", false);
 
@@ -164,31 +162,28 @@ void AutGroup::createFactoredElements()
 
 }
 
-std::string AutGroup::gapCreateGroupCmd(int d, bool semi)
+void AutGroup::gapCreateGroup(int d, bool semi)
 {
-    std::string cmd;
-
-    auto sDCmdGenerate = [&cmd, d]() {
-        cmd += "G:=Group((";
+    auto sDCmdGenerate = [d]() {
+        std::string cmd;
+        cmd += "Group((";
         for (int i = 1; i < d; i++) {
             cmd.append(std::to_string(i) + ",");
         }
-        cmd += std::to_string(d) + "),(1,2));\n";
+        return cmd + std::to_string(d) + "),(1,2));\n";
     };
+
+    std::string cmd;
 
     if (semi) {
         // semidirect product S_d with S_2
-        sDCmdGenerate();
-        // TODOX
+        gap_eval("Sd:=" + sDCmdGenerate());
+        gap_eval("S2:=Group((1,2));\n", true);
+        gap_eval("Sdhom:=GroupHomomorphismByFunction(Sd,Sd,function(g) return (1,2)*g*(1,2);end);\n", true);
+        gap_eval("hom:=GroupHomomorphismByImages(S2, AutomorphismGroup(Sd), [(1,2)], [Sdhom]);\n", true);
+        gap_eval("G:=SemidirectProduct(S2, hom, Sd);\n", true);
     } else {
         // S_d
-        sDCmdGenerate();
+        gap_eval("G:=" + sDCmdGenerate());
     }
-    qDebug() << "Create cmd:" << QString(cmd.c_str());
-    return cmd;
 }
-
-//std::string AutGroup::gapCreateGroupCmd(int d, bool semi)
-//{
-
-//}

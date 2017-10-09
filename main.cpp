@@ -27,7 +27,9 @@ int main(int argc, char** argv)
 //    app.setWindowIcon(QIcon::fromTheme(QStringLiteral("plasmadiscover")));
 //    app.setAttribute(Qt::AA_UseHighDpiPixmaps, true);
 
-    Hypersimplex *test_hyper = createHypersimplex(3,1);
+    Hypersimplex *test_hyper = createHypersimplex(4,2);
+
+    delete test_hyper;
 
 //    Hypersimplex *test_hyper2 = new Hypersimplex(5,2);
 

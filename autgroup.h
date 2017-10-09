@@ -37,7 +37,7 @@ public:
     }
 
 private:
-    std::string gapCreateGroupCmd(int d, bool semi);
+    void gapCreateGroup(int d, bool semi);
 //    std::string gapGetAllElements(std::string set);
 
     void calcSubgroups();
@@ -49,15 +49,4 @@ private:
     std::vector<QString> m_elements;
     std::vector<std::string> m_factorizations;
     std::vector<std::string> m_subgroups;
-
-    // TODOX: do this as std container
-//    GroupElement *gens;
 };
-
-//class GroupElement {
-//public:
-//    GroupElement(int d, int k);
-
-//private:
-
-//};
