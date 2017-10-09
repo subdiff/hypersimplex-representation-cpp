@@ -34,6 +34,15 @@ static void genAsymSd_1d(int dim, bool *comp)
     }
     comp[0] = dComp;
 }
+static void genAsymSd_1d_inv(int dim, bool *comp)
+{
+    bool dComp = comp[0];
+
+    for (int i = 0; i < dim - 1; i++) {
+        comp[i] = comp[i+1];
+    }
+    comp[dim - 1] = dComp;
+}
 static void genAsymSd_12(int dim, bool *comp)
 {
     bool tmp = comp[0];
@@ -55,6 +64,15 @@ static void genSymSd_1d(int dim, bool *comp)
         comp[i] = !comp[i-1];
     }
     comp[0] = !dComp;
+}
+static void genSymSd_1d_inv(int dim, bool *comp)
+{
+    bool dComp = comp[0];
+
+    for (int i = 0; i < dim - 1; i++) {
+        comp[i] = !comp[i+1];
+    }
+    comp[dim - 1] = !dComp;
 }
 static void genSymSd_12(int dim, bool *comp)
 {
@@ -137,116 +155,12 @@ Hypersimplex::Hypersimplex(int d, int k)
 
     initGraph();
     initGroup();
-
-    calcVtxTrnsSubgroups();
-    qDebug() << "vtxtrns subs:";
-    for (auto s : m_vtxTrnsSubgroups)
-        qDebug() << QString(s.c_str());
 }
 
 Hypersimplex::~Hypersimplex()
 {
     delete m_graph;
     delete m_group;
-}
-
-AsymHypers::AsymHypers(int d, int k)
-    : Hypersimplex(d, k)
-{
-//    calcVtxTrnsSubgroups();
-//    qDebug() << "vtxtrns subs:";
-//    for (auto s : m_vtxTrnsSubgroups)
-//        qDebug() << QString(s.c_str());
-
-    m_genAsymSd_1d = new int[m_vertexCount];
-    m_genAsymSd_12 = new int[m_vertexCount];
-
-    bool genAsymSd_1d_result[m_vertexCount][m_d];
-    bool genAsymSd_12_result[m_vertexCount][m_d];
-
-    for (int i = 0; i < m_vertexCount; i++) {
-        bool comps[m_d] = {false};
-        combinadicComb(m_k, i, comps);
-
-        std::copy(comps, comps + m_d, genAsymSd_1d_result[i]);
-        std::copy(comps, comps + m_d, genAsymSd_12_result[i]);
-
-        genAsymSd_1d(m_d, genAsymSd_1d_result[i]);
-        genAsymSd_12(m_d, genAsymSd_12_result[i]);
-
-//        qDebug() << "---------------";
-//        qDebug() << "------" << i << "------";
-//        for (int j = 0; j < m_d; j++) {
-//            qDebug() << j << ":" << comps[j]
-//                        << genAsymSd_1d_result[i][j]
-//                           << genAsymSd_12_result[i][j];
-//        }
-//        qDebug() << "---------------";
-//        qDebug() << "TEST:" << combinadicN(m_d, comps);
-//        qDebug() << "---------------";
-    }
-
-    for (int i = 0; i < m_vertexCount; i++) {
-        m_genAsymSd_1d[i] = combinadicN(m_d, genAsymSd_1d_result[i]);
-        m_genAsymSd_12[i] = combinadicN(m_d, genAsymSd_12_result[i]);
-    }
-}
-
-AsymHypers::~AsymHypers()
-{
-    delete[] m_genAsymSd_1d;
-    delete[] m_genAsymSd_12;
-}
-
-SymHypers::SymHypers(int d, int k)
-    : Hypersimplex(d, k)
-{
-    m_genSymS2_12 = new int[m_vertexCount];
-    m_genSymSd_1d = new int[m_vertexCount];
-    m_genSymSd_12 = new int[m_vertexCount];
-
-    bool genSymS2_12_result[m_vertexCount][m_d];
-    bool genSymSd_1d_result[m_vertexCount][m_d];
-    bool genSymSd_12_result[m_vertexCount][m_d];
-
-//    qDebug() << "initSym:" << m_vertexCount;
-
-    for (int i = 0; i < m_vertexCount; i++) {
-        bool comps[m_d] = {false};
-        combinadicComb(m_k, i, comps);
-
-        std::copy(comps, comps + m_d, genSymS2_12_result[i]);
-        std::copy(comps, comps + m_d, genSymSd_1d_result[i]);
-        std::copy(comps, comps + m_d, genSymSd_12_result[i]);
-
-        genSymS2_12(m_d, genSymS2_12_result[i]);
-        genSymSd_1d(m_d, genSymSd_1d_result[i]);
-        genSymSd_12(m_d, genSymSd_12_result[i]);
-
-//        qDebug() << "---------------";
-//        qDebug() << "------" << i << "------";
-//        for (int j = 0; j < m_d; j++) {
-//            qDebug() << j << ":" << comps[j] << genSymS2_12_result[i][j]
-//                        << genSymSd_1d_result[i][j]
-//                           << genSymSd_12_result[i][j];
-//        }
-//        qDebug() << "---------------";
-//        qDebug() << "TEST:" << combinadicN(m_d, comps);
-//        qDebug() << "---------------";
-    }
-
-    for (int i = 0; i < m_vertexCount; i++) {
-        m_genSymS2_12[i] = combinadicN(m_d, genSymS2_12_result[i]);
-        m_genSymSd_1d[i] = combinadicN(m_d, genSymSd_1d_result[i]);
-        m_genSymSd_12[i] = combinadicN(m_d, genSymSd_12_result[i]);
-    }
-}
-
-SymHypers::~SymHypers()
-{
-    delete[] m_genSymS2_12;
-    delete[] m_genSymSd_1d;
-    delete[] m_genSymSd_12;
 }
 
 void Hypersimplex::initGraph()
@@ -291,92 +205,257 @@ bool Hypersimplex::isVtxTrnsSubgroup(std::string sub)
 
 void Hypersimplex::startPermutate(std::string factoredPerm, int *result)
 {
-    for (int i = 1; i < m_vertexCount; i++) {
-        result[i-1] = i;
+    for (int i = 0; i < m_vertexCount; i++) {
+        result[i] = i + 1;
     }
-
     permutateVertices(factoredPerm, result);
-
-//    std::vector<std::string> factors;
-//    // TODOX
-
-//    for (auto factor : factors) {
-//        permutateVertices(factor, result);
-//    }
 }
 
 void Hypersimplex::permutateVertices(std::string factoredPerm, int *vertices)
 {
-    int input[m_vertexCount];
-    std::copy(vertices, vertices + m_vertexCount, input);
-
-    std::vector<int *>parsedFactoredPerm = parsePermutation(factoredPerm);
-    if (parsedFactoredPerm.size() == 0) {
+    if (factoredPerm[0] == '<') {
         return;
     }
 
+//    int input[m_vertexCount];
+//    std::copy(vertices, vertices + m_vertexCount, input);
+
+    std::vector<int *>parsedFactoredPerm = parsePermutation(factoredPerm);
+
+//    for (int i = 0; i < m_vertexCount; i++) {
+//        qDebug() << "Perm:" << parsedFactoredPerm[0][i];
+//    }
+
+//    for (int i = 0; i < m_vertexCount; i++) {
+//        qDebug() << "Perm:" << parsedFactoredPerm[0][i];
+//    }
+
     for (auto factor : parsedFactoredPerm) {
+        int input[m_vertexCount];
+        std::copy(vertices, vertices + m_vertexCount, input);
         for (int i=0; i < m_vertexCount; i++) {
             vertices[factor[i]] = input[i];
         }
     }
+
+//    for (int i = 0; i < m_vertexCount; i++) {
+//        qDebug() << "Perm Vert:" << input[i] << vertices[i];
+//    }
+}
+
+AsymHypers::AsymHypers(int d, int k)
+    : Hypersimplex(d, k)
+{
+    m_genAsymSd_1d = new int[m_vertexCount];
+    m_genAsymSd_1d_inv = new int[m_vertexCount];
+    m_genAsymSd_12 = new int[m_vertexCount];
+
+    bool genAsymSd_1d_result[m_vertexCount][m_d];
+    bool genAsymSd_1d_inv_result[m_vertexCount][m_d];
+    bool genAsymSd_12_result[m_vertexCount][m_d];
+
+    for (int i = 0; i < m_vertexCount; i++) {
+        bool comps[m_d] = {false};
+        combinadicComb(m_k, i, comps);
+
+        std::copy(comps, comps + m_d, genAsymSd_1d_result[i]);
+        std::copy(comps, comps + m_d, genAsymSd_1d_inv_result[i]);
+        std::copy(comps, comps + m_d, genAsymSd_12_result[i]);
+
+        genAsymSd_1d(m_d, genAsymSd_1d_result[i]);
+        genAsymSd_1d_inv(m_d, genAsymSd_1d_inv_result[i]);
+        genAsymSd_12(m_d, genAsymSd_12_result[i]);
+
+//        qDebug() << "---------------";
+//        qDebug() << "------" << i << "------";
+//        for (int j = 0; j < m_d; j++) {
+//            qDebug() << j << ":" << comps[j]
+//                        << genAsymSd_1d_result[i][j]
+//                           << genAsymSd_12_result[i][j];
+//        }
+//        qDebug() << "---------------";
+//        qDebug() << "TEST:" << combinadicN(m_d, comps);
+//        qDebug() << "---------------";
+    }
+
+    for (int i = 0; i < m_vertexCount; i++) {
+        m_genAsymSd_1d[i] = combinadicN(m_d, genAsymSd_1d_result[i]);
+        m_genAsymSd_1d_inv[i] = combinadicN(m_d, genAsymSd_1d_inv_result[i]);
+        m_genAsymSd_12[i] = combinadicN(m_d, genAsymSd_12_result[i]);
+    }
+
+//    int test[m_vertexCount];
+//    qDebug() << "---------";
+//    qDebug() << "---------";
+//    startPermutate(m_group->getFactorizations()[1], test);
+//    qDebug() << "---------";
+//    startPermutate(m_group->getFactorizations()[4], test);
+//    qDebug() << "---------";
+//    startPermutate(m_group->getFactorizations()[2], test);
+//    for (auto v : test)
+//        qDebug() << "TEST PERM1:" << v;
+
+//    startPermutate(m_group->getFactorizations()[2], test);
+//    for (auto v : test)
+//        qDebug() << "TEST PERM2:" << v;
+
+    Hypersimplex::calcVtxTrnsSubgroups();
+    qDebug() << "vtxtrns subs:";
+    for (auto s : m_vtxTrnsSubgroups)
+        qDebug() << QString(s.c_str());
+}
+
+AsymHypers::~AsymHypers()
+{
+    delete[] m_genAsymSd_1d;
+    delete[] m_genAsymSd_1d_inv;
+    delete[] m_genAsymSd_12;
+}
+
+SymHypers::SymHypers(int d, int k)
+    : Hypersimplex(d, k)
+{
+    m_genSymS2_12 = new int[m_vertexCount];
+    m_genSymSd_1d = new int[m_vertexCount];
+    m_genSymSd_1d_inv = new int[m_vertexCount];
+    m_genSymSd_12 = new int[m_vertexCount];
+
+    bool genSymS2_12_result[m_vertexCount][m_d];
+    bool genSymSd_1d_result[m_vertexCount][m_d];
+    bool genSymSd_1d_inv_result[m_vertexCount][m_d];
+    bool genSymSd_12_result[m_vertexCount][m_d];
+
+    for (int i = 0; i < m_vertexCount; i++) {
+        bool comps[m_d] = {false};
+        combinadicComb(m_k, i, comps);
+
+        std::copy(comps, comps + m_d, genSymS2_12_result[i]);
+        std::copy(comps, comps + m_d, genSymSd_1d_result[i]);
+        std::copy(comps, comps + m_d, genSymSd_1d_inv_result[i]);
+        std::copy(comps, comps + m_d, genSymSd_12_result[i]);
+
+        genSymS2_12(m_d, genSymS2_12_result[i]);
+        genSymSd_1d(m_d, genSymSd_1d_result[i]);
+        genSymSd_1d_inv(m_d, genSymSd_1d_inv_result[i]);
+        genSymSd_12(m_d, genSymSd_12_result[i]);
+
+//        qDebug() << "---------------";
+//        qDebug() << "------" << i << "------";
+//        for (int j = 0; j < m_d; j++) {
+//            qDebug() << j << ":" << comps[j] << genSymS2_12_result[i][j]
+//                        << genSymSd_1d_result[i][j]
+//                           << genSymSd_12_result[i][j];
+//        }
+//        qDebug() << "---------------";
+//        qDebug() << "TEST:" << combinadicN(m_d, comps);
+//        qDebug() << "---------------";
+    }
+
+    for (int i = 0; i < m_vertexCount; i++) {
+        m_genSymS2_12[i] = combinadicN(m_d, genSymS2_12_result[i]);
+        m_genSymSd_1d[i] = combinadicN(m_d, genSymSd_1d_result[i]);
+        m_genSymSd_1d_inv[i] = combinadicN(m_d, genSymSd_1d_inv_result[i]);
+        m_genSymSd_12[i] = combinadicN(m_d, genSymSd_12_result[i]);
+    }
+
+    Hypersimplex::calcVtxTrnsSubgroups();
+    qDebug() << "vtxtrns subs:";
+    for (auto s : m_vtxTrnsSubgroups)
+        qDebug() << QString(s.c_str());
+}
+
+SymHypers::~SymHypers()
+{
+    delete[] m_genSymS2_12;
+    delete[] m_genSymSd_1d;
+    delete[] m_genSymSd_1d_inv;
+    delete[] m_genSymSd_12;
 }
 
 std::vector<int *> AsymHypers::parsePermutation(std::string perm)
 {
     std::vector<int *> ret;
-    if (perm[0] == '<') {
-        return ret;
-    }
+    std::size_t pos = 0;
 
-    bool cont = true;
-    while (cont) {
-        if (perm[0] == 'x') {
-            if (perm[1] != '^') {
-                ret.push_back(m_genAsymSd_1d);
+    qDebug() << "parsePermutation1" << QString(perm.c_str());
+
+    qDebug() << m_genAsymSd_1d << m_genAsymSd_1d_inv << m_genAsymSd_12;
+
+    while (pos != std::string::npos) {
+        char symbol = perm[pos];
+        int times = 1;
+        bool inverse = false;
+
+        qDebug() << "IN1" << pos << symbol;
+
+        if (perm[pos + 1] == '^') {
+            if (perm[pos + 2] == '-') {
+                inverse = true;
+                times = perm[pos + 3] - '0';
             } else {
-                if (perm[2] == '-') {
-                    int times = perm[3] - '0';
-                    while (times > 0) {
-                        ret.push_back(m_genAsymSd_1d_inv);
-                    }
-                } else {
-
-                }
+                times = perm[pos + 2] - '0';
             }
-
-        } else if (perm[0] == 'y') {
-
         }
+
+//        qDebug() << "IN2" << inverse << times;
+
+        int *ptr;
+        if (symbol == 'x') {
+            ptr = inverse ? m_genAsymSd_1d_inv : m_genAsymSd_1d;
+        } else {
+            ptr = m_genAsymSd_12;
+        }
+
+        while (times > 0) {
+            ret.push_back(ptr);
+            times--;
+        }
+
+//        qDebug() << "IN3" << ret[0];
+
+        pos = perm.find_first_of("xy", pos + 1);
     }
+
+    for (auto i : ret)
+        qDebug() << "pPRet:" << i;
+
+    return ret;
 }
 
 std::vector<int *> SymHypers::parsePermutation(std::string perm)
 {
     std::vector<int *> ret;
-    if (perm[0] == '<') {
-        return ret;
-    }
+    std::size_t pos = 0;
 
-    bool cont = true;
-    while (cont) {
-        if (perm[0] == 'x') {
-            if (perm[1] != '^') {
-                ret.push_back(m_genSymSd_1d);
+    while (pos != std::string::npos) {
+        char symbol = perm[pos];
+        int times = 1;
+        bool inverse = false;
+
+        if (perm[pos + 1] == '^') {
+            if (perm[pos + 2] == '-') {
+                inverse = true;
+                times = perm[pos + 3] - '0';
             } else {
-                if (perm[2] == '-') {
-                    int times = perm[3] - '0';
-                    while (times > 0) {
-                        ret.push_back(m_genSymSd_1d_inv);
-                    }
-                } else {
-
-                }
+                times = perm[pos + 2] - '0';
             }
-
-        } else if (perm[0] == 'y') {
-
         }
+
+        int *ptr;
+        if (symbol == 'x') {
+            ptr = inverse ? m_genSymSd_1d_inv : m_genSymSd_1d;
+        } else if (symbol == 'y') {
+            ptr = m_genSymSd_12;
+        } else {
+            ptr = m_genSymS2_12;
+        }
+
+        while (times > 0) {
+            ret.push_back(ptr);
+        }
+
+        pos = perm.find_first_of("xy", pos + 1);
     }
+    return ret;
 }
 

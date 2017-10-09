@@ -57,14 +57,6 @@ public:
     ~AsymHypers();
 
 private:
-    void initSym();
-    void initAsym();
-
-    void initGraph();
-    void initGroup();
-
-//    void startPermutate(std::string factoredPerm, int *result);
-//    void permutateVertices(std::string factor, int *vertices);
     virtual std::vector<int *> parsePermutation(std::string perm) override;
 
     void calcVtxTrnsSubgroups();
@@ -85,14 +77,6 @@ public:
     ~SymHypers();
 
 private:
-    void initSym();
-    void initAsym();
-
-    void initGraph();
-    void initGroup();
-
-//    void startPermutate(std::string factoredPerm, int *result);
-//    void permutateVertices(std::string factor, int *vertices);
     virtual std::vector<int *> parsePermutation(std::string perm) override;
 
     void calcVtxTrnsSubgroups();
