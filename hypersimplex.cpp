@@ -131,10 +131,9 @@ static int combinadicN(int d, const bool *comb)
 
 Hypersimplex::Hypersimplex(int d, int k)
     : m_d(d),
-      m_k(k)
+      m_k(k),
+      m_vertexCount(binomCoeff(d, k))
 {
-    int vcnt = binomCoeff(d, k);
-
     qDebug() << "Create H:" << d << k;
 
     if (d == 2 * k) {
@@ -145,6 +144,11 @@ Hypersimplex::Hypersimplex(int d, int k)
 
     initGraph();
     initGroup();
+
+    calcVtxTrnsSubgroups();
+    qDebug() << "vtxtrns subs:";
+    for (auto s : m_vtxTrnsSubgroups)
+        qDebug() << QString(s.c_str());
 }
 
 Hypersimplex::~Hypersimplex()
@@ -162,7 +166,7 @@ Hypersimplex::~Hypersimplex()
 
 void Hypersimplex::initSym()
 {
-    int vcnt = binomCoeff(m_d, m_k);
+    int vcnt = m_vertexCount;
 
     m_genSymS2_12 = new int[vcnt];
     m_genSymSd_1d = new int[vcnt];
@@ -207,7 +211,7 @@ void Hypersimplex::initSym()
 
 void Hypersimplex::initAsym()
 {
-    int vcnt = binomCoeff(m_d, m_k);
+    int vcnt = m_vertexCount;
 
     m_genAsymSd_1d = new int[vcnt];
     m_genAsymSd_12 = new int[vcnt];
@@ -268,7 +272,83 @@ void Hypersimplex::calcVtxTrnsSubgroups()
 
 bool Hypersimplex::isVtxTrnsSubgroup(std::string sub)
 {
+    bool vertexHits[m_vertexCount] = {false};
 
+    for (auto factored : m_group->getFactorizations()) {
+        int res[m_vertexCount];
+        startPermutate(factored, res);
+
+        vertexHits[res[0]] = true;
+    }
+
+    for (auto hit : vertexHits) {
+        if (!hit) {
+            return false;
+        }
+    }
+    return true;
+}
+
+void Hypersimplex::startPermutate(std::string factoredPerm, int *result)
+{
+    for (int i = 1; i < m_vertexCount; i++) {
+        result[i-1] = i;
+    }
+
+    permutateVertices(factoredPerm, result);
+
+//    std::vector<std::string> factors;
+//    // TODOX
+
+//    for (auto factor : factors) {
+//        permutateVertices(factor, result);
+//    }
+}
+
+void Hypersimplex::permutateVertices(std::string factoredPerm, int *vertices)
+{
+    int input[m_vertexCount];
+    std::copy(vertices, vertices + m_vertexCount, input);
+
+    std::vector<int *>parsedFactoredPerm = parsePermutation(factoredPerm);
+    if (parsedFactoredPerm.size() == 0) {
+        return;
+    }
+
+    for (auto factor : parsedFactoredPerm) {
+        for (int i=0; i < m_vertexCount; i++) {
+            vertices[factor[i]] = input[i];
+        }
+    }
+}
+
+std::vector<int *> Hypersimplex::parsePermutation(std::string perm)
+{
+    std::vector<int *> ret;
+    if (perm[0] == '<') {
+        return ret;
+    }
+
+    bool cont = true;
+    while (cont) {
+        if (perm[0] == 'x') {
+            if (perm[1] != '^') {
+                ret.push_back(m_genAsymSd_1d);
+            } else {
+                if (perm[2] == '-') {
+                    int times = perm[3] - '0';
+                    while (times > 0) {
+                        ret.push_back(m_genAsymSd_1d_inv);
+                    }
+                } else {
+
+                }
+            }
+
+        } else if (perm[0] == 'y') {
+
+        }
+    }
 }
 
 //Vertex::Vertex(int dim, bool *components)

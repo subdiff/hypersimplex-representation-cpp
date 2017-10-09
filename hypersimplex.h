@@ -42,6 +42,10 @@ private:
     void initGraph();
     void initGroup();
 
+    void startPermutate(std::string factoredPerm, int *result);
+    void permutateVertices(std::string factor, int *vertices);
+    std::vector<int *> parsePermutation(std::string perm);
+
     void calcVtxTrnsSubgroups();
     bool isVtxTrnsSubgroup(std::string sub);
 
@@ -49,6 +53,7 @@ private:
     AutGroup *m_group;
     std::vector<std::string> m_vtxTrnsSubgroups;
     bool **m_vertices;
+    int m_vertexCount;
 
     /*
      * Associates which combinadic vertex is
@@ -56,10 +61,12 @@ private:
      */
     // case d != 2k
     int *m_genAsymSd_1d = nullptr;
+    int *m_genAsymSd_1d_inv = nullptr;
     int *m_genAsymSd_12 = nullptr;
     // case d = 2k
     int *m_genSymS2_12 = nullptr;
     int *m_genSymSd_1d = nullptr;
+    int *m_genSymSd_1d_inv = nullptr;
     int *m_genSymSd_12 = nullptr;
 };
 

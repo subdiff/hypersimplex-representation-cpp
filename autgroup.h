@@ -32,7 +32,9 @@ public:
         return m_subgroups;
     }
 
-    QString getFactorizations();
+    std::vector<std::string> getFactorizations() const {
+        return m_factorizations;
+    }
 
 private:
     std::string gapCreateGroupCmd(int d, bool semi);

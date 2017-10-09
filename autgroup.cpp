@@ -130,7 +130,7 @@ void AutGroup::calcSubgroups()
 
 void AutGroup::createFactoredElements()
 {
-//    m_factorizations.clear();
+    m_factorizations.clear();
 //    std::string elementList = gap_eval("AsList(G);\n");
 
     gap_eval("hom:=EpimorphismFromFreeGroup(G:names:=[\"x\",\"y\"]);\n", true);
@@ -138,7 +138,28 @@ void AutGroup::createFactoredElements()
     gap_eval("l:=[];\n", false);
     gap_eval("for g in G do Add(l, PreImagesRepresentative(hom,g)); od;\n", false);
 
-    std::string factorlist = gap_eval("l;\n");
+    std::string facs = gap_eval("l;\n");
+    std::size_t start = facs.find('<');
+    if (start == std::string::npos) {
+        return;
+    }
+
+    facs.erase(0, start);
+
+    bool cont = true;
+    while (cont) {
+        std::size_t limit = facs.find(',');
+        if (limit == std::string::npos) {
+            cont = false;
+            limit = facs.find(']') - 1;
+        }
+        std::string fac = facs.substr(0, limit);
+        m_factorizations.push_back(fac);
+
+        facs.erase(0, limit + 2);
+
+//        qDebug() << "TEST" << QString(fac.c_str()) << "|||" << QString(facs.c_str());
+    }
 
 
 }
