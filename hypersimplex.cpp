@@ -181,7 +181,7 @@ void Hypersimplex::calcVtxTrnsSubgroups()
 //    auto sub = m_group->getSubgroups()[97];   //TODOX
     for (auto sub : m_group->getSubgroups()) {
         if (isVtxTrnsSubgroup(sub)) {
-            m_vtxTrnsSubgroups.push_back(sub);
+            m_vtxTrnsSubgroups.push_back(VtxTrnsSubgroup(sub));
         }
     }
 }
@@ -305,7 +305,7 @@ AsymHypers::AsymHypers(int d, int k)
     calcVtxTrnsSubgroups();
     qDebug() << "vtxtrns subs:" << m_vtxTrnsSubgroups.size();
     for (auto s : m_vtxTrnsSubgroups)
-        qDebug() << QString(s.c_str());
+        qDebug() << QString(s.m_gapName.c_str());
 }
 
 AsymHypers::~AsymHypers()
@@ -369,7 +369,7 @@ SymHypers::SymHypers(int d, int k)
     calcVtxTrnsSubgroups();
     qDebug() << "vtxtrns subs:" << m_vtxTrnsSubgroups.size();
     for (auto s : m_vtxTrnsSubgroups)
-        qDebug() << QString(s.c_str());
+        qDebug() << QString(s.m_gapName.c_str());
 }
 
 SymHypers::~SymHypers()

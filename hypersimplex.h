@@ -24,6 +24,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 class Graph;
 class AutGroup;
 
+struct VtxTrnsSubgroup {
+    VtxTrnsSubgroup(std::string sub) : m_gapName(sub) {}
+    std::string m_gapName;
+    std::vector<std::string> m_edgeEquivClasses;
+};
+
 class Hypersimplex {
 public:
     virtual ~Hypersimplex();
@@ -45,11 +51,9 @@ protected:
     int m_k;
     Graph *m_graph;
     AutGroup *m_group;
-    std::vector<std::string> m_vtxTrnsSubgroups;
+    std::vector<VtxTrnsSubgroup> m_vtxTrnsSubgroups;
     bool **m_vertices;
     int m_vertexCount;
-
-private:
 };
 
 class AsymHypers : public Hypersimplex {
