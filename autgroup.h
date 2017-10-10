@@ -34,12 +34,16 @@ public:
         return m_factorizations;
     }
 
+    std::vector<std::string> getSubgroupFactorizations(std::string subgroup) const;
+
 private:
     void gapCreateGroup(int d, bool semi);
 //    std::string gapGetAllElements(std::string set);
 
     void calcSubgroups();
     void createFactoredElements();
+
+    void calcVtxTrnsSubgroups();
 
 //    QString calcEdgeEquivClasses();
 

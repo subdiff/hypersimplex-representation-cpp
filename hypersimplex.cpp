@@ -190,12 +190,22 @@ bool Hypersimplex::isVtxTrnsSubgroup(std::string sub)
 
     qDebug() << "isVtxTrnsSubgroup:" << QString(sub.c_str());
 
-    for (auto factored : m_group->getFactorizations()) {
-        int res[m_vertexCount];
-        startPermutate(factored, res);
+    for (auto sub : m_group->getSubgroups()) {
+        for (auto factored : m_group->getSubgroupFactorizations(sub)) {
+            int res[m_vertexCount];
+            startPermutate(factored, res);
 
-        vertexHits[res[0]] = true;
+            vertexHits[res[0]] = true;
+
+        }
     }
+
+//    for (auto factored : m_group->getFactorizations()) {
+//        int res[m_vertexCount];
+//        startPermutate(factored, res);
+
+//        vertexHits[res[0]] = true;
+//    }
 
     for (auto hit : vertexHits) {
         if (!hit) {

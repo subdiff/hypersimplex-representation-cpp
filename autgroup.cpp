@@ -185,8 +185,47 @@ void AutGroup::createFactoredElements()
 
 //        qDebug() << "TEST" << QString(fac.c_str()) << "|||" << QString(facs.c_str());
     }
+}
 
+std::vector<std::string> AutGroup::getSubgroupFactorizations(std::string subgroup) const
+{
+    std::vector<std::string> ret;
 
+//    gap_eval("hom:=EpimorphismFromFreeGroup(G:names:=[\"x\",\"y\"]);\n", true);
+    gap_eval("l:=[];\n", false);
+
+//    gap_eval("for g in G do Add(l, PreImagesRepresentative(hom,g)); od;\n", false);
+
+    // TODO: This is multiple times Factorization of elements. Find saved factorization in m_factorizations instead?
+    gap_eval("for g in " + subgroup + " do Add(l, Factorization(G,g)); od;\n", false);
+
+    std::string facs = gap_eval("l;\n");
+
+    qDebug() << "FACS" << QString(facs.c_str());
+
+    return ret;
+
+//    std::size_t start = facs.find('<');
+//    if (start == std::string::npos) {
+//        return;
+//    }
+
+//    facs.erase(0, start);
+
+//    bool cont = true;
+//    while (cont) {
+//        std::size_t limit = facs.find(',');
+//        if (limit == std::string::npos) {
+//            cont = false;
+//            limit = facs.find(']') - 1;
+//        }
+//        std::string fac = facs.substr(0, limit);
+//        m_factorizations.push_back(fac);
+
+//        facs.erase(0, limit + 2);
+
+//        qDebug() << "TEST" << QString(fac.c_str()) << "|||" << QString(facs.c_str());
+//    }
 }
 
 void AutGroup::gapCreateGroup(int d, bool semi)
