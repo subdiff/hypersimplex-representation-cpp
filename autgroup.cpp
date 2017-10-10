@@ -126,10 +126,31 @@ AutGroup::~AutGroup()
 
 void AutGroup::calcSubgroups()
 {
+    m_subgroups.clear();
+
     std::string subgroupList = gap_eval("Subs:=AllSubgroups(G);\n", true);
+//    gap_eval("Subs:=AllSubgroups(G);\n", false);
 
-    qDebug() << "calcSubgroups" << QString(subgroupList.c_str());
+    std::size_t limit = 0;
+    bool cont = true;
+    while (cont) {
+        std::size_t pos = subgroupList.find("Group", limit);
+        limit = subgroupList.find("), Group", pos);
 
+//        qDebug()<< "S"<< pos << limit;
+
+        if (limit == std::string::npos) {
+            cont = false;
+            limit = subgroupList.find(") ]\n", pos);
+        }
+        limit++;
+
+        std::string subgr = subgroupList.substr(pos, limit - pos);
+        m_subgroups.push_back(subgr);
+//        qDebug()<< "SUB"<< QString(subgr.c_str());
+    }
+
+//    qDebug() << "calcSubgroups" << QString(subgroupList.c_str());
 }
 
 void AutGroup::createFactoredElements()

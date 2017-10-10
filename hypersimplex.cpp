@@ -427,7 +427,7 @@ std::vector<int *> SymHypers::parsePermutation(std::string perm)
     std::vector<int *> ret;
     std::size_t pos = 0;
 
-    qDebug() << "parsePermutation START" << QString(perm.c_str());
+//    qDebug() << "parsePermutation START" << QString(perm.c_str());
 
     while (pos != std::string::npos) {
         char symbol = perm[pos + 1];
