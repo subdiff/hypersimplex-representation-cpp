@@ -304,7 +304,7 @@ AsymHypers::AsymHypers(int d, int k)
 //    qDebug() << "---------";
 //    startPermutate(m_group->getFactorizations()[4], test);
 
-    Hypersimplex::calcVtxTrnsSubgroups();
+    calcVtxTrnsSubgroups();
     qDebug() << "vtxtrns subs:";
     for (auto s : m_vtxTrnsSubgroups)
         qDebug() << QString(s.c_str());
@@ -368,7 +368,7 @@ SymHypers::SymHypers(int d, int k)
 //    qDebug() << "---------";
 //    startPermutate(m_group->getFactorizations()[38], test);
 
-    Hypersimplex::calcVtxTrnsSubgroups();
+    calcVtxTrnsSubgroups();
     qDebug() << "vtxtrns subs:";
     for (auto s : m_vtxTrnsSubgroups)
         qDebug() << QString(s.c_str());

@@ -59,8 +59,6 @@ public:
 
 private:
     virtual std::vector<int *> parsePermutation(std::string perm) override;
-
-    void calcVtxTrnsSubgroups();
     bool isVtxTrnsSubgroup(std::string sub);
 
     /*
@@ -79,8 +77,6 @@ public:
 
 private:
     virtual std::vector<int *> parsePermutation(std::string perm) override;
-
-    void calcVtxTrnsSubgroups();
     bool isVtxTrnsSubgroup(std::string sub);
 
     /*
