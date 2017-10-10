@@ -29,7 +29,6 @@ int main(int argc, char** argv)
 
     Hypersimplex *test_hyper = createHypersimplex(4,2);
 
-    delete test_hyper;
 
 //    Hypersimplex *test_hyper2 = new Hypersimplex(5,2);
 

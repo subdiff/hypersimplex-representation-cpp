@@ -21,8 +21,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 #include <string>
 
-#include <QString>
-
 class AutGroup {
 public:
     AutGroup(int d, int k);
@@ -41,12 +39,10 @@ private:
 //    std::string gapGetAllElements(std::string set);
 
     void calcSubgroups();
-    QString createFactorization(QString g);
     void createFactoredElements();
 
 //    QString calcEdgeEquivClasses();
 
-    std::vector<QString> m_elements;
     std::vector<std::string> m_factorizations;
     std::vector<std::string> m_subgroups;
 };

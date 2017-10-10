@@ -116,6 +116,7 @@ AutGroup::AutGroup(int d, int k)
     gap_eval("G;\n", true);
 
     createFactoredElements();
+    calcSubgroups();
 }
 
 AutGroup::~AutGroup()
@@ -125,6 +126,9 @@ AutGroup::~AutGroup()
 
 void AutGroup::calcSubgroups()
 {
+    std::string subgroupList = gap_eval("Subs:=AllSubgroups(G);\n", true);
+
+    qDebug() << "calcSubgroups" << QString(subgroupList.c_str());
 
 }
 
@@ -132,9 +136,11 @@ void AutGroup::createFactoredElements()
 {
     m_factorizations.clear();
 
-    gap_eval("hom:=EpimorphismFromFreeGroup(G:names:=[\"x\",\"y\"]);\n", true);
+//    gap_eval("hom:=EpimorphismFromFreeGroup(G:names:=[\"x\",\"y\"]);\n", true);
     gap_eval("l:=[];\n", false);
-    gap_eval("for g in G do Add(l, PreImagesRepresentative(hom,g)); od;\n", false);
+
+//    gap_eval("for g in G do Add(l, PreImagesRepresentative(hom,g)); od;\n", false);
+    gap_eval("for g in G do Add(l, Factorization(G,g)); od;\n", false);
 
     std::string facs = gap_eval("l;\n");
     std::size_t start = facs.find('<');
@@ -172,8 +178,6 @@ void AutGroup::gapCreateGroup(int d, bool semi)
         }
         return cmd + std::to_string(d) + "),(1,2));\n";
     };
-
-    std::string cmd;
 
     if (semi) {
         // semidirect product S_d with S_2

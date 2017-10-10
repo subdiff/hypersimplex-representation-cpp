@@ -188,6 +188,8 @@ bool Hypersimplex::isVtxTrnsSubgroup(std::string sub)
 {
     bool vertexHits[m_vertexCount] = {false};
 
+    qDebug() << "isVtxTrnsSubgroup:" << QString(sub.c_str());
+
     for (auto factored : m_group->getFactorizations()) {
         int res[m_vertexCount];
         startPermutate(factored, res);
@@ -208,6 +210,7 @@ void Hypersimplex::startPermutate(std::string factoredPerm, int *result)
     for (int i = 0; i < m_vertexCount; i++) {
         result[i] = i + 1;
     }
+//    qDebug() << "startPermutate!";
     permutateVertices(factoredPerm, result);
 }
 
@@ -217,8 +220,10 @@ void Hypersimplex::permutateVertices(std::string factoredPerm, int *vertices)
         return;
     }
 
-//    int input[m_vertexCount];
-//    std::copy(vertices, vertices + m_vertexCount, input);
+    int input[m_vertexCount];
+    std::copy(vertices, vertices + m_vertexCount, input);
+
+//    qDebug() << "permutateVertices!" << QString(factoredPerm.c_str());
 
     std::vector<int *>parsedFactoredPerm = parsePermutation(factoredPerm);
 
@@ -287,17 +292,7 @@ AsymHypers::AsymHypers(int d, int k)
 //    int test[m_vertexCount];
 //    qDebug() << "---------";
 //    qDebug() << "---------";
-//    startPermutate(m_group->getFactorizations()[1], test);
-//    qDebug() << "---------";
 //    startPermutate(m_group->getFactorizations()[4], test);
-//    qDebug() << "---------";
-//    startPermutate(m_group->getFactorizations()[2], test);
-//    for (auto v : test)
-//        qDebug() << "TEST PERM1:" << v;
-
-//    startPermutate(m_group->getFactorizations()[2], test);
-//    for (auto v : test)
-//        qDebug() << "TEST PERM2:" << v;
 
     Hypersimplex::calcVtxTrnsSubgroups();
     qDebug() << "vtxtrns subs:";
@@ -358,6 +353,11 @@ SymHypers::SymHypers(int d, int k)
         m_genSymSd_12[i] = combinadicN(m_d, genSymSd_12_result[i]);
     }
 
+//    int test[m_vertexCount];
+//    qDebug() << "---------";
+//    qDebug() << "---------";
+//    startPermutate(m_group->getFactorizations()[38], test);
+
     Hypersimplex::calcVtxTrnsSubgroups();
     qDebug() << "vtxtrns subs:";
     for (auto s : m_vtxTrnsSubgroups)
@@ -377,30 +377,30 @@ std::vector<int *> AsymHypers::parsePermutation(std::string perm)
     std::vector<int *> ret;
     std::size_t pos = 0;
 
-    qDebug() << "parsePermutation1" << QString(perm.c_str());
+//    qDebug() << "parsePermutation1" << QString(perm.c_str());
 
-    qDebug() << m_genAsymSd_1d << m_genAsymSd_1d_inv << m_genAsymSd_12;
+//    qDebug() << m_genAsymSd_1d << m_genAsymSd_1d_inv << m_genAsymSd_12;
 
     while (pos != std::string::npos) {
-        char symbol = perm[pos];
+        char symbol = perm[pos + 1];
         int times = 1;
         bool inverse = false;
 
-        qDebug() << "IN1" << pos << symbol;
+//        qDebug() << "IN1" << pos << symbol;
 
-        if (perm[pos + 1] == '^') {
-            if (perm[pos + 2] == '-') {
+        if (perm[pos + 2] == '^') {
+            if (perm[pos + 3] == '-') {
                 inverse = true;
-                times = perm[pos + 3] - '0';
+                times = perm[pos + 4] - '0';
             } else {
-                times = perm[pos + 2] - '0';
+                times = perm[pos + 3] - '0';
             }
         }
 
 //        qDebug() << "IN2" << inverse << times;
 
         int *ptr;
-        if (symbol == 'x') {
+        if (symbol == '1') {
             ptr = inverse ? m_genAsymSd_1d_inv : m_genAsymSd_1d;
         } else {
             ptr = m_genAsymSd_12;
@@ -413,11 +413,11 @@ std::vector<int *> AsymHypers::parsePermutation(std::string perm)
 
 //        qDebug() << "IN3" << ret[0];
 
-        pos = perm.find_first_of("xy", pos + 1);
+        pos = perm.find('x', pos + 1);
     }
 
-    for (auto i : ret)
-        qDebug() << "pPRet:" << i;
+//    for (auto i : ret)
+//        qDebug() << "pPRet:" << i;
 
     return ret;
 }
@@ -427,35 +427,60 @@ std::vector<int *> SymHypers::parsePermutation(std::string perm)
     std::vector<int *> ret;
     std::size_t pos = 0;
 
+    qDebug() << "parsePermutation START" << QString(perm.c_str());
+
     while (pos != std::string::npos) {
-        char symbol = perm[pos];
+        char symbol = perm[pos + 1];
         int times = 1;
         bool inverse = false;
 
-        if (perm[pos + 1] == '^') {
-            if (perm[pos + 2] == '-') {
+//        qDebug() << "IN1" << pos << symbol;
+
+        if (perm[pos + 2] == '^') {
+            if (perm[pos + 3] == '-') {
                 inverse = true;
-                times = perm[pos + 3] - '0';
+                times = perm[pos + 4] - '0';
             } else {
-                times = perm[pos + 2] - '0';
+                times = perm[pos + 3] - '0';
             }
         }
 
+//        qDebug() << "IN2" << inverse << times;
+
         int *ptr;
-        if (symbol == 'x') {
-            ptr = inverse ? m_genSymSd_1d_inv : m_genSymSd_1d;
-        } else if (symbol == 'y') {
-            ptr = m_genSymSd_12;
+        if (symbol == '3') {
+            while (times > 0) {
+                ret.push_back(m_genSymS2_12);
+                ret.push_back(m_genSymSd_12);
+                times--;
+            }
         } else {
-            ptr = m_genSymS2_12;
+            if (symbol == '1') {
+                ptr = inverse ? m_genSymSd_1d_inv : m_genSymSd_1d;
+            } else {
+                ptr = m_genSymSd_12;
+            }
+            while (times > 0) {
+                ret.push_back(ptr);
+                times--;
+            }
         }
 
-        while (times > 0) {
-            ret.push_back(ptr);
-        }
+//        if (symbol == '1') {
+//            ptr = inverse ? m_genSymSd_1d_inv : m_genSymSd_1d;
+//        } else if (symbol == '2') {
+//            ptr = m_genSymSd_12;
+//        } else {
+//            ptr = m_genSymS2_12;
+//        }
+//        while (times > 0) {
+//            ret.push_back(ptr);
+//        }
 
-        pos = perm.find_first_of("xy", pos + 1);
+        pos = perm.find('x', pos + 1);
     }
+
+//    qDebug() << "parsePermutation END";
     return ret;
 }
 
