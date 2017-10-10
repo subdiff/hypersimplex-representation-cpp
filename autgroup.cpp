@@ -52,7 +52,7 @@ static std::string gap_eval(const std::string _cmd, bool readOutput = true)
 
     std::string ret;
 
-    qDebug() << "GAP Input:" << cmd;
+//    qDebug() << "GAP Input:" << cmd;
     libgap_enter();
     libgap_start_interaction(cmd);
 
@@ -70,7 +70,7 @@ static std::string gap_eval(const std::string _cmd, bool readOutput = true)
     }
     if (out) {
         ret = std::string(out);
-        qDebug() << "GAP Output:" << QString(out);
+//        qDebug() << "GAP Output:" << QString(out);
     }
     libgap_exit();
     libgap_finish_interaction();
@@ -150,7 +150,41 @@ void AutGroup::calcSubgroups()
 //        qDebug()<< "SUB"<< QString(subgr.c_str());
     }
 
+    qDebug() << "-----------------";
+    qDebug() << "-----------------";
+    qDebug() << "m_subgroups Count" << m_subgroups.size();
+    for (auto s : m_subgroups)
+        qDebug() << "m_subgroups" << QString(s.c_str());
+
+    qDebug() << "-----------------";
 //    qDebug() << "calcSubgroups" << QString(subgroupList.c_str());
+}
+
+static std::vector<std::string> splitFactoredElements(std::string elements)
+{
+    std::vector<std::string> ret;
+
+    std::size_t start = elements.find_first_of("<x(");
+    if (start == std::string::npos) {
+        return ret;
+    }
+    elements.erase(0, start);
+
+    bool cont = true;
+    while (cont) {
+        std::size_t limit = elements.find(',');
+        if (limit == std::string::npos) {
+            cont = false;
+            limit = elements.find(']') - 1;
+        }
+        std::string el = elements.substr(0, limit);
+        ret.push_back(el);
+
+        elements.erase(0, limit + 2);
+
+//        qDebug() << "TEST" << QString(fac.c_str()) << "|||" << QString(facs.c_str());
+    }
+    return ret;
 }
 
 void AutGroup::createFactoredElements()
@@ -164,33 +198,39 @@ void AutGroup::createFactoredElements()
     gap_eval("for g in G do Add(l, Factorization(G,g)); od;\n", false);
 
     std::string facs = gap_eval("l;\n");
-    std::size_t start = facs.find('<');
-    if (start == std::string::npos) {
-        return;
-    }
+    m_factorizations = splitFactoredElements(facs);
 
-    facs.erase(0, start);
+    qDebug() << "-----------------";
+    qDebug() << "-----------------";
+    qDebug() << "m_factorizations Count" << m_factorizations.size();
+    for (auto f : m_factorizations)
+        qDebug() << "m_factorizations" << QString(f.c_str());
 
-    bool cont = true;
-    while (cont) {
-        std::size_t limit = facs.find(',');
-        if (limit == std::string::npos) {
-            cont = false;
-            limit = facs.find(']') - 1;
-        }
-        std::string fac = facs.substr(0, limit);
-        m_factorizations.push_back(fac);
+//    std::size_t start = facs.find('<');
+//    if (start == std::string::npos) {
+//        return;
+//    }
 
-        facs.erase(0, limit + 2);
+//    facs.erase(0, start);
 
-//        qDebug() << "TEST" << QString(fac.c_str()) << "|||" << QString(facs.c_str());
-    }
+//    bool cont = true;
+//    while (cont) {
+//        std::size_t limit = facs.find(',');
+//        if (limit == std::string::npos) {
+//            cont = false;
+//            limit = facs.find(']') - 1;
+//        }
+//        std::string fac = facs.substr(0, limit);
+//        m_factorizations.push_back(fac);
+
+//        facs.erase(0, limit + 2);
+
+////        qDebug() << "TEST" << QString(fac.c_str()) << "|||" << QString(facs.c_str());
+//    }
 }
 
 std::vector<std::string> AutGroup::getSubgroupFactorizations(std::string subgroup) const
 {
-    std::vector<std::string> ret;
-
 //    gap_eval("hom:=EpimorphismFromFreeGroup(G:names:=[\"x\",\"y\"]);\n", true);
     gap_eval("l:=[];\n", false);
 
@@ -203,7 +243,7 @@ std::vector<std::string> AutGroup::getSubgroupFactorizations(std::string subgrou
 
     qDebug() << "FACS" << QString(facs.c_str());
 
-    return ret;
+    return splitFactoredElements(facs);
 
 //    std::size_t start = facs.find('<');
 //    if (start == std::string::npos) {

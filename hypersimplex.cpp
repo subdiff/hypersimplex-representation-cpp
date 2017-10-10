@@ -176,7 +176,9 @@ void Hypersimplex::initGroup()
 void Hypersimplex::calcVtxTrnsSubgroups()
 {
     m_vtxTrnsSubgroups.clear();
+    qDebug() << "calcVtxTrnsSubgroups";
 
+//    auto sub = m_group->getSubgroups()[97];   //TODOX
     for (auto sub : m_group->getSubgroups()) {
         if (isVtxTrnsSubgroup(sub)) {
             m_vtxTrnsSubgroups.push_back(sub);
@@ -188,24 +190,20 @@ bool Hypersimplex::isVtxTrnsSubgroup(std::string sub)
 {
     bool vertexHits[m_vertexCount] = {false};
 
-    qDebug() << "isVtxTrnsSubgroup:" << QString(sub.c_str());
+    qDebug() << "isVtxTrnsSubgroup1:" << QString(sub.c_str());
 
-    for (auto sub : m_group->getSubgroups()) {
-        for (auto factored : m_group->getSubgroupFactorizations(sub)) {
-            int res[m_vertexCount];
-            startPermutate(factored, res);
+    for (auto factored : m_group->getSubgroupFactorizations(sub)) {
+        qDebug() << "-----------------";
+        qDebug() << "FACTORED:" << QString(factored.c_str());
 
-            vertexHits[res[0]] = true;
+        int res[m_vertexCount];
+        startPermutate(factored, res);
 
-        }
+        qDebug() << "permutated:" << res[0];
+
+        vertexHits[res[0] - 1] = true;
+
     }
-
-//    for (auto factored : m_group->getFactorizations()) {
-//        int res[m_vertexCount];
-//        startPermutate(factored, res);
-
-//        vertexHits[res[0]] = true;
-//    }
 
     for (auto hit : vertexHits) {
         if (!hit) {
@@ -305,7 +303,7 @@ AsymHypers::AsymHypers(int d, int k)
 //    startPermutate(m_group->getFactorizations()[4], test);
 
     calcVtxTrnsSubgroups();
-    qDebug() << "vtxtrns subs:";
+    qDebug() << "vtxtrns subs:" << m_vtxTrnsSubgroups.size();
     for (auto s : m_vtxTrnsSubgroups)
         qDebug() << QString(s.c_str());
 }
@@ -369,7 +367,7 @@ SymHypers::SymHypers(int d, int k)
 //    startPermutate(m_group->getFactorizations()[38], test);
 
     calcVtxTrnsSubgroups();
-    qDebug() << "vtxtrns subs:";
+    qDebug() << "vtxtrns subs:" << m_vtxTrnsSubgroups.size();
     for (auto s : m_vtxTrnsSubgroups)
         qDebug() << QString(s.c_str());
 }
@@ -513,12 +511,12 @@ std::vector<int *> SymHypers::parsePermutation(std::string perm)
     std::vector<int *> ret;
     std::size_t pos = 0;
 
-    qDebug() << "parsePermutation VORHER" << QString(perm.c_str());
+//    qDebug() << "parsePermutation VORHER" << QString(perm.c_str());
 
 
     perm = prepareForParsing(perm);
 
-    qDebug() << "parsePermutation NACHHER" << QString(perm.c_str());
+//    qDebug() << "parsePermutation NACHHER" << QString(perm.c_str());
 
     while (pos != std::string::npos) {
         char symbol = perm[pos + 1];
