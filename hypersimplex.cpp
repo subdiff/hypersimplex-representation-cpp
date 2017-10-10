@@ -382,10 +382,86 @@ SymHypers::~SymHypers()
     delete[] m_genSymSd_12;
 }
 
+std::string Hypersimplex::prepareForParsing(const std::string &perm)
+{
+    std::string ret;
+    std::size_t pos = 0;
+
+//    qDebug() << "prepareForParsing" << QString(perm.c_str());
+
+    auto inverteParsedPart = [](const std::string part) {
+        std::size_t pos = 0;
+        std::string ret;
+        while (pos != std::string::npos) {
+            std::string cur = part.substr(pos, 2) + '^';
+            if (part[pos + 2] == '^') {
+                if (part[pos + 3] == '-') {
+                    // TODO: only reads in exponents with one digit
+                    cur += part[pos + 4];
+                    pos += 5;
+                } else {
+                    cur += '-';
+                    // TODO: only reads in exponents with one digit
+                    cur += part[pos + 3];
+                    pos += 4;
+                }
+            } else {
+                cur += '1';
+                pos += 2;
+            }
+            ret = cur + ret;
+        }
+        return ret;
+    };
+
+    while (pos != std::string::npos) {
+        std::size_t partEnd;
+        std::string part;
+
+//        qDebug() << "IN" << pos << perm[pos];
+
+        if (perm[pos] == '(') {
+            partEnd = perm.rfind(')');
+            part = prepareForParsing(perm.substr(pos + 1, partEnd - (pos + 1)));
+            int times;
+            bool inverse;
+
+            if (perm[partEnd + 2] == '-') {
+                // TODO: only reads in exponents with one digit
+                times = perm[partEnd + 3] - '0';
+                inverse = true;
+                part = inverteParsedPart(part);
+                pos = partEnd + 4;
+            } else {
+                // TODO: only reads in exponents with one digit
+                times = perm[partEnd + 2] - '0';
+                inverse = false;
+                pos = partEnd + 3;
+            }
+
+            while (times > 0) {
+                ret += part;
+                times--;
+            }
+        } else {
+            partEnd = perm.find('(', pos + 1);
+            if (partEnd != std::string::npos) {
+                partEnd--;
+            }
+            part = perm.substr(pos, partEnd);
+            ret += part;
+            pos = partEnd;
+        }
+    }
+    return ret;
+}
+
 std::vector<int *> AsymHypers::parsePermutation(std::string perm)
 {
     std::vector<int *> ret;
     std::size_t pos = 0;
+
+    perm = prepareForParsing(perm);
 
 //    qDebug() << "parsePermutation1" << QString(perm.c_str());
 
@@ -437,7 +513,12 @@ std::vector<int *> SymHypers::parsePermutation(std::string perm)
     std::vector<int *> ret;
     std::size_t pos = 0;
 
-//    qDebug() << "parsePermutation START" << QString(perm.c_str());
+    qDebug() << "parsePermutation VORHER" << QString(perm.c_str());
+
+
+    perm = prepareForParsing(perm);
+
+    qDebug() << "parsePermutation NACHHER" << QString(perm.c_str());
 
     while (pos != std::string::npos) {
         char symbol = perm[pos + 1];

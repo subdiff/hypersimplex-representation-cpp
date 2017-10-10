@@ -35,6 +35,7 @@ protected:
 
     void startPermutate(std::string factoredPerm, int *result);
     void permutateVertices(std::string factor, int *vertices);
+    std::string prepareForParsing(const std::string &perm);
     virtual std::vector<int *> parsePermutation(std::string perm) = 0;
 
     void calcVtxTrnsSubgroups();
