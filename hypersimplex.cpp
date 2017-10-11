@@ -270,7 +270,7 @@ bool Hypersimplex::isVtxTrnsSubgroup(std::string sub)
 
 //        qDebug() << "permutated:" << res[0];
 
-        vertexHits[res[0] - 1] = true;
+        vertexHits[res[0]] = true;
 
     }
 
@@ -296,6 +296,15 @@ void Hypersimplex::calcEdgeEquivClasses()
             int *vertices = new int[m_vertexCount];
             startPermutate(fac, vertices);
             imgList.push_back(vertices);
+        }
+
+        qDebug() << "imgList:";
+        for (auto img : imgList) {
+            std::string debug;
+            for (int i = 0; i<m_vertexCount; i++) {
+                debug += std::to_string(img[i]) + " ";
+            }
+            qDebug() << QString(debug.c_str());
         }
 
         std::vector<int> vertexHits;
@@ -374,7 +383,7 @@ void Hypersimplex::calcEdgeEquivClasses()
 void Hypersimplex::startPermutate(std::string factoredPerm, int *result)
 {
     for (int i = 0; i < m_vertexCount; i++) {
-        result[i] = i + 1;
+        result[i] = i;
     }
 //    qDebug() << "startPermutate!";
     permutateVertices(factoredPerm, result);
