@@ -55,6 +55,8 @@ protected:
     void initGraph();
     void initGroup();
 
+    bool haveEdge(int v, int w);
+
     void startPermutate(std::string factoredPerm, int *result);
     void permutateVertices(std::string factoredPerm, int *vertices);
     int permutateVertex(std::string factoredPerm, int vertex);

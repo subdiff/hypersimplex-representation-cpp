@@ -24,58 +24,58 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <QDebug>
 
-static void genAsymSd_1d(int dim, bool *comp)
+static void genAsymSd_1d(int dim, int *comp)
 {
-    bool dComp = comp[dim - 1];
+    int dComp = comp[dim - 1];
 
     for (int i = dim - 1; i > 0; i--) {
         comp[i] = comp[i-1];
     }
     comp[0] = dComp;
 }
-static void genAsymSd_1d_inv(int dim, bool *comp)
+static void genAsymSd_1d_inv(int dim, int *comp)
 {
-    bool dComp = comp[0];
+    int dComp = comp[0];
 
     for (int i = 0; i < dim - 1; i++) {
         comp[i] = comp[i+1];
     }
     comp[dim - 1] = dComp;
 }
-static void genAsymSd_12(int dim, bool *comp)
+static void genAsymSd_12(int dim, int *comp)
 {
-    bool tmp = comp[0];
+    int tmp = comp[0];
     comp[0] = comp[1];
     comp[1] = tmp;
 }
 
-static void genSymS2_12(int dim, bool *comp)
+static void genSymS2_12(int dim, int *comp)
 {
     for (int i = 0; i < dim; i++) {
         comp[i] = !comp[i];
     }
 }
-static void genSymSd_1d(int dim, bool *comp)
+static void genSymSd_1d(int dim, int *comp)
 {
-    bool dComp = comp[dim - 1];
+    int dComp = comp[dim - 1];
 
     for (int i = dim - 1; i > 0; i--) {
         comp[i] = !comp[i-1];
     }
     comp[0] = !dComp;
 }
-static void genSymSd_1d_inv(int dim, bool *comp)
+static void genSymSd_1d_inv(int dim, int *comp)
 {
-    bool dComp = comp[0];
+    int dComp = comp[0];
 
     for (int i = 0; i < dim - 1; i++) {
         comp[i] = !comp[i+1];
     }
     comp[dim - 1] = !dComp;
 }
-static void genSymSd_12(int dim, bool *comp)
+static void genSymSd_12(int dim, int *comp)
 {
-    bool tmp = comp[0];
+    int tmp = comp[0];
     comp[0] = comp[1];
     comp[1] = tmp;
     genSymS2_12(dim, comp);
@@ -119,19 +119,21 @@ static int combinadicCombMax(int k, int n, int &max)
  *
  * nInSet starts counting at 0.
  */
-static void combinadicComb(int k, int nInSet, bool *comb)
+static void combinadicComb(int k, int nInSet, int *comb)
 {
-    int n1 = nInSet;
-
     for (int i = k; i > 0; i--) {
         int diff;
-        int combIndex = combinadicCombMax(i, n1, diff);
-        comb[combIndex] = true;
-        n1 = n1 - diff;
+        int combIndex = combinadicCombMax(i, nInSet, diff);
+
+//        if (tempN == 6 || tempN == 1)
+//            qDebug() << "i:" << i << "nInSet:" << nInSet << "combIndex:" << combIndex << "diff:" << diff;
+
+        comb[combIndex] = 1;
+        nInSet = nInSet - diff;
     }
 }
 
-static int combinadicN(int d, const bool *comb)
+static int combinadicN(int d, const int *comb)
 {
     int n = 0;
     int j = 1;
@@ -178,19 +180,42 @@ Hypersimplex::~Hypersimplex()
     delete m_group;
 }
 
+bool Hypersimplex::haveEdge(int v, int w)
+{
+    int vComb[m_d] = {0};
+    int wComb[m_d] = {0};
+
+//    qDebug() << "haveEdge:" << v << w;
+
+    combinadicComb(m_k, v - 1, vComb);
+    combinadicComb(m_k, w - 1, wComb);
+
+    int sum = 0;
+    for (int i = 0; i < m_d; i++) {
+//        qDebug() << "IN" << i <<":" << vComb[i] << wComb[i];
+        sum += vComb[i] && wComb[i];
+    }
+
+    return sum == m_k - 1;
+}
+
 void Hypersimplex::initEdges()
 {
     for (int i = 0; i < m_vertexCount; i++) {
-        for (int j = 0; j < m_vertexCount; j++) {
-            if (i == j) {
-                continue;
+        for (int j = i + 1; j < m_vertexCount; j++) {
+//            Edge edge(i + 1, j + 1);
+//            if (std::any_of(m_edges.begin(), m_edges.end(), [&edge](Edge comp){return comp == edge;}) ) {
+//                continue;
+//            }
+            if (haveEdge(i+1, j+1)) {
+                m_edges.push_back(Edge(i + 1, j + 1));
             }
-            Edge edge(i, j);
-            if (std::any_of(m_edges.begin(), m_edges.end(), [&edge](Edge comp){return comp == edge;}) ) {
-                continue;
-            }
-            m_edges.push_back(edge);
         }
+    }
+
+    qDebug() << "Edges:";
+    for (auto e: m_edges) {
+        qDebug() << "[" << e.v << "--" << e.w << "]";
     }
 }
 
@@ -396,12 +421,12 @@ AsymHypers::AsymHypers(int d, int k)
     m_genAsymSd_1d_inv = new int[m_vertexCount];
     m_genAsymSd_12 = new int[m_vertexCount];
 
-    bool genAsymSd_1d_result[m_vertexCount][m_d];
-    bool genAsymSd_1d_inv_result[m_vertexCount][m_d];
-    bool genAsymSd_12_result[m_vertexCount][m_d];
+    int genAsymSd_1d_result[m_vertexCount][m_d];
+    int genAsymSd_1d_inv_result[m_vertexCount][m_d];
+    int genAsymSd_12_result[m_vertexCount][m_d];
 
     for (int i = 0; i < m_vertexCount; i++) {
-        bool comps[m_d] = {false};
+        int comps[m_d] = {0};
         combinadicComb(m_k, i, comps);
 
         std::copy(comps, comps + m_d, genAsymSd_1d_result[i]);
@@ -458,14 +483,19 @@ SymHypers::SymHypers(int d, int k)
     m_genSymSd_1d_inv = new int[m_vertexCount];
     m_genSymSd_12 = new int[m_vertexCount];
 
-    bool genSymS2_12_result[m_vertexCount][m_d];
-    bool genSymSd_1d_result[m_vertexCount][m_d];
-    bool genSymSd_1d_inv_result[m_vertexCount][m_d];
-    bool genSymSd_12_result[m_vertexCount][m_d];
+    int genSymS2_12_result[m_vertexCount][m_d];
+    int genSymSd_1d_result[m_vertexCount][m_d];
+    int genSymSd_1d_inv_result[m_vertexCount][m_d];
+    int genSymSd_12_result[m_vertexCount][m_d];
 
     for (int i = 0; i < m_vertexCount; i++) {
-        bool comps[m_d] = {false};
+        int comps[m_d] = {0};
         combinadicComb(m_k, i, comps);
+
+//        qDebug() << "---------------";
+//        qDebug() << "vertex:" << i;
+//        for (int i = 0; i < m_d; i++)
+//            qDebug() << comps[i];
 
         std::copy(comps, comps + m_d, genSymS2_12_result[i]);
         std::copy(comps, comps + m_d, genSymSd_1d_result[i]);
