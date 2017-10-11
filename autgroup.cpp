@@ -260,7 +260,7 @@ std::vector<std::string> AutGroup::getSubgroupFactorizations(std::string subgrou
 
     std::string facs = gap_eval("l;\n");
 
-    qDebug() << "FACS" << QString(facs.c_str());
+//    qDebug() << "FACS" << QString(facs.c_str());
 
     return splitFactoredElements(facs);
 

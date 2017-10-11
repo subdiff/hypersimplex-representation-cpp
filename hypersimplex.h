@@ -32,8 +32,10 @@ struct Edge {
 };
 
 struct EdgeEquivClass {
-    EdgeEquivClass(std::vector<Edge> edges) : m_edges(edges) {}
+    EdgeEquivClass(std::vector<Edge> edges);
     std::vector<Edge> m_edges;
+    void sortEdges();
+    int calcMultiplicity();
     int multiplicity;
 };
 
