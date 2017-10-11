@@ -16,7 +16,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************/
 
-#include "graph.h"
 #include "autgroup.h"
 
 #include "hypersimplex.h"
@@ -171,13 +170,11 @@ Hypersimplex::Hypersimplex(int d, int k)
     qDebug() << "Create H:" << d << k;
 
     initEdges();
-    initGraph();
     initGroup();
 }
 
 Hypersimplex::~Hypersimplex()
 {
-    delete m_graph;
     delete m_group;
 }
 
@@ -195,11 +192,6 @@ void Hypersimplex::initEdges()
             m_edges.push_back(edge);
         }
     }
-}
-
-void Hypersimplex::initGraph()
-{
-    m_graph = new Graph(m_d);
 }
 
 void Hypersimplex::initGroup()

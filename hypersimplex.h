@@ -21,7 +21,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <array>
 #include <vector>
 
-class Graph;
 class AutGroup;
 
 struct Edge {
@@ -69,7 +68,6 @@ protected:
 
     int m_d;
     int m_k;
-    Graph *m_graph;
     AutGroup *m_group;
     std::vector<VtxTrnsSubgroup> m_vtxTrnsSubgroups;
     std::vector<Edge> m_edges;

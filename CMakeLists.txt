@@ -34,7 +34,6 @@ MESSAGE( STATUS "variable is now: " ${LIB_GAP} ) # TODOX
 set( ALL_SRCS
      main.cpp
      hypersimplex.cpp
-     graph.cpp
      autgroup.cpp
      )
 
