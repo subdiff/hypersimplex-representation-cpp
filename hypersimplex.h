@@ -56,6 +56,7 @@ protected:
     void initEdges();
     void initGraph();
     void initGroup();
+    void initCalculations();
 
     bool haveEdge(int v, int w);
 

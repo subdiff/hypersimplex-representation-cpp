@@ -252,6 +252,45 @@ void Hypersimplex::initGroup()
     m_group = new AutGroup(m_d, m_k);
 }
 
+void Hypersimplex::initCalculations()
+{
+    qDebug() << "---------------";
+    calcVtxTrnsSubgroups();
+    qDebug() << "---------------";
+    qDebug() << "---------------";
+    qDebug() << "vtxtrns subs:" << m_vtxTrnsSubgroups.size();
+    for (auto s : m_vtxTrnsSubgroups)
+        qDebug() << QString(s->m_gapName.c_str());
+
+    qDebug() << "---------------";
+    qDebug() << "---------------";
+    calcEdgeEquivClasses();
+
+    qDebug() << "---------------";
+    qDebug() << "---------------";
+    qDebug() << "EECs of subgroups:";
+    for (auto s : m_vtxTrnsSubgroups) {
+        qDebug() << "---------------";
+        qDebug() << QString(s->m_gapName.c_str());
+
+        qDebug() << "EEC count:" << s->m_edgeEquivClasses.size();
+        int index = 1;
+        for (auto eec : s->m_edgeEquivClasses) {
+            std::string debug = "class " + std::to_string(index) + " (mult " + std::to_string(eec->multiplicity) + ")" + ": ";
+            std::vector<Edge>::const_iterator it = eec->m_edges.cbegin();
+            while (it != eec->m_edges.cend()) {
+                if (it != eec->m_edges.cbegin()) {
+                    debug +=  + " | ";
+                }
+                debug += std::to_string(it->v) + "--" + std::to_string(it->w);
+                it++;
+            }
+            qDebug() << debug.c_str();
+            index++;
+        }
+    }
+}
+
 void Hypersimplex::calcVtxTrnsSubgroups()
 {
     qDebug() << "calcVtxTrnsSubgroups";
@@ -538,29 +577,7 @@ AsymHypers::AsymHypers(int d, int k)
 //    qDebug() << "---------";
 //    startPermutate(m_group->getFactorizations()[4], test);
 
-    qDebug() << "---------------";
-    calcVtxTrnsSubgroups();
-    qDebug() << "---------------";
-    qDebug() << "---------------";
-    qDebug() << "vtxtrns subs:" << m_vtxTrnsSubgroups.size();
-    for (auto s : m_vtxTrnsSubgroups)
-        qDebug() << QString(s->m_gapName.c_str());
-
-    qDebug() << "---------------";
-    qDebug() << "---------------";
-    calcEdgeEquivClasses();
-    qDebug() << "EECs of subgroups:";
-    for (auto s : m_vtxTrnsSubgroups) {
-        qDebug() << QString(s->m_gapName.c_str());
-
-        qDebug() << "EEC count:" << s->m_edgeEquivClasses.size();
-        for (auto eec : s->m_edgeEquivClasses) {
-            qDebug() << "eec:" << eec->multiplicity;
-            for (auto edge : eec->m_edges) {
-                qDebug() << "v:" << edge.v << "w:" << edge.w;
-            }
-        }
-    }
+    initCalculations();
 }
 
 AsymHypers::~AsymHypers()
@@ -621,46 +638,12 @@ SymHypers::SymHypers(int d, int k)
         m_genSymSd_12[i] = combinadicN(m_d, genSymSd_12_result[i]);
     }
 
+    initCalculations();
+
 //    int test[m_vertexCount];
 //    qDebug() << "---------";
 //    qDebug() << "---------";
 //    startPermutate(m_group->getFactorizations()[38], test);
-
-    qDebug() << "---------------";
-    calcVtxTrnsSubgroups();
-    qDebug() << "---------------";
-    qDebug() << "---------------";
-    qDebug() << "vtxtrns subs:" << m_vtxTrnsSubgroups.size();
-    for (auto s : m_vtxTrnsSubgroups)
-        qDebug() << QString(s->m_gapName.c_str());
-
-    qDebug() << "---------------";
-    qDebug() << "---------------";
-    calcEdgeEquivClasses();
-
-    qDebug() << "---------------";
-    qDebug() << "---------------";
-    qDebug() << "EECs of subgroups:";
-    for (auto s : m_vtxTrnsSubgroups) {
-        qDebug() << "---------------";
-        qDebug() << QString(s->m_gapName.c_str());
-
-        qDebug() << "EEC count:" << s->m_edgeEquivClasses.size();
-        int index = 1;
-        for (auto eec : s->m_edgeEquivClasses) {
-            std::string debug = "class " + std::to_string(index) + " (mult " + std::to_string(eec->multiplicity) + ")" + ": ";
-            std::vector<Edge>::const_iterator it = eec->m_edges.cbegin();
-            while (it != eec->m_edges.cend()) {
-                if (it != eec->m_edges.cbegin()) {
-                    debug +=  + " | ";
-                }
-                debug += std::to_string(it->v) + "--" + std::to_string(it->w);
-                it++;
-            }
-            qDebug() << debug.c_str();
-            index++;
-        }
-    }
 }
 
 SymHypers::~SymHypers()
