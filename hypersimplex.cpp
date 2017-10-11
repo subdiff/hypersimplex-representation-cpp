@@ -430,16 +430,15 @@ void Hypersimplex::calcEdgeEquivClasses()
             }
         }
 
-        // TODOX: sort eecs
-
-        for (auto c : eecs)
+        for (auto c : eecs) {
+            std::sort (c->m_edges.begin(), c->m_edges.end(), [](Edge e, Edge l) { return e.v < l.v || e.v == l.v && e.w <= l.w; });
             c->calcMultiplicity();
+        }
 
+        for_each(sub->m_edgeEquivClasses.begin(), sub->m_edgeEquivClasses.end(), [](EdgeEquivClass *ptr){delete ptr;});
         sub->m_edgeEquivClasses = eecs;
 
-        for (auto p : imgList) {
-            delete[] p;
-        }
+        for_each(imgList.begin(), imgList.end(), [](int *ptr){delete ptr;});
 
 //        qDebug() << "######";
 //        qDebug() << "FINAL EECs:";
@@ -662,7 +661,6 @@ SymHypers::SymHypers(int d, int k)
             index++;
         }
     }
-
 }
 
 SymHypers::~SymHypers()
