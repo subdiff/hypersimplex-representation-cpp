@@ -638,16 +638,28 @@ SymHypers::SymHypers(int d, int k)
     qDebug() << "---------------";
     qDebug() << "---------------";
     calcEdgeEquivClasses();
+
+    qDebug() << "---------------";
+    qDebug() << "---------------";
     qDebug() << "EECs of subgroups:";
     for (auto s : m_vtxTrnsSubgroups) {
+        qDebug() << "---------------";
         qDebug() << QString(s->m_gapName.c_str());
 
         qDebug() << "EEC count:" << s->m_edgeEquivClasses.size();
+        int index = 1;
         for (auto eec : s->m_edgeEquivClasses) {
-            qDebug() << "eec:" << eec->multiplicity;
-            for (auto edge : eec->m_edges) {
-                qDebug() << "v:" << edge.v << "w:" << edge.w;
+            std::string debug = "class " + std::to_string(index) + " (mult " + std::to_string(eec->multiplicity) + ")" + ": ";
+            std::vector<Edge>::const_iterator it = eec->m_edges.cbegin();
+            while (it != eec->m_edges.cend()) {
+                if (it != eec->m_edges.cbegin()) {
+                    debug +=  + " | ";
+                }
+                debug += std::to_string(it->v) + "--" + std::to_string(it->w);
+                it++;
             }
+            qDebug() << debug.c_str();
+            index++;
         }
     }
 
