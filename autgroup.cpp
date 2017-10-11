@@ -164,6 +164,8 @@ static std::vector<std::string> splitFactoredElements(std::string elements)
 {
     std::vector<std::string> ret;
 
+//    qDebug() << "FACS DO" << elements.c_str();
+
     std::size_t start = elements.find_first_of("<x(");
     if (start == std::string::npos) {
         return ret;
@@ -184,6 +186,11 @@ static std::vector<std::string> splitFactoredElements(std::string elements)
 
 //        qDebug() << "TEST" << QString(fac.c_str()) << "|||" << QString(facs.c_str());
     }
+
+//    std::string debug;
+//    for (auto s : ret)
+//        debug += s;
+//    qDebug() << "FACS ->" << debug.c_str();
     return ret;
 }
 

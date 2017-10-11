@@ -307,11 +307,14 @@ bool Hypersimplex::isVtxTrnsSubgroup(std::string sub)
 {
     bool vertexHits[m_vertexCount] = {false};
 
+    if (sub != "Group([ (1,2)(3,5)(4,6) ])")
+        return false;
+
     qDebug() << "test:" << QString(sub.c_str());
 
     for (auto factored : m_group->getSubgroupFactorizations(sub)) {
-//        qDebug() << "-----------------";
-//        qDebug() << "FACTORED:" << QString(factored.c_str());
+        qDebug() << "-----------------";
+        qDebug() << "FACTORED:" << QString(factored.c_str());
 
         int res[m_vertexCount];
         startPermutate(factored, res);
@@ -350,12 +353,12 @@ void Hypersimplex::calcEdgeEquivClasses()
             int *vertices = new int[m_vertexCount];
             startPermutate(fac, vertices);
 
-            qDebug() << "Perm" << QString(fac.c_str());
-            std::string debug;
-            for (int i = 0; i<m_vertexCount; i++) {
-                debug += std::to_string(vertices[i]) + " ";
-            }
-            qDebug() << QString(debug.c_str());
+//            qDebug() << "Perm" << QString(fac.c_str());
+//            std::string debug;
+//            for (int i = 0; i<m_vertexCount; i++) {
+//                debug += std::to_string(vertices[i]) + " ";
+//            }
+//            qDebug() << QString(debug.c_str());
 
             imgList.push_back(vertices);
         }
@@ -494,6 +497,7 @@ void Hypersimplex::calcEdgeEquivClasses()
 
 void Hypersimplex::startPermutate(std::string factoredPerm, int *result)
 {
+//    qDebug() << "startPermutate";
     for (int i = 0; i < m_vertexCount; i++) {
         result[i] = i;
     }
@@ -508,6 +512,8 @@ void Hypersimplex::permutateVertices(std::string factoredPerm, int *vertices)
 
     int input[m_vertexCount];
     std::copy(vertices, vertices + m_vertexCount, input);
+
+//    qDebug() << "permutateVertices";
 
     std::vector<int *>parsedFactoredPerm = parsePermutation(factoredPerm);
 
@@ -659,7 +665,7 @@ std::string Hypersimplex::prepareForParsing(const std::string &perm)
     std::string ret;
     std::size_t pos = 0;
 
-//    qDebug() << "prepareForParsing" << QString(perm.c_str());
+    qDebug() << "prepareForParsing" << QString(perm.c_str());
 
     auto inverteParsedPart = [](const std::string part) {
         std::size_t pos = 0;
@@ -690,7 +696,7 @@ std::string Hypersimplex::prepareForParsing(const std::string &perm)
         std::size_t partEnd;
         std::string part;
 
-//        qDebug() << "IN" << pos << perm[pos];
+//        qDebug() << "IN" << pos << perm[pos] << ret.c_str();
 
         if (perm[pos] == '(') {
             partEnd = perm.rfind(')');
@@ -717,9 +723,6 @@ std::string Hypersimplex::prepareForParsing(const std::string &perm)
             }
         } else {
             partEnd = perm.find('(', pos + 1);
-            if (partEnd != std::string::npos) {
-                partEnd--;
-            }
             part = perm.substr(pos, partEnd);
             ret += part;
             pos = partEnd;
