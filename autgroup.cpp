@@ -187,6 +187,19 @@ static std::vector<std::string> splitFactoredElements(std::string elements)
     return ret;
 }
 
+std::vector<std::string> AutGroup::getFactorizations(std::string group) const
+{
+    if (group == "") {
+        return m_factorizations;
+    }
+
+    gap_eval("l:=[];\n", false);
+    gap_eval("for g in " + group + " do Add(l, Factorization(G,g)); od;\n", false);
+
+    std::string facs = gap_eval("l;\n");
+    return splitFactoredElements(facs);
+}
+
 void AutGroup::createFactoredElements()
 {
     m_factorizations.clear();
@@ -227,6 +240,12 @@ void AutGroup::createFactoredElements()
 
 ////        qDebug() << "TEST" << QString(fac.c_str()) << "|||" << QString(facs.c_str());
 //    }
+}
+
+std::string AutGroup::getFactorization(std::string element) const
+{
+    // TODO: Faster if we use the list elements.
+    return gap_eval("Factorization(G, " + element + " ));\n", true);
 }
 
 std::vector<std::string> AutGroup::getSubgroupFactorizations(std::string subgroup) const

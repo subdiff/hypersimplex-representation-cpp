@@ -36,7 +36,6 @@ set( ALL_SRCS
      hypersimplex.cpp
      graph.cpp
      autgroup.cpp
-     vertex.cpp
      )
 
 qt5_add_resources( ALL_SRCS

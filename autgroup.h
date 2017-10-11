@@ -30,9 +30,9 @@ public:
         return m_subgroups;
     }
 
-    std::vector<std::string> getFactorizations() const {
-        return m_factorizations;
-    }
+    std::string getFactorization(std::string element) const;
+
+    std::vector<std::string> getFactorizations(std::string group = "") const;
 
     std::vector<std::string> getSubgroupFactorizations(std::string subgroup) const;
 

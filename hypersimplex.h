@@ -24,10 +24,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 class Graph;
 class AutGroup;
 
+struct Edge {
+    Edge(int _v, int _w);
+    inline bool operator==(Edge const& b) { return v == b.v && w == b.w; }
+    inline bool operator!=(Edge const& b){ return !(*this == b); }
+    inline bool has(int vertex) { return v == vertex || w == vertex; }
+    int v, w;
+};
+
+struct EdgeEquivClass {
+    EdgeEquivClass(std::vector<Edge> edges) : m_edges(edges) {}
+    std::vector<Edge> m_edges;
+    int multiplicity;
+};
+
 struct VtxTrnsSubgroup {
-    VtxTrnsSubgroup(std::string sub) : m_gapName(sub) {}
+    VtxTrnsSubgroup(std::string sub, AutGroup *parent);
     std::string m_gapName;
-    std::vector<std::string> m_edgeEquivClasses;
+    AutGroup *m_parent;
+    std::vector<std::string> m_facEl;
+    std::vector<EdgeEquivClass> m_edgeEquivClasses;
 };
 
 class Hypersimplex {
@@ -36,23 +52,27 @@ public:
 protected:
     Hypersimplex(int d, int k);
 
+    void initEdges();
     void initGraph();
     void initGroup();
 
     void startPermutate(std::string factoredPerm, int *result);
-    void permutateVertices(std::string factor, int *vertices);
+    void permutateVertices(std::string factoredPerm, int *vertices);
+    int permutateVertex(std::string factoredPerm, int vertex);
     std::string prepareForParsing(const std::string &perm);
     virtual std::vector<int *> parsePermutation(std::string perm) = 0;
 
     void calcVtxTrnsSubgroups();
     bool isVtxTrnsSubgroup(std::string sub);
 
+    void calcEdgeEquivClasses();
+
     int m_d;
     int m_k;
     Graph *m_graph;
     AutGroup *m_group;
     std::vector<VtxTrnsSubgroup> m_vtxTrnsSubgroups;
-    bool **m_vertices;
+    std::vector<Edge> m_edges;
     int m_vertexCount;
 };
 
