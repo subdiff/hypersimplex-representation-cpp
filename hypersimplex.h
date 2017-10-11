@@ -36,7 +36,7 @@ struct EdgeEquivClass {
     std::vector<Edge> m_edges;
     void sortEdges();
     int calcMultiplicity();
-    int multiplicity;
+    int multiplicity = 0;
 };
 
 struct VtxTrnsSubgroup {
@@ -44,7 +44,7 @@ struct VtxTrnsSubgroup {
     std::string m_gapName;
     AutGroup *m_parent;
     std::vector<std::string> m_facEl;
-    std::vector<EdgeEquivClass> m_edgeEquivClasses;
+    std::vector<EdgeEquivClass *> m_edgeEquivClasses;
 };
 
 class Hypersimplex {
@@ -73,7 +73,7 @@ protected:
     int m_d;
     int m_k;
     AutGroup *m_group;
-    std::vector<VtxTrnsSubgroup> m_vtxTrnsSubgroups;
+    std::vector<VtxTrnsSubgroup *> m_vtxTrnsSubgroups;
     std::vector<Edge> m_edges;
     int m_vertexCount;
 };

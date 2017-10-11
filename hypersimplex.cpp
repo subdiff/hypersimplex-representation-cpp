@@ -178,18 +178,18 @@ int EdgeEquivClass::calcMultiplicity()
     int mult = 0;
     auto v = m_edges[0].v;
 
-    qDebug() << "calcMultiplicity" << v;
-    std::string debug;
-    for (auto e : m_edges)
-        debug += std::to_string(e.v) + std::to_string(e.w) + "|";
-    qDebug() << (debug + std::to_string(multiplicity)).c_str();
+//    qDebug() << "calcMultiplicity" << v;
+//    std::string debug;
+//    for (auto e : m_edges)
+//        debug += std::to_string(e.v) + std::to_string(e.w) + "|";
+//    qDebug() << (debug + std::to_string(multiplicity)).c_str();
 
     for (auto e : m_edges) {
-        qDebug() << "IN" << e.v << e.w;
+//        qDebug() << "IN" << e.v << e.w;
         if (e.has(v)) {
             mult++;
         }
-        qDebug() << "OUT" << mult;
+//        qDebug() << "OUT" << mult;
     }
     multiplicity = mult;
 
@@ -254,13 +254,12 @@ void Hypersimplex::initGroup()
 
 void Hypersimplex::calcVtxTrnsSubgroups()
 {
-    m_vtxTrnsSubgroups.clear();
     qDebug() << "calcVtxTrnsSubgroups";
 
 //    auto sub = m_group->getSubgroups()[97];   //TODOX
     for (auto sub : m_group->getSubgroups()) {
         if (isVtxTrnsSubgroup(sub)) {
-            m_vtxTrnsSubgroups.push_back(VtxTrnsSubgroup(sub, m_group));
+            m_vtxTrnsSubgroups.push_back(new VtxTrnsSubgroup(sub, m_group));
         }
     }
 }
@@ -294,13 +293,13 @@ bool Hypersimplex::isVtxTrnsSubgroup(std::string sub)
 
 void Hypersimplex::calcEdgeEquivClasses()
 {
-//    qDebug() << "calcEdgeEquivClasses!";
+    qDebug() << "calcEdgeEquivClasses!";
 
-    auto sub = &m_vtxTrnsSubgroups[0];
-//    for (auto sub : m_vtxTrnsSubgroups) {
+//    auto sub = m_vtxTrnsSubgroups[0];
+    for (auto sub : m_vtxTrnsSubgroups) {
         qDebug() << QString(sub->m_gapName.c_str());
 
-        std::vector<EdgeEquivClass> eecs;
+        std::vector<EdgeEquivClass *> eecs;
 
         std::vector<int*> imgList;
 
@@ -353,16 +352,15 @@ void Hypersimplex::calcEdgeEquivClasses()
              * to a vertex whose edges already have been tested
              */
             if (testOnHit(vertex)) {
-                qDebug() << "HIT" << vertex;
+//                qDebug() << "HIT" << vertex;
                 continue;
             }
-            qDebug() << "new" << vertex;
             vertexHits.push_back(vertex);
             std::vector<Edge> vertexEdges = getEdgesToVertex(vertex);
 
-            qDebug() << "vertexEdges";
-            for (auto e: vertexEdges)
-                qDebug() << e.v << e.w;
+//            qDebug() << "vertexEdges";
+//            for (auto e: vertexEdges)
+//                qDebug() << e.v << e.w;
 
             for (auto vEdge : vertexEdges) {
                 std::vector<Edge> edgeImgs;
@@ -378,49 +376,46 @@ void Hypersimplex::calcEdgeEquivClasses()
                     edgeImgs.push_back(edgeImg(vEdge, el));
                 }
 
-                qDebug() << "edgeImgs";
-                for (auto e: edgeImgs)
-                    qDebug() << e.v << e.w;
+//                qDebug() << "edgeImgs";
+//                for (auto e: edgeImgs)
+//                    qDebug() << e.v << e.w;
 
 
                 auto setToClass = [&eecs](std::vector<Edge> edgeImgs) {
                     for (auto c : eecs) {
-                        for (auto e : c.m_edges) {
-                            if (std::any_of(edgeImgs.begin(), edgeImgs.end(), [&e](Edge comp){return comp == e;})) {
-                                c.m_edges.insert(c.m_edges.end(), edgeImgs.begin(), edgeImgs.end());
+                        for (auto e : c->m_edges) {
+                            auto hasEdge = [](std::vector<Edge> &edges, Edge &e) {
+                                return std::any_of(edges.begin(), edges.end(), [&e](Edge comp){return comp == e;});
+                            };
+
+                            if (hasEdge(edgeImgs, e)) {
+                                for (auto eI : edgeImgs) {
+                                    if (!hasEdge(c->m_edges, eI)) {
+                                        c->m_edges.push_back(eI);
+                                    }
+                                }
                                 return;
                             }
                         }
                     }
                     // class is not yet listed in class_list
-                    auto eec = EdgeEquivClass(edgeImgs);
-
-//                    qDebug() << "###";
-//                    qDebug() << "Neue eec!";
-//                    for (auto e : eec.m_edges)
-//                        qDebug() << e.v << e.w;
-//                    qDebug() << "###";
-
+                    auto eec = new EdgeEquivClass(edgeImgs);
                     eecs.push_back(eec);
+
+//                    std::string debug;
+//                    for (auto e : eec->m_edges)
+//                        debug += std::to_string(e.v) + std::to_string(e.w) + "|";
+//                    qDebug() << (debug + std::to_string(eec->multiplicity)).c_str();
+//                    qDebug() << "###";
                 };
                 setToClass(edgeImgs);
-
-//                qDebug() << "######";
-//                qDebug() << "BISHERIGE EECs:";
-//                for (auto c : eecs) {
-//                    std::string debug;
-//                    for (auto e : c.m_edges)
-//                        debug += std::to_string(e.v) + std::to_string(e.w) + "|";
-//                    qDebug() << debug.c_str();
-//                }
-//                qDebug() << "######";
             }
         }
 
-        // sort eecs
+        // TODOX: sort eecs
 
         for (auto c : eecs)
-            c.calcMultiplicity();
+            c->calcMultiplicity();
 
         sub->m_edgeEquivClasses = eecs;
 
@@ -428,17 +423,17 @@ void Hypersimplex::calcEdgeEquivClasses()
             delete[] p;
         }
 
-        qDebug() << "######";
-        qDebug() << "FINALE EECs:";
-        for (auto c : sub->m_edgeEquivClasses) {
-            std::string debug;
-            for (auto e : c.m_edges)
-                debug += std::to_string(e.v) + std::to_string(e.w) + "|";
-            qDebug() << (debug + std::to_string(c.multiplicity)).c_str();
-        }
-        qDebug() << "######";
-//    }
+//        qDebug() << "######";
+//        qDebug() << "FINAL EECs:";
+//        for (auto c : sub->m_edgeEquivClasses) {
+//            std::string debug;
+//            for (auto e : c->m_edges)
+//                debug += std::to_string(e.v) + std::to_string(e.w) + "|";
+//            qDebug() << (debug + std::to_string(c->multiplicity)).c_str();
+//        }
+//        qDebug() << "######";
 
+    }
 }
 
 void Hypersimplex::startPermutate(std::string factoredPerm, int *result)
@@ -446,7 +441,6 @@ void Hypersimplex::startPermutate(std::string factoredPerm, int *result)
     for (int i = 0; i < m_vertexCount; i++) {
         result[i] = i;
     }
-//    qDebug() << "startPermutate!";
     permutateVertices(factoredPerm, result);
 }
 
@@ -459,17 +453,7 @@ void Hypersimplex::permutateVertices(std::string factoredPerm, int *vertices)
     int input[m_vertexCount];
     std::copy(vertices, vertices + m_vertexCount, input);
 
-//    qDebug() << "permutateVertices!" << QString(factoredPerm.c_str());
-
     std::vector<int *>parsedFactoredPerm = parsePermutation(factoredPerm);
-
-//    for (int i = 0; i < m_vertexCount; i++) {
-//        qDebug() << "Perm:" << parsedFactoredPerm[0][i];
-//    }
-
-//    for (int i = 0; i < m_vertexCount; i++) {
-//        qDebug() << "Perm:" << parsedFactoredPerm[0][i];
-//    }
 
     for (auto factor : parsedFactoredPerm) {
         int input[m_vertexCount];
@@ -543,19 +527,19 @@ AsymHypers::AsymHypers(int d, int k)
     qDebug() << "---------------";
     qDebug() << "vtxtrns subs:" << m_vtxTrnsSubgroups.size();
     for (auto s : m_vtxTrnsSubgroups)
-        qDebug() << QString(s.m_gapName.c_str());
+        qDebug() << QString(s->m_gapName.c_str());
 
     qDebug() << "---------------";
     qDebug() << "---------------";
     calcEdgeEquivClasses();
     qDebug() << "EECs of subgroups:";
     for (auto s : m_vtxTrnsSubgroups) {
-        qDebug() << QString(s.m_gapName.c_str());
+        qDebug() << QString(s->m_gapName.c_str());
 
-        qDebug() << "EEC count:" << s.m_edgeEquivClasses.size();
-        for (auto eec : s.m_edgeEquivClasses) {
-            qDebug() << "eec:" << eec.multiplicity;
-            for (auto edge : eec.m_edges) {
+        qDebug() << "EEC count:" << s->m_edgeEquivClasses.size();
+        for (auto eec : s->m_edgeEquivClasses) {
+            qDebug() << "eec:" << eec->multiplicity;
+            for (auto edge : eec->m_edges) {
                 qDebug() << "v:" << edge.v << "w:" << edge.w;
             }
         }
@@ -631,19 +615,19 @@ SymHypers::SymHypers(int d, int k)
     qDebug() << "---------------";
     qDebug() << "vtxtrns subs:" << m_vtxTrnsSubgroups.size();
     for (auto s : m_vtxTrnsSubgroups)
-        qDebug() << QString(s.m_gapName.c_str());
+        qDebug() << QString(s->m_gapName.c_str());
 
     qDebug() << "---------------";
     qDebug() << "---------------";
     calcEdgeEquivClasses();
     qDebug() << "EECs of subgroups:";
     for (auto s : m_vtxTrnsSubgroups) {
-        qDebug() << QString(s.m_gapName.c_str());
+        qDebug() << QString(s->m_gapName.c_str());
 
-        qDebug() << "EEC count:" << s.m_edgeEquivClasses.size();
-        for (auto eec : s.m_edgeEquivClasses) {
-            qDebug() << "eec:" << eec.multiplicity;
-            for (auto edge : eec.m_edges) {
+        qDebug() << "EEC count:" << s->m_edgeEquivClasses.size();
+        for (auto eec : s->m_edgeEquivClasses) {
+            qDebug() << "eec:" << eec->multiplicity;
+            for (auto edge : eec->m_edges) {
                 qDebug() << "v:" << edge.v << "w:" << edge.w;
             }
         }
