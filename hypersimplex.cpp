@@ -307,14 +307,14 @@ bool Hypersimplex::isVtxTrnsSubgroup(std::string sub)
 {
     bool vertexHits[m_vertexCount] = {false};
 
-    if (sub != "Group([ (1,2)(3,5)(4,6) ])")
-        return false;
+//    if (sub != "Group([ (1,2)(3,5)(4,6) ])")
+//        return false;
 
-    qDebug() << "test:" << QString(sub.c_str());
+//    qDebug() << "test:" << QString(sub.c_str());
 
     for (auto factored : m_group->getSubgroupFactorizations(sub)) {
-        qDebug() << "-----------------";
-        qDebug() << "FACTORED:" << QString(factored.c_str());
+//        qDebug() << "-----------------";
+//        qDebug() << "FACTORED:" << QString(factored.c_str());
 
         int res[m_vertexCount];
         startPermutate(factored, res);
@@ -665,7 +665,7 @@ std::string Hypersimplex::prepareForParsing(const std::string &perm)
     std::string ret;
     std::size_t pos = 0;
 
-    qDebug() << "prepareForParsing" << QString(perm.c_str());
+//    qDebug() << "prepareForParsing" << QString(perm.c_str());
 
     auto inverteParsedPart = [](const std::string part) {
         std::size_t pos = 0;
@@ -699,7 +699,20 @@ std::string Hypersimplex::prepareForParsing(const std::string &perm)
 //        qDebug() << "IN" << pos << perm[pos] << ret.c_str();
 
         if (perm[pos] == '(') {
-            partEnd = perm.rfind(')');
+            int brackets = 1;
+            std::size_t subpos = pos;
+            while (brackets > 0) {
+//                qDebug() << "BRACKETS" << subpos << perm[subpos] << brackets;
+                partEnd = perm.find_first_of("()", subpos + 1);
+                if (perm[partEnd] == ')') {
+                    brackets--;
+                } else {
+                    brackets++;
+                }
+//                qDebug() << "BRACKETS" << partEnd << perm[partEnd] << brackets;
+//                brackets += perm[partEnd] == ')' ? -1 : 1;
+                subpos = partEnd + 1;
+            }
             part = prepareForParsing(perm.substr(pos + 1, partEnd - (pos + 1)));
             int times;
             bool inverse;
@@ -723,7 +736,8 @@ std::string Hypersimplex::prepareForParsing(const std::string &perm)
             }
         } else {
             partEnd = perm.find('(', pos + 1);
-            part = perm.substr(pos, partEnd);
+            part = perm.substr(pos, partEnd - pos);
+//            qDebug() << "READIN" << partEnd << perm[partEnd] << part.c_str();
             ret += part;
             pos = partEnd;
         }
