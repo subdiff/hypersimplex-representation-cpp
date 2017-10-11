@@ -177,12 +177,22 @@ int EdgeEquivClass::calcMultiplicity()
 {
     int mult = 0;
     auto v = m_edges[0].v;
+
+    qDebug() << "calcMultiplicity" << v;
+    std::string debug;
+    for (auto e : m_edges)
+        debug += std::to_string(e.v) + std::to_string(e.w) + "|";
+    qDebug() << (debug + std::to_string(multiplicity)).c_str();
+
     for (auto e : m_edges) {
+        qDebug() << "IN" << e.v << e.w;
         if (e.has(v)) {
             mult++;
         }
+        qDebug() << "OUT" << mult;
     }
     multiplicity = mult;
+
     return mult;
 }
 
@@ -285,27 +295,37 @@ bool Hypersimplex::isVtxTrnsSubgroup(std::string sub)
 void Hypersimplex::calcEdgeEquivClasses()
 {
 //    qDebug() << "calcEdgeEquivClasses!";
-    for (auto sub : m_vtxTrnsSubgroups) {
-//        qDebug() << "sub:" << QString(sub.m_gapName.c_str());
+
+    auto sub = &m_vtxTrnsSubgroups[0];
+//    for (auto sub : m_vtxTrnsSubgroups) {
+        qDebug() << QString(sub->m_gapName.c_str());
 
         std::vector<EdgeEquivClass> eecs;
 
         std::vector<int*> imgList;
 
-        for (auto fac : sub.m_facEl) {
+        for (auto fac : sub->m_facEl) {
             int *vertices = new int[m_vertexCount];
             startPermutate(fac, vertices);
+
+            qDebug() << "Perm" << QString(fac.c_str());
+            std::string debug;
+            for (int i = 0; i<m_vertexCount; i++) {
+                debug += std::to_string(vertices[i]) + " ";
+            }
+            qDebug() << QString(debug.c_str());
+
             imgList.push_back(vertices);
         }
 
-        qDebug() << "imgList:";
-        for (auto img : imgList) {
-            std::string debug;
-            for (int i = 0; i<m_vertexCount; i++) {
-                debug += std::to_string(img[i]) + " ";
-            }
-            qDebug() << QString(debug.c_str());
-        }
+//        qDebug() << "... permutations:";
+//        for (auto img : imgList) {
+//            std::string debug;
+//            for (int i = 0; i<m_vertexCount; i++) {
+//                debug += std::to_string(img[i]) + " ";
+//            }
+//            qDebug() << QString(debug.c_str());
+//        }
 
         std::vector<int> vertexHits;
 
@@ -333,22 +353,35 @@ void Hypersimplex::calcEdgeEquivClasses()
              * to a vertex whose edges already have been tested
              */
             if (testOnHit(vertex)) {
+                qDebug() << "HIT" << vertex;
                 continue;
             }
+            qDebug() << "new" << vertex;
             vertexHits.push_back(vertex);
             std::vector<Edge> vertexEdges = getEdgesToVertex(vertex);
+
+            qDebug() << "vertexEdges";
+            for (auto e: vertexEdges)
+                qDebug() << e.v << e.w;
 
             for (auto vEdge : vertexEdges) {
                 std::vector<Edge> edgeImgs;
 
-                for (auto el :  sub.m_facEl) {
-                    auto edgeImg = [this, &el](Edge e) {
-                        auto imgV = permutateVertex(el, e.v);
-                        auto imgW = permutateVertex(el, e.w);
+                for (auto el :  sub->m_facEl) {
+                    auto edgeImg = [this](Edge e, std::string factoredPerm) {
+//                        qDebug() << "XXX1" << e.v << e.w << QString(factoredPerm.c_str());
+                        auto imgV = permutateVertex(factoredPerm, e.v);
+                        auto imgW = permutateVertex(factoredPerm, e.w);
+//                        qDebug() << "XXX2" << imgV << imgW;
                         return Edge(imgV, imgW);
                     };
-                    edgeImgs.push_back(edgeImg(vEdge));
+                    edgeImgs.push_back(edgeImg(vEdge, el));
                 }
+
+                qDebug() << "edgeImgs";
+                for (auto e: edgeImgs)
+                    qDebug() << e.v << e.w;
+
 
                 auto setToClass = [&eecs](std::vector<Edge> edgeImgs) {
                     for (auto c : eecs) {
@@ -360,9 +393,27 @@ void Hypersimplex::calcEdgeEquivClasses()
                         }
                     }
                     // class is not yet listed in class_list
-                    eecs.push_back(EdgeEquivClass(edgeImgs));
+                    auto eec = EdgeEquivClass(edgeImgs);
+
+//                    qDebug() << "###";
+//                    qDebug() << "Neue eec!";
+//                    for (auto e : eec.m_edges)
+//                        qDebug() << e.v << e.w;
+//                    qDebug() << "###";
+
+                    eecs.push_back(eec);
                 };
                 setToClass(edgeImgs);
+
+//                qDebug() << "######";
+//                qDebug() << "BISHERIGE EECs:";
+//                for (auto c : eecs) {
+//                    std::string debug;
+//                    for (auto e : c.m_edges)
+//                        debug += std::to_string(e.v) + std::to_string(e.w) + "|";
+//                    qDebug() << debug.c_str();
+//                }
+//                qDebug() << "######";
             }
         }
 
@@ -371,12 +422,22 @@ void Hypersimplex::calcEdgeEquivClasses()
         for (auto c : eecs)
             c.calcMultiplicity();
 
-        sub.m_edgeEquivClasses = eecs;
+        sub->m_edgeEquivClasses = eecs;
 
         for (auto p : imgList) {
             delete[] p;
         }
-    }
+
+        qDebug() << "######";
+        qDebug() << "FINALE EECs:";
+        for (auto c : sub->m_edgeEquivClasses) {
+            std::string debug;
+            for (auto e : c.m_edges)
+                debug += std::to_string(e.v) + std::to_string(e.w) + "|";
+            qDebug() << (debug + std::to_string(c.multiplicity)).c_str();
+        }
+        qDebug() << "######";
+//    }
 
 }
 
@@ -425,12 +486,9 @@ void Hypersimplex::permutateVertices(std::string factoredPerm, int *vertices)
 
 int Hypersimplex::permutateVertex(std::string factoredPerm, int vertex)
 {
-    std::vector<int *>parsedFactoredPerm = parsePermutation(factoredPerm);
-
-    for (auto factor : parsedFactoredPerm) {
-        vertex = factor[vertex];
-    }
-    return vertex;
+    int vertices[m_vertexCount];
+    startPermutate(factoredPerm, vertices);
+    return vertices[vertex];
 }
 
 AsymHypers::AsymHypers(int d, int k)
