@@ -23,7 +23,7 @@ include_directories(/home/roman/Studium/Masterarbeit/Software/libgap/install/inc
 link_directories(/home/roman/Studium/Masterarbeit/Software/libgap/install/lib)
 
 # find_library(LIB_GAP gap REQUIRED)
-find_library(SYSTEM LIB_GAP gap PATHS /home/roman/Studium/Masterarbeit/Software/libgap/install/lib REQUIRED)
+find_library(LIB_GAP NAMES gap PATHS /home/roman/Studium/Masterarbeit/Software/libgap/install/lib REQUIRED)
 
 MESSAGE( STATUS "variable is now: " ${LIB_GAP} ) # TODOX
 
