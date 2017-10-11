@@ -187,8 +187,8 @@ bool Hypersimplex::haveEdge(int v, int w)
 
 //    qDebug() << "haveEdge:" << v << w;
 
-    combinadicComb(m_k, v - 1, vComb);
-    combinadicComb(m_k, w - 1, wComb);
+    combinadicComb(m_k, v, vComb);
+    combinadicComb(m_k, w, wComb);
 
     int sum = 0;
     for (int i = 0; i < m_d; i++) {
@@ -203,12 +203,8 @@ void Hypersimplex::initEdges()
 {
     for (int i = 0; i < m_vertexCount; i++) {
         for (int j = i + 1; j < m_vertexCount; j++) {
-//            Edge edge(i + 1, j + 1);
-//            if (std::any_of(m_edges.begin(), m_edges.end(), [&edge](Edge comp){return comp == edge;}) ) {
-//                continue;
-//            }
-            if (haveEdge(i+1, j+1)) {
-                m_edges.push_back(Edge(i + 1, j + 1));
+            if (haveEdge(i, j)) {
+                m_edges.push_back(Edge(i, j));
             }
         }
     }
