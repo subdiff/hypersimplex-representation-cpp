@@ -295,7 +295,11 @@ void Hypersimplex::calcEdgeEquivClasses()
 {
     qDebug() << "calcEdgeEquivClasses!";
 
-//    auto sub = m_vtxTrnsSubgroups[0];
+    auto hasEdge = [](std::vector<Edge> &edges, Edge &e) {
+        return std::any_of(edges.begin(), edges.end(), [&e](Edge comp){return comp == e;});
+    };
+
+//    auto sub = m_vtxTrnsSubgroups[16];
     for (auto sub : m_vtxTrnsSubgroups) {
         qDebug() << QString(sub->m_gapName.c_str());
 
@@ -373,42 +377,56 @@ void Hypersimplex::calcEdgeEquivClasses()
 //                        qDebug() << "XXX2" << imgV << imgW;
                         return Edge(imgV, imgW);
                     };
-                    edgeImgs.push_back(edgeImg(vEdge, el));
+                    auto eI = edgeImg(vEdge, el);
+                    if (!hasEdge(edgeImgs, eI)) {
+                        edgeImgs.push_back(eI);
+                    }
                 }
 
-//                qDebug() << "edgeImgs";
-//                for (auto e: edgeImgs)
-//                    qDebug() << e.v << e.w;
+                // add edges to existing class or create new one
+                bool addToClass = false;
+                for (auto c : eecs) {
+                    // test first if one of the mapped edges is in this class already
+                    for (auto e : edgeImgs) {
+                        if (hasEdge(c->m_edges, e)) {
+                            addToClass = true;
+                            break;
+                        }
+                    }
 
-
-                auto setToClass = [&eecs](std::vector<Edge> edgeImgs) {
-                    for (auto c : eecs) {
+                    // test also if one of the edges already in class 'c' is in the image
+                    if (!addToClass) {
                         for (auto e : c->m_edges) {
-                            auto hasEdge = [](std::vector<Edge> &edges, Edge &e) {
-                                return std::any_of(edges.begin(), edges.end(), [&e](Edge comp){return comp == e;});
-                            };
-
                             if (hasEdge(edgeImgs, e)) {
-                                for (auto eI : edgeImgs) {
-                                    if (!hasEdge(c->m_edges, eI)) {
-                                        c->m_edges.push_back(eI);
-                                    }
-                                }
-                                return;
+                                addToClass = true;
+                                break;
                             }
                         }
                     }
+
+                    if (addToClass) {
+                        // add new edges to class 'c'
+
+                        std::string debug;
+                        for (auto e : c->m_edges)
+                            debug += std::to_string(e.v) + std::to_string(e.w) + "|";
+//                        qDebug() << "ADD:" << debug.c_str();
+
+                        for (auto eI : edgeImgs) {
+//                            qDebug() << "test:" << eI.v << eI.w;
+                            if (!hasEdge(c->m_edges, eI)) {
+                                c->m_edges.push_back(eI);
+                            }
+                        }
+                        break;
+                    }
+                }
+
+                if (!addToClass) {
                     // class is not yet listed in class_list
                     auto eec = new EdgeEquivClass(edgeImgs);
                     eecs.push_back(eec);
-
-//                    std::string debug;
-//                    for (auto e : eec->m_edges)
-//                        debug += std::to_string(e.v) + std::to_string(e.w) + "|";
-//                    qDebug() << (debug + std::to_string(eec->multiplicity)).c_str();
-//                    qDebug() << "###";
-                };
-                setToClass(edgeImgs);
+                }
             }
         }
 
