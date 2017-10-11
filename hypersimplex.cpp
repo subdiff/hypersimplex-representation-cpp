@@ -52,7 +52,7 @@ static void genAsymSd_12(int dim, int *comp)
 static void genSymS2_12(int dim, int *comp)
 {
     for (int i = 0; i < dim; i++) {
-        comp[i] = !comp[i];
+        comp[i] = 1 - comp[i];
     }
 }
 static void genSymSd_1d(int dim, int *comp)
@@ -60,18 +60,18 @@ static void genSymSd_1d(int dim, int *comp)
     int dComp = comp[dim - 1];
 
     for (int i = dim - 1; i > 0; i--) {
-        comp[i] = !comp[i-1];
+        comp[i] = 1 - comp[i-1];
     }
-    comp[0] = !dComp;
+    comp[0] = 1 - dComp;
 }
 static void genSymSd_1d_inv(int dim, int *comp)
 {
     int dComp = comp[0];
 
     for (int i = 0; i < dim - 1; i++) {
-        comp[i] = !comp[i+1];
+        comp[i] = 1 - comp[i+1];
     }
-    comp[dim - 1] = !dComp;
+    comp[dim - 1] = 1 - dComp;
 }
 static void genSymSd_12(int dim, int *comp)
 {
