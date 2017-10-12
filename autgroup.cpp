@@ -118,13 +118,13 @@ static void gapCreateGroup(int d, bool semi)
     if (semi) {
         // semidirect product S_d with S_2
         gap_eval("Sd:=" + sDCmdGenerate());
-        gap_eval("S2:=Group((1,2));\n", true);
-        gap_eval("Sdhom:=GroupHomomorphismByFunction(Sd,Sd,function(g) return (1,2)*g*(1,2);end);\n", true);
-        gap_eval("hom:=GroupHomomorphismByImages(S2, AutomorphismGroup(Sd), [(1,2)], [Sdhom]);\n", true);
-        gap_eval("G:=SemidirectProduct(S2, hom, Sd);\n", true);
+        gap_eval("S2:=Group((1,2));\n", false);
+        gap_eval("Sdhom:=GroupHomomorphismByFunction(Sd,Sd,function(g) return (1,2)*g*(1,2);end);\n", false);
+        gap_eval("hom:=GroupHomomorphismByImages(S2, AutomorphismGroup(Sd), [(1,2)], [Sdhom]);\n", false);
+        gap_eval("G:=SemidirectProduct(S2, hom, Sd);\n", false);
     } else {
         // S_d
-        gap_eval("G:=" + sDCmdGenerate());
+        gap_eval("G:=" + sDCmdGenerate(), false);
     }
 }
 
@@ -146,7 +146,9 @@ AutGroup::AutGroup(int d, int k)
     libgap_exit()
 
     gapCreateGroup(d, d == 2*k);
-    gap_eval("G;\n", true);
+    m_gapName = gap_eval("G;\n", true);
+
+    qDebug() << "Full automorphism group:" << m_gapName.c_str();
 
     createFactoredElements();
     calcSubgroups();
@@ -252,13 +254,19 @@ std::string AutGroup::getFactorization(std::string element) const
 
 std::vector<std::string> AutGroup::getFactorizations(std::string subgroup) const
 {
-    if (subgroup == "") {
+//    qDebug() << "getFactorizations" << subgroup.c_str();
+
+    bool isFullGroup = gap_eval(subgroup + "=" + m_gapName + ";\n").substr(0, 4) == "true";
+    if (subgroup == "" || isFullGroup) {
         return m_factorizations;
     }
-//    gap_eval("hom:=EpimorphismFromFreeGroup(G:names:=[\"x\",\"y\"]);\n", true);
+
     gap_eval("l:=[];\n", false);
 
+//    gap_eval("hom:=EpimorphismFromFreeGroup(G:names:=[\"x\",\"y\"]);\n", true);
 //    gap_eval("for g in G do Add(l, PreImagesRepresentative(hom,g)); od;\n", false);
+
+    gap_eval("for g in " + subgroup + " do Add(l, Factorization(G,g)); od;\n", false);
 
     // TODO: This is multiple times Factorization of elements. Find saved factorization in m_factorizations instead?
     gap_eval("for g in " + subgroup + " do Add(l, Factorization(G,g)); od;\n", false);

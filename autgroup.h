@@ -40,4 +40,6 @@ private:
 
     std::vector<std::string> m_factorizations;
     std::vector<std::string> m_subgroups;
+
+    std::string m_gapName;
 };

@@ -28,8 +28,7 @@ int main(int argc, char** argv)
 //    app.setWindowIcon(QIcon::fromTheme(QStringLiteral("plasmadiscover")));
 //    app.setAttribute(Qt::AA_UseHighDpiPixmaps, true);
 
-//    Hypersimplex *test_hyper = s_createHypersimplex(3,1);
-//    test_hyper = s_createHypersimplex(5,2);
+    s_createHypersimplex(3,1);
 
     qmlRegisterType<BackEnd>("subdiff.de.math.hypersimplex.representation", 1, 0, "BackEnd");
 
@@ -42,7 +41,7 @@ int main(int argc, char** argv)
 //    delete test_hyper;
 //    delete test_hyper2;
 
-//    return 0;
+    return 0;
 
     return app.exec();
 }
