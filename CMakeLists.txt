@@ -35,6 +35,7 @@ set( ALL_SRCS
      main.cpp
      hypersimplex.cpp
      autgroup.cpp
+     gimatrix.cpp
      )
 
 qt5_add_resources( ALL_SRCS

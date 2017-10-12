@@ -16,9 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************/
 
-// A hypersimplex
-
-#include <array>
+#include <string>
 #include <vector>
 
 class AutGroup;
@@ -46,25 +44,6 @@ struct VtxTrnsSubgroup {
     AutGroup *m_parent;
     std::vector<std::string> m_facEl;
     std::vector<EdgeEquivClass *> m_edgeEquivClasses;
-};
-
-// Group invariant matrix with vanishing diagonal
-class GiMatrix {
-public:
-    GiMatrix(Hypersimplex *hypers, VtxTrnsSubgroup *group);
-
-    // TODOX:
-    // setVariables()
-    // getPossibleVariableCombinations()
-
-private:
-    void calculateMatrix();
-
-    Hypersimplex *m_hypers;
-    VtxTrnsSubgroup *m_group;
-
-    int **m_matrix;
-    std::vector<double> m_vars;
 };
 
 class Hypersimplex {
