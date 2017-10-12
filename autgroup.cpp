@@ -251,12 +251,6 @@ void AutGroup::createFactoredElements()
 //        qDebug() << "m_factorizations" << QString(f.c_str());
 }
 
-std::string AutGroup::getFactorization(std::string element) const
-{
-    // TODO: Faster if we use the list elements.
-    return gap_eval("Factorization(G, " + element + " ));\n", true);
-}
-
 std::vector<std::string> AutGroup::getFactorizations(int subIndex) const
 {
 //    qDebug() << "getFactorizations" << subgroup.c_str();

@@ -28,8 +28,6 @@ public:
         return m_subgroups;
     }
 
-    std::string getFactorization(std::string element) const;
-
     std::vector<std::string> getFactorizations(int subIndex = -1) const;
 
 private:
