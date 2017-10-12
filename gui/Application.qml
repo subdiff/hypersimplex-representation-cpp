@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import QtQuick 2.3
 import QtQuick.Controls 1.4
-import QtQuick.Layouts 1.3 as Layouts
 
 import subdiff.de.math.hypersimplex.representation 1.0
 
@@ -41,39 +40,62 @@ Item {
         onSelectedSubgroupChanged: subgroupSelector.currentIndex = selectedSubgroup;
     }
 
-    Layouts.RowLayout {
+    Row {
         id: hypersSelector
         anchors {
-            top: parent.top
             left: parent.left
-            topMargin: 10
             leftMargin: 10
         }
         spacing: 10
 
-        Label {
-            text: "d:"
+        Row {
+            id: parametersRow
+            spacing: 10
+
+            anchors.verticalCenter: controlButtonsCol.verticalCenter
+
+            Label {
+                text: "d:"
+            }
+            SpinBox {
+                id: dSpin
+                width: applyButton.width / 2
+                minimumValue: 3
+                maximumValue: 20
+            }
+            Label {
+                text: "k:"
+            }
+            SpinBox {
+                id: kSpin
+                width: dSpin.width
+                minimumValue: 1
+                maximumValue: dSpin.value - 1
+            }
         }
-        SpinBox {
-            id: dSpin
-            width: applyButton.width / 2
-            minimumValue: 3
-            maximumValue: 20
-        }
-        Label {
-            text: "k:"
-        }
-        SpinBox {
-            id: kSpin
-            width: dSpin.width
-            minimumValue: 1
-            maximumValue: dSpin.value - 1
-        }
-        Button {
-            id: applyButton
-            text: "Apply"
-            enabled: backend.ready && (dSpin.value != curD || kSpin.value != curK);
-            onClicked: initHypers(dSpin.value, kSpin.value)
+        Column {
+            id: controlButtonsCol
+            spacing: 10
+            anchors {
+                top: parent.top
+                topMargin: 10
+            }
+
+            Button {
+                id: applyButton
+                text: "Apply"
+                enabled: backend.ready && (dSpin.value != curD || kSpin.value != curK);
+                onClicked: initHypers(dSpin.value, kSpin.value)
+            }
+            Button {
+                id: resetButton
+                text: "Reset"
+                enabled: (dSpin.value != curD || kSpin.value != curK) && curD != 0;
+                onClicked: {
+                    dSpin.value = curD;
+                    kSpin.value = curK;
+                }
+            }
         }
     }
 
@@ -83,7 +105,7 @@ Item {
             top: hypersSelector.bottom
             left: hypersSelector.left
             right: hypersSelector.right
-            topMargin: 10
+            topMargin: 20
         }
         enabled: count > 1
         model: backend.vtxTrSubgroups
