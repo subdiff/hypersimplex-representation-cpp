@@ -1,3 +1,3 @@
 # hypersimplex-representation
 
-Prerequisites: Qt, libgap
+Prerequisites: Qt, libgap, Eigen3

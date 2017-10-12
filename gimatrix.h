@@ -17,9 +17,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************/
 
 #include <vector>
+#include <eigen3/Eigen/Dense>
 
 class Hypersimplex;
 class VtxTrnsSubgroup;
+
+using namespace Eigen;
 
 // Group invariant matrix with vanishing diagonal
 class GiMatrix {
@@ -29,8 +32,8 @@ public:
     // TODOX:
     // setVariables()
     // getPossibleVariableCombinations()
-    // calcEigen()
-    // calcNullspaceRepr()
+
+    MatrixXd calcNullspaceRepr();
 
 private:
     void calculateMatrix();
@@ -38,6 +41,11 @@ private:
     Hypersimplex *m_hypers;
     VtxTrnsSubgroup *m_group;
 
-    int **m_matrix;
+    MatrixXd m_matrix;     // Matrix<double, Dynamic, Dynamic>
+
     std::vector<double> m_vars;
+
+    std::vector<VectorXd> m_nullspRepr;
+
+    int m_dim;
 };

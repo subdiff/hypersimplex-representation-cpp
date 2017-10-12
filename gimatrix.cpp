@@ -20,18 +20,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "hypersimplex.h"
 
 #include <algorithm>
+#include <eigen3/Eigen/Eigenvalues>
 
 #include <QDebug>
 
+#include <iostream>
+
 GiMatrix::GiMatrix(Hypersimplex *hypers, VtxTrnsSubgroup *group)
-    : m_hypers(hypers),
+    : m_dim(hypers->vertexCount()),
+      m_hypers(hypers),
       m_group(group)
 {
-    // define matrix
-    // TODOX
+    m_matrix.resize(m_dim, m_dim);
 
-    for (int i = 0; i < hypers->d(); i++) {
-        m_matrix[i][i] = 0;
+    for (int i = 0; i < m_dim; i++) {
+        m_matrix(i, i) = 0;
     }
 
     // set variables defaults
@@ -39,6 +42,7 @@ GiMatrix::GiMatrix(Hypersimplex *hypers, VtxTrnsSubgroup *group)
         m_vars.push_back(1. / (double)eec->multiplicity / m_hypers->degree());
     }
     calculateMatrix();
+    calcNullspaceRepr();
 }
 
 void GiMatrix::calculateMatrix()
@@ -54,13 +58,44 @@ void GiMatrix::calculateMatrix()
         return 0.;
     };
 
-    int dim = m_hypers->d();
-
-    for (int row = 0; row < dim; row++) {
+    for (int row = 0; row < m_dim; row++) {
         for (int col = 0; col < row; col++) {
             auto val = getCellVal(Edge(col, row));
-            m_matrix[row][col] = val;
-            m_matrix[col][row] = val;
+            m_matrix(row, col) = val;
+            m_matrix(col, row) = val;
         }
     }
+}
+
+MatrixXd GiMatrix::calcNullspaceRepr()
+{
+    qDebug() << "----------------";
+    qDebug() << "----------------";
+    qDebug() << "----------------";
+
+    qDebug() << m_group->m_gapName.c_str();
+
+    qDebug() << "m_matrix";
+    std::cout << m_matrix  << std::endl;
+
+    SelfAdjointEigenSolver<MatrixXd> eigensolver(m_matrix);
+    if (eigensolver.info() != Success) {
+        return MatrixXd();
+    }
+
+    VectorXd eVals = eigensolver.eigenvalues();
+    MatrixXd eVcts = eigensolver.eigenvectors();
+
+    qDebug() << "Eigenvalues:";
+    std::cout << eVals.transpose() << std::endl;
+
+    qDebug() << "Eigenvectors:";
+    std::cout << eVcts  << std::endl;
+
+    qDebug() << "----------------";
+    qDebug() << "Null Space Representation:";
+    MatrixXd nullspReprs = eVcts.block(0, m_dim - m_hypers->d(), m_dim, m_hypers->d() - 1).transpose();
+    std::cout << nullspReprs  << std::endl;;
+
+    return nullspReprs;
 }

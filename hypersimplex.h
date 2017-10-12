@@ -23,7 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 
 class AutGroup;
-class Hypersimplex;
+class GiMatrix;
 
 struct Edge {
     Edge(int _v, int _w);
@@ -55,13 +55,13 @@ public:
 
     inline int d() { return m_d; }
     inline int k() { return m_k; }
+    inline int vertexCount() { return m_vertexCount; }
     inline int degree() { return m_degree; }
 
 protected:
     Hypersimplex(int d, int k);
 
     void initEdges();
-    void initGraph();
     void initGroup();
     void initCalculations();
 
@@ -88,6 +88,10 @@ private:
     bool isVtxTrnsSubgroup(int sub);
 
     std::vector<Edge> getEdgesToVertex(int vertex);
+
+    void calcGiMatrix();
+
+    GiMatrix * m_reprMatrix = nullptr;
 };
 
 class AsymHypers : public Hypersimplex {

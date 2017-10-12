@@ -16,9 +16,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************/
 
-#include "autgroup.h"
-
 #include "hypersimplex.h"
+
+#include "autgroup.h"
+#include "gimatrix.h"
 
 #include <algorithm>
 
@@ -210,6 +211,7 @@ Hypersimplex::Hypersimplex(int d, int k)
 Hypersimplex::~Hypersimplex()
 {
     delete m_group;
+    delete m_reprMatrix;
 }
 
 bool Hypersimplex::haveEdge(int v, int w)
@@ -291,6 +293,13 @@ void Hypersimplex::initCalculations()
             index++;
         }
     }
+
+    calcGiMatrix();
+}
+
+void Hypersimplex::calcGiMatrix()
+{
+    m_reprMatrix = new GiMatrix(this, m_vtxTrnsSubgroups[1]);
 }
 
 void Hypersimplex::calcVtxTrnsSubgroups()
