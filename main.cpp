@@ -25,6 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 int main(int argc, char** argv)
 {
     QGuiApplication app(argc, argv);
+    app.setWindowIcon(QIcon::fromTheme(QStringLiteral("applications-education-mathematics")));
 
 //    s_createHypersimplex(4,2);
 
