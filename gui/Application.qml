@@ -1,9 +1,24 @@
 import QtQuick 2.3
 import QtQuick.Controls 1.4
 
+import subdiff.de.math.hypersimplex.representation 1.0
+
 Item {
     width: 1000
     height: 500
+
+    property int curD: 0
+    property int curK: 0
+
+    function initHypers(d, k) {
+        curD = d;
+        curK = k;
+        backend.getHypersimplex(d, k);
+    }
+
+    BackEnd {
+        id: backend
+    }
 
     Rectangle {
         id: rect
@@ -11,12 +26,6 @@ Item {
         width: parent.width / 2
         height: parent.height/2
         color: "yellow"
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: Qt.quit()
-        }
-    }
 
     Row {
         anchors.centerIn: parent
@@ -26,8 +35,8 @@ Item {
         }
         SpinBox {
             id: dSpin
-            minimumValue: 4
-            maximumValue: 99
+            minimumValue: 3
+            maximumValue: 20
         }
         Label {
             text: "k:"
@@ -36,6 +45,11 @@ Item {
             id: kSpin
             minimumValue: 1
             maximumValue: dSpin.value - 1
+        }
+        Button {
+            text: "Apply"
+            enabled: dSpin.value != curD || kSpin.value != curK
+            onClicked: initHypers(dSpin.value, kSpin.value)
         }
     }
 }

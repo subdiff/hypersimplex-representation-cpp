@@ -16,33 +16,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************/
 
-#include <QGuiApplication>
-#include <QQuickView>
-
-#include "hypersimplex.h"
 #include "backend.h"
+#include "hypersimplex.h"
 
-int main(int argc, char** argv)
+BackEnd::BackEnd(QObject *parent) :
+    QObject(parent)
 {
-    QGuiApplication app(argc, argv);
-//    app.setWindowIcon(QIcon::fromTheme(QStringLiteral("plasmadiscover")));
-//    app.setAttribute(Qt::AA_UseHighDpiPixmaps, true);
+}
 
-//    Hypersimplex *test_hyper = createHypersimplex(3,1);
-//    test_hyper = createHypersimplex(5,2);
-
-    qmlRegisterType<BackEnd>("subdiff.de.math.hypersimplex.representation", 1, 0, "BackEnd");
-
-    QQuickView view;
-    view.setSource(QUrl("qrc:/gui/Application.qml"));
-    view.show();
-
-    QObject::connect((QObject*)view.engine(), SIGNAL(quit()), &app, SLOT(quit()));
-
-//    delete test_hyper;
-//    delete test_hyper2;
-
-//    return 0;
-
-    return app.exec();
+void BackEnd::getHypersimplex(int d, int k)
+{
+    ::createHypersimplex(d, k);
 }

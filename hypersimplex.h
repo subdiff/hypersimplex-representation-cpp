@@ -16,6 +16,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************/
 
+#ifndef HYPERSIMPLEX_H
+#define HYPERSIMPLEX_H
+
 #include <string>
 #include <vector>
 
@@ -124,16 +127,21 @@ private:
     int *m_genSymSd_12 = nullptr;
 };
 
+static Hypersimplex *s_hypers = nullptr;
 static Hypersimplex *createHypersimplex(int d, int k)
 {
     if (k <= 0 || d <= 1 || d <= k) {
         return nullptr;
     }
 
+    delete s_hypers;
+
     if (d == 2 * k) {
-        return new SymHypers(d, k);
+        s_hypers = new SymHypers(d, k);
     } else {
-        return new AsymHypers(d, k);
+        s_hypers = new AsymHypers(d, k);
     }
+    return s_hypers;
 }
 
+#endif // HYPERSIMPLEX_H
