@@ -22,6 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 
 class AutGroup;
+class Hypersimplex;
 
 struct Edge {
     Edge(int _v, int _w);
@@ -33,8 +34,8 @@ struct Edge {
 
 struct EdgeEquivClass {
     EdgeEquivClass(std::vector<Edge> edges);
+    bool has(Edge edge);
     std::vector<Edge> m_edges;
-    void sortEdges();
     int calcMultiplicity();
     int multiplicity = 0;
 };
@@ -47,9 +48,33 @@ struct VtxTrnsSubgroup {
     std::vector<EdgeEquivClass *> m_edgeEquivClasses;
 };
 
+// Group invariant matrix with vanishing diagonal
+class GiMatrix {
+public:
+    GiMatrix(Hypersimplex *hypers, VtxTrnsSubgroup *group);
+
+    // TODOX:
+    // setVariables()
+    // getPossibleVariableCombinations()
+
+private:
+    void calculateMatrix();
+
+    Hypersimplex *m_hypers;
+    VtxTrnsSubgroup *m_group;
+
+    int **m_matrix;
+    std::vector<double> m_vars;
+};
+
 class Hypersimplex {
 public:
     virtual ~Hypersimplex();
+
+    inline int d() { return m_d; }
+    inline int k() { return m_k; }
+    inline int degree() { return m_degree; }
+
 protected:
     Hypersimplex(int d, int k);
 
@@ -66,17 +91,21 @@ protected:
     std::string prepareForParsing(const std::string &perm);
     virtual std::vector<int *> parsePermutation(std::string perm) = 0;
 
-    void calcVtxTrnsSubgroups();
-    bool isVtxTrnsSubgroup(std::string sub);
-
-    void calcEdgeEquivClasses();
-
     int m_d;
     int m_k;
+    int m_degree;
     AutGroup *m_group;
     std::vector<VtxTrnsSubgroup *> m_vtxTrnsSubgroups;
     std::vector<Edge> m_edges;
     int m_vertexCount;
+
+private:
+    void calcEdgeEquivClasses();
+
+    void calcVtxTrnsSubgroups();
+    bool isVtxTrnsSubgroup(std::string sub);
+
+    std::vector<Edge> getEdgesToVertex(int vertex);
 };
 
 class AsymHypers : public Hypersimplex {
@@ -118,6 +147,10 @@ private:
 
 static Hypersimplex *createHypersimplex(int d, int k)
 {
+    if (k <= 0 || d <= 1 || d <= k) {
+        return nullptr;
+    }
+
     if (d == 2 * k) {
         return new SymHypers(d, k);
     } else {

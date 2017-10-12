@@ -153,8 +153,8 @@ void AutGroup::calcSubgroups()
     qDebug() << "-----------------";
     qDebug() << "-----------------";
     qDebug() << "m_subgroups Count" << m_subgroups.size();
-    for (auto s : m_subgroups)
-        qDebug() << "m_subgroups" << QString(s.c_str());
+//    for (auto s : m_subgroups)
+//        qDebug() << "m_subgroups" << QString(s.c_str());
 
     qDebug() << "-----------------";
 //    qDebug() << "calcSubgroups" << QString(subgroupList.c_str());
