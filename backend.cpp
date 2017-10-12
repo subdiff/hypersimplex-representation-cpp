@@ -23,8 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 BackEnd::BackEnd(QObject *parent) :
     QObject(parent)
-{
-}
+{}
 
 BackEnd::~BackEnd()
 {
@@ -36,15 +35,13 @@ BackEnd::~BackEnd()
     }
 }
 
-bool BackEnd::ready()
-{
-    return m_ready;
-}
-
 void BackEnd::getHypersimplex(int d, int k)
 {
     m_ready = false;
-    readyChanged();
+    emit readyChanged();
+
+    setVtxTrSubgroups(std::vector<std::string>());
+    setSelectedSubgroup(0);
 
     QtConcurrent::run(::s_createHypersimplex, d, k);
 
@@ -55,13 +52,46 @@ void BackEnd::getHypersimplex(int d, int k)
 
 void BackEnd::checkReady()
 {
-    if (::s_ready && !m_ready) {
+    if (!::s_ready) {
+        return;
+    }
+
+    if (!m_ready) {
         m_ready = ::s_ready;
-        readyChanged();
+        emit readyChanged();
 
         if (m_checkReadyTimer) {
             delete m_checkReadyTimer;
             m_checkReadyTimer = nullptr;
         }
+        setVtxTrSubgroups(::s_hypers->getVtxTrSubgroupNames());
+        qDebug() << "checkReady";
+    }
+}
+
+void BackEnd::setVtxTrSubgroups(std::vector<std::string> subNames)
+{
+    bool changed = false;
+    if (subNames.size() != m_vtxTrSubgroups.size()) {
+        changed = true;
+    }
+
+    if (!changed) {
+        int index = 0;
+        for (auto s : m_vtxTrSubgroups) {
+            if (QString::compare(s, subNames[index].c_str()) != 0) {
+                changed = true;
+                break;
+            }
+            index++;
+        }
+    }
+
+    if (changed) {
+        m_vtxTrSubgroups.clear();
+        for (std::string sub : subNames) {
+            m_vtxTrSubgroups.append(QString(sub.c_str()));
+        }
+        emit vtxTrSubgroupsChanged();
     }
 }

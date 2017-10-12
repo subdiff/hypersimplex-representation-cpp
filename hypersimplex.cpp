@@ -214,6 +214,16 @@ Hypersimplex::~Hypersimplex()
     delete m_reprMatrix;
 }
 
+std::vector<std::string> Hypersimplex::getVtxTrSubgroupNames()
+{
+    std::vector<std::string> ret;
+
+    for (auto s : m_vtxTrnsSubgroups) {
+        ret.push_back(s->m_gapName);
+    }
+    return ret;
+}
+
 bool Hypersimplex::haveEdge(int v, int w)
 {
     int vComb[m_d] = {0};
@@ -295,6 +305,8 @@ void Hypersimplex::initCalculations()
     }
 
     calcGiMatrix();
+
+    qDebug() << "initCalculations DONE";
 }
 
 void Hypersimplex::calcGiMatrix()

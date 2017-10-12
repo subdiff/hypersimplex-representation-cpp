@@ -18,6 +18,8 @@ Item {
 
     BackEnd {
         id: backend
+
+        onSelectedSubgroupChanged: subgroupSelector.currentIndex = selectedSubgroup;
     }
 
     Rectangle {
@@ -52,5 +54,20 @@ Item {
             onClicked: initHypers(dSpin.value, kSpin.value)
         }
     }
+    }
+
+    ComboBox {
+        id: subgroupSelector
+        anchors {
+            top: rect.bottom
+            left: rect.left
+            right: rect.right
+            topMargin: 10
+        }
+        enabled: count > 1
+        model: backend.vtxTrSubgroups
+
+        currentIndex: backend.selectedSubgroup
+        onCurrentIndexChanged: backend.selectedSubgroup = currentIndex;
     }
 }

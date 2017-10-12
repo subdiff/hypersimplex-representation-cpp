@@ -26,7 +26,7 @@ int main(int argc, char** argv)
 {
     QGuiApplication app(argc, argv);
 
-    s_createHypersimplex(4,2);
+//    s_createHypersimplex(4,2);
 
     qmlRegisterType<BackEnd>("subdiff.de.math.hypersimplex.representation", 1, 0, "BackEnd");
 
@@ -36,10 +36,7 @@ int main(int argc, char** argv)
 
     QObject::connect((QObject*)view.engine(), SIGNAL(quit()), &app, SLOT(quit()));
 
-//    delete test_hyper;
-//    delete test_hyper2;
-
-    return 0;
+//    return 0;
 
     return app.exec();
 }

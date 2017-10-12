@@ -21,11 +21,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <QObject>
 #include <QTimer>
+#include <QStringList>
 
 class BackEnd : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool ready READ ready NOTIFY readyChanged)
+    Q_PROPERTY(QStringList vtxTrSubgroups READ vtxTrSubgroups NOTIFY vtxTrSubgroupsChanged)
+    Q_PROPERTY(int selectedSubgroup READ selectedSubgroup WRITE setSelectedSubgroup NOTIFY selectedSubgroupChanged)
 
 public:
     explicit BackEnd(QObject *parent = nullptr);
@@ -33,17 +36,37 @@ public:
 
     Q_INVOKABLE void getHypersimplex(int d, int k);
 
-    bool ready();
+    bool ready() const {
+        return m_ready;
+    }
+    QList<QString> vtxTrSubgroups() const {
+        return m_vtxTrSubgroups;
+    }
+    void setVtxTrSubgroups(std::vector<std::string> subNames);
+
+    int selectedSubgroup() const {
+        return m_selectedSubgroup;
+    }
+    void setSelectedSubgroup(int set) {
+        if (m_selectedSubgroup != set) {
+            m_selectedSubgroup = set;
+            emit selectedSubgroupChanged();
+        }
+    }
 
 public Q_SLOTS:
     void checkReady();
 
 Q_SIGNALS:
     void readyChanged();
+    void vtxTrSubgroupsChanged();
+    void selectedSubgroupChanged();
 
 private:
     QTimer *m_checkReadyTimer = nullptr;
     bool m_ready;
+    QStringList m_vtxTrSubgroups;
+    int m_selectedSubgroup = 0;
 };
 
 #endif // BACKEND_H

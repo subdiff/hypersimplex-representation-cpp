@@ -58,6 +58,8 @@ public:
     inline int vertexCount() { return m_vertexCount; }
     inline int degree() { return m_degree; }
 
+    std::vector<std::string> getVtxTrSubgroupNames();
+
 protected:
     Hypersimplex(int d, int k);
 
