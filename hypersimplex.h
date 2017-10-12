@@ -127,21 +127,25 @@ private:
     int *m_genSymSd_12 = nullptr;
 };
 
+static bool s_ready = true;
 static Hypersimplex *s_hypers = nullptr;
-static Hypersimplex *createHypersimplex(int d, int k)
+
+static void *s_createHypersimplex(int d, int k)
 {
     if (k <= 0 || d <= 1 || d <= k) {
         return nullptr;
     }
 
     delete s_hypers;
+    s_hypers = nullptr;
 
+    s_ready = false;
     if (d == 2 * k) {
         s_hypers = new SymHypers(d, k);
     } else {
         s_hypers = new AsymHypers(d, k);
     }
-    return s_hypers;
+    s_ready = true;
 }
 
 #endif // HYPERSIMPLEX_H

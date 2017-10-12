@@ -20,14 +20,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define BACKEND_H
 
 #include <QObject>
+#include <QTimer>
 
 class BackEnd : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(bool ready READ ready NOTIFY readyChanged)
+
 public:
     explicit BackEnd(QObject *parent = nullptr);
+    ~BackEnd();
 
     Q_INVOKABLE void getHypersimplex(int d, int k);
+
+    bool ready();
+
+public Q_SLOTS:
+    void checkReady();
+
+Q_SIGNALS:
+    void readyChanged();
+
+private:
+    QTimer *m_checkReadyTimer = nullptr;
+    bool m_ready;
 };
 
 #endif // BACKEND_H

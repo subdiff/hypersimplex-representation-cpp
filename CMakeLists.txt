@@ -17,6 +17,7 @@ find_package( Qt5 REQUIRED
               Gui
               Qml
               Quick
+              Concurrent
             )
 
 include_directories(/home/roman/Studium/Masterarbeit/Software/libgap/install/include)    #TODOX

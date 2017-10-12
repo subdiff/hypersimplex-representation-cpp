@@ -48,8 +48,9 @@ Item {
         }
         Button {
             text: "Apply"
-            enabled: dSpin.value != curD || kSpin.value != curK
+            enabled: backend.ready && (dSpin.value != curD || kSpin.value != curK);
             onClicked: initHypers(dSpin.value, kSpin.value)
         }
+    }
     }
 }

@@ -19,12 +19,49 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "backend.h"
 #include "hypersimplex.h"
 
+#include <QtConcurrent/QtConcurrentRun>
+
 BackEnd::BackEnd(QObject *parent) :
     QObject(parent)
 {
 }
 
+BackEnd::~BackEnd()
+{
+    // TODO: Make sure running s_createHypersimplex calls are aborted
+
+    if (::s_hypers) {
+        delete ::s_hypers;
+        ::s_hypers = nullptr;
+    }
+}
+
+bool BackEnd::ready()
+{
+    return m_ready;
+}
+
 void BackEnd::getHypersimplex(int d, int k)
 {
-    ::createHypersimplex(d, k);
+    m_ready = false;
+    readyChanged();
+
+    QtConcurrent::run(::s_createHypersimplex, d, k);
+
+    m_checkReadyTimer = new QTimer(this);
+    connect(m_checkReadyTimer, SIGNAL(timeout()), this, SLOT(checkReady()));
+    m_checkReadyTimer->start(1000);
+}
+
+void BackEnd::checkReady()
+{
+    if (::s_ready && !m_ready) {
+        m_ready = ::s_ready;
+        readyChanged();
+
+        if (m_checkReadyTimer) {
+            delete m_checkReadyTimer;
+            m_checkReadyTimer = nullptr;
+        }
+    }
 }
