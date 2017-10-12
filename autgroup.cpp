@@ -78,15 +78,11 @@ static std::string gap_eval(const std::string _cmd, bool readOutput = true)
     return ret;
 }
 
-AutGroup::AutGroup(int d, int k)
+static bool gapIsInitialized = false;
+static void initGap()
 {
-    if (d == 2*k) {
-        // semidirect product S_d with S_2
-        m_factorizations.reserve(2 * factorial(d));
-
-    } else {
-        // S_d
-        m_factorizations.reserve(factorial(d));
+    if (gapIsInitialized) {
+        return;
     }
 
     libgap_set_error_handler(&gap_error_handler);
@@ -105,12 +101,49 @@ AutGroup::AutGroup(int d, int k)
     libgap_initialize(argc, const_cast<char**>(argv));
     qDebug() << "GAP initialized";
 
+    gapIsInitialized = true;
+}
+
+static void gapCreateGroup(int d, bool semi)
+{
+    auto sDCmdGenerate = [d]() {
+        std::string cmd;
+        cmd += "Group((";
+        for (int i = 1; i < d; i++) {
+            cmd.append(std::to_string(i) + ",");
+        }
+        return cmd + std::to_string(d) + "),(1,2));\n";
+    };
+
+    if (semi) {
+        // semidirect product S_d with S_2
+        gap_eval("Sd:=" + sDCmdGenerate());
+        gap_eval("S2:=Group((1,2));\n", true);
+        gap_eval("Sdhom:=GroupHomomorphismByFunction(Sd,Sd,function(g) return (1,2)*g*(1,2);end);\n", true);
+        gap_eval("hom:=GroupHomomorphismByImages(S2, AutomorphismGroup(Sd), [(1,2)], [Sdhom]);\n", true);
+        gap_eval("G:=SemidirectProduct(S2, hom, Sd);\n", true);
+    } else {
+        // S_d
+        gap_eval("G:=" + sDCmdGenerate());
+    }
+}
+
+AutGroup::AutGroup(int d, int k)
+{
+    if (d == 2*k) {
+        // semidirect product S_d with S_2
+        m_factorizations.reserve(2 * factorial(d));
+
+    } else {
+        // S_d
+        m_factorizations.reserve(factorial(d));
+    }
+
+    initGap();
+
     libgap_enter()
     libGAP_CollectBags(0,1);
     libgap_exit()
-
-//    gap_eval("1+2+3;\n");
-//      gap_eval("g:=FreeGroup(2);\n");
 
     gapCreateGroup(d, d == 2*k);
     gap_eval("G;\n", true);
@@ -292,28 +325,4 @@ std::vector<std::string> AutGroup::getSubgroupFactorizations(std::string subgrou
 
 //        qDebug() << "TEST" << QString(fac.c_str()) << "|||" << QString(facs.c_str());
 //    }
-}
-
-void AutGroup::gapCreateGroup(int d, bool semi)
-{
-    auto sDCmdGenerate = [d]() {
-        std::string cmd;
-        cmd += "Group((";
-        for (int i = 1; i < d; i++) {
-            cmd.append(std::to_string(i) + ",");
-        }
-        return cmd + std::to_string(d) + "),(1,2));\n";
-    };
-
-    if (semi) {
-        // semidirect product S_d with S_2
-        gap_eval("Sd:=" + sDCmdGenerate());
-        gap_eval("S2:=Group((1,2));\n", true);
-        gap_eval("Sdhom:=GroupHomomorphismByFunction(Sd,Sd,function(g) return (1,2)*g*(1,2);end);\n", true);
-        gap_eval("hom:=GroupHomomorphismByImages(S2, AutomorphismGroup(Sd), [(1,2)], [Sdhom]);\n", true);
-        gap_eval("G:=SemidirectProduct(S2, hom, Sd);\n", true);
-    } else {
-        // S_d
-        gap_eval("G:=" + sDCmdGenerate());
-    }
 }

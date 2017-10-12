@@ -28,9 +28,10 @@ int main(int argc, char** argv)
 //    app.setAttribute(Qt::AA_UseHighDpiPixmaps, true);
 
     Hypersimplex *test_hyper = createHypersimplex(3,1);
+    delete test_hyper;
 
-
-//    Hypersimplex *test_hyper2 = new Hypersimplex(5,2);
+//    Hypersimplex *test_hyper2 = createHypersimplex(5,2);
+//    delete test_hyper2;
 
     QQuickView view;
     view.setSource(QUrl("qrc:/gui/Application.qml"));
@@ -38,7 +39,7 @@ int main(int argc, char** argv)
 
     QObject::connect((QObject*)view.engine(), SIGNAL(quit()), &app, SLOT(quit()));
 
-    delete test_hyper;
+//    delete test_hyper;
 //    delete test_hyper2;
 
     return 0;
