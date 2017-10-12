@@ -147,10 +147,10 @@ static int combinadicN(int d, const int *comb)
     return n;
 }
 
-VtxTrnsSubgroup::VtxTrnsSubgroup(std::string sub, AutGroup *parent)
+VtxTrnsSubgroup::VtxTrnsSubgroup(std::string sub, int index, AutGroup *parent)
     : m_gapName(sub),
-      m_parent(parent),
-      m_facEl(parent->getFactorizations(sub))
+      m_index(index),
+      m_parent(parent)
 {}
 
 Edge::Edge(int _v, int _w)
@@ -298,14 +298,16 @@ void Hypersimplex::calcVtxTrnsSubgroups()
     qDebug() << "calcVtxTrnsSubgroups";
 
 //    auto sub = m_group->getSubgroups()[97];   //TODOX
+    int index = 0;
     for (auto sub : m_group->getSubgroups()) {
-        if (isVtxTrnsSubgroup(sub)) {
-            m_vtxTrnsSubgroups.push_back(new VtxTrnsSubgroup(sub, m_group));
+        if (isVtxTrnsSubgroup(index)) {
+            m_vtxTrnsSubgroups.push_back(new VtxTrnsSubgroup(sub, index, m_group));
         }
+        index++;
     }
 }
 
-bool Hypersimplex::isVtxTrnsSubgroup(std::string sub)
+bool Hypersimplex::isVtxTrnsSubgroup(int sub)
 {
     bool vertexHits[m_vertexCount] = {false};
 
@@ -362,7 +364,7 @@ void Hypersimplex::calcEdgeEquivClasses()
 
         std::vector<int*> imgList;
 
-        for (auto fac : sub->m_facEl) {
+        for (auto fac : m_group->getFactorizations(sub->m_index)) {
             int *vertices = new int[m_vertexCount];
             startPermutate(fac, vertices);
 
@@ -415,7 +417,7 @@ void Hypersimplex::calcEdgeEquivClasses()
             for (auto vEdge : vertexEdges) {
                 std::vector<Edge> edgeImgs;
 
-                for (auto el :  sub->m_facEl) {
+                for (auto el :  m_group->getFactorizations(sub->m_index)) {
                     auto edgeImg = [this](Edge e, std::string factoredPerm) {
 //                        qDebug() << "XXX1" << e.v << e.w << QString(factoredPerm.c_str());
                         auto imgV = permutateVertex(factoredPerm, e.v);

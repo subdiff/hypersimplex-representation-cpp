@@ -30,7 +30,7 @@ public:
 
     std::string getFactorization(std::string element) const;
 
-    std::vector<std::string> getFactorizations(std::string subgroup = "") const;
+    std::vector<std::string> getFactorizations(int subIndex = -1) const;
 
 private:
     void calcSubgroups();
@@ -40,6 +40,8 @@ private:
 
     std::vector<std::string> m_factorizations;
     std::vector<std::string> m_subgroups;
+
+    std::vector<std::string> *m_subFactorizations = nullptr;
 
     std::string m_gapName;
 };

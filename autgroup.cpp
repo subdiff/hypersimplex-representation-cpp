@@ -157,11 +157,15 @@ AutGroup::AutGroup(int d, int k)
 AutGroup::~AutGroup()
 {
     libgap_finalize();
+    delete[] m_subFactorizations;
+    m_subFactorizations = nullptr;
 }
 
 void AutGroup::calcSubgroups()
 {
     m_subgroups.clear();
+    delete[] m_subFactorizations;
+    m_subFactorizations = nullptr;
 
     std::string subgroupList = gap_eval("Subs:=AllSubgroups(G);\n", true);
 //    gap_eval("Subs:=AllSubgroups(G);\n", false);
@@ -181,6 +185,7 @@ void AutGroup::calcSubgroups()
         std::string subgr = subgroupList.substr(pos, limit - pos);
         m_subgroups.push_back(subgr);
     }
+    m_subFactorizations = new std::vector<std::string>[m_subgroups.size()];
 
     qDebug() << "-----------------";
     qDebug() << "-----------------";
@@ -252,28 +257,29 @@ std::string AutGroup::getFactorization(std::string element) const
     return gap_eval("Factorization(G, " + element + " ));\n", true);
 }
 
-std::vector<std::string> AutGroup::getFactorizations(std::string subgroup) const
+std::vector<std::string> AutGroup::getFactorizations(int subIndex) const
 {
 //    qDebug() << "getFactorizations" << subgroup.c_str();
 
-    bool isFullGroup = gap_eval(subgroup + "=" + m_gapName + ";\n").substr(0, 4) == "true";
-    if (subgroup == "" || isFullGroup) {
+    if (subIndex == -1) {
         return m_factorizations;
     }
 
+    std::string subgroup = m_subgroups[subIndex];
+
+    if (gap_eval(subgroup + "=" + m_gapName + ";\n").substr(0, 4) == "true") {
+        return m_factorizations;
+    }
+    if (m_subFactorizations[subIndex].size() > 0) {
+        return m_subFactorizations[subIndex];
+    }
+
     gap_eval("l:=[];\n", false);
-
-//    gap_eval("hom:=EpimorphismFromFreeGroup(G:names:=[\"x\",\"y\"]);\n", true);
-//    gap_eval("for g in G do Add(l, PreImagesRepresentative(hom,g)); od;\n", false);
-
     gap_eval("for g in " + subgroup + " do Add(l, Factorization(G,g)); od;\n", false);
-
-    // TODO: This is multiple times Factorization of elements. Find saved factorization in m_factorizations instead?
-    gap_eval("for g in " + subgroup + " do Add(l, Factorization(G,g)); od;\n", false);
-
     std::string facs = gap_eval("l;\n");
 
 //    qDebug() << "FACS" << QString(facs.c_str());
 
-    return splitFactoredElements(facs);
+    m_subFactorizations[subIndex] = splitFactoredElements(facs);
+    return m_subFactorizations[subIndex];
 }

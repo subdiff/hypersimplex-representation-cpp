@@ -25,10 +25,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 int main(int argc, char** argv)
 {
     QGuiApplication app(argc, argv);
-//    app.setWindowIcon(QIcon::fromTheme(QStringLiteral("plasmadiscover")));
-//    app.setAttribute(Qt::AA_UseHighDpiPixmaps, true);
 
-    s_createHypersimplex(3,1);
+    s_createHypersimplex(4,2);
 
     qmlRegisterType<BackEnd>("subdiff.de.math.hypersimplex.representation", 1, 0, "BackEnd");
 

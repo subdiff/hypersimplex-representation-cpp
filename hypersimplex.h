@@ -42,10 +42,10 @@ struct EdgeEquivClass {
 };
 
 struct VtxTrnsSubgroup {
-    VtxTrnsSubgroup(std::string sub, AutGroup *parent);
+    VtxTrnsSubgroup(std::string sub, int index, AutGroup *parent);
     std::string m_gapName;
+    int m_index;
     AutGroup *m_parent;
-    std::vector<std::string> m_facEl;
     std::vector<EdgeEquivClass *> m_edgeEquivClasses;
 };
 
@@ -85,7 +85,7 @@ private:
     void calcEdgeEquivClasses();
 
     void calcVtxTrnsSubgroups();
-    bool isVtxTrnsSubgroup(std::string sub);
+    bool isVtxTrnsSubgroup(int sub);
 
     std::vector<Edge> getEdgesToVertex(int vertex);
 };
@@ -97,7 +97,6 @@ public:
 
 private:
     virtual std::vector<int *> parsePermutation(std::string perm) override;
-    bool isVtxTrnsSubgroup(std::string sub);
 
     /*
      * Associates which combinadic vertex is
@@ -115,7 +114,6 @@ public:
 
 private:
     virtual std::vector<int *> parsePermutation(std::string perm) override;
-    bool isVtxTrnsSubgroup(std::string sub);
 
     /*
      * Associates which combinadic vertex is
