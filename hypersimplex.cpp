@@ -314,7 +314,7 @@ bool Hypersimplex::isVtxTrnsSubgroup(std::string sub)
 
 //    qDebug() << "test:" << QString(sub.c_str());
 
-    for (auto factored : m_group->getSubgroupFactorizations(sub)) {
+    for (auto factored : m_group->getFactorizations(sub)) {
 //        qDebug() << "-----------------";
 //        qDebug() << "FACTORED:" << QString(factored.c_str());
 

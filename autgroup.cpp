@@ -58,9 +58,9 @@ static std::string gap_eval(const std::string _cmd, bool readOutput = true)
 
     auto status = libGAP_ReadEvalCommand(libGAP_BottomLVars, NULL);
     if (status != libGAP_STATUS_END) {
-        qDebug() << "ERROR";
+        qDebug() << "GAP STATUS ERROR";
     } else {
-//        qDebug() << "SUCCESS";
+//        qDebug() << "GAP SUCCESS";
     }
 
     char *out = nullptr;
@@ -170,8 +170,6 @@ void AutGroup::calcSubgroups()
         std::size_t pos = subgroupList.find("Group", limit);
         limit = subgroupList.find("), Group", pos);
 
-//        qDebug()<< "S"<< pos << limit;
-
         if (limit == std::string::npos) {
             cont = false;
             limit = subgroupList.find(") ]\n", pos);
@@ -180,17 +178,15 @@ void AutGroup::calcSubgroups()
 
         std::string subgr = subgroupList.substr(pos, limit - pos);
         m_subgroups.push_back(subgr);
-//        qDebug()<< "SUB"<< QString(subgr.c_str());
     }
 
     qDebug() << "-----------------";
     qDebug() << "-----------------";
-    qDebug() << "m_subgroups Count" << m_subgroups.size();
+    qDebug() << "Subgroup Count" << m_subgroups.size();
 //    for (auto s : m_subgroups)
 //        qDebug() << "m_subgroups" << QString(s.c_str());
 
     qDebug() << "-----------------";
-//    qDebug() << "calcSubgroups" << QString(subgroupList.c_str());
 }
 
 static std::vector<std::string> splitFactoredElements(std::string elements)
@@ -227,27 +223,15 @@ static std::vector<std::string> splitFactoredElements(std::string elements)
     return ret;
 }
 
-std::vector<std::string> AutGroup::getFactorizations(std::string group) const
-{
-    if (group == "") {
-        return m_factorizations;
-    }
-
-    gap_eval("l:=[];\n", false);
-    gap_eval("for g in " + group + " do Add(l, Factorization(G,g)); od;\n", false);
-
-    std::string facs = gap_eval("l;\n");
-    return splitFactoredElements(facs);
-}
-
 void AutGroup::createFactoredElements()
 {
     m_factorizations.clear();
 
-//    gap_eval("hom:=EpimorphismFromFreeGroup(G:names:=[\"x\",\"y\"]);\n", true);
     gap_eval("l:=[];\n", false);
 
+//    gap_eval("hom:=EpimorphismFromFreeGroup(G:names:=[\"x\",\"y\"]);\n", true);
 //    gap_eval("for g in G do Add(l, PreImagesRepresentative(hom,g)); od;\n", false);
+
     gap_eval("for g in G do Add(l, Factorization(G,g)); od;\n", false);
 
     std::string facs = gap_eval("l;\n");
@@ -255,31 +239,9 @@ void AutGroup::createFactoredElements()
 
     qDebug() << "-----------------";
     qDebug() << "-----------------";
-    qDebug() << "m_factorizations Count" << m_factorizations.size();
-    for (auto f : m_factorizations)
-        qDebug() << "m_factorizations" << QString(f.c_str());
-
-//    std::size_t start = facs.find('<');
-//    if (start == std::string::npos) {
-//        return;
-//    }
-
-//    facs.erase(0, start);
-
-//    bool cont = true;
-//    while (cont) {
-//        std::size_t limit = facs.find(',');
-//        if (limit == std::string::npos) {
-//            cont = false;
-//            limit = facs.find(']') - 1;
-//        }
-//        std::string fac = facs.substr(0, limit);
-//        m_factorizations.push_back(fac);
-
-//        facs.erase(0, limit + 2);
-
-////        qDebug() << "TEST" << QString(fac.c_str()) << "|||" << QString(facs.c_str());
-//    }
+    qDebug() << "Factorizations Count" << m_factorizations.size();
+//    for (auto f : m_factorizations)
+//        qDebug() << "m_factorizations" << QString(f.c_str());
 }
 
 std::string AutGroup::getFactorization(std::string element) const
@@ -288,8 +250,11 @@ std::string AutGroup::getFactorization(std::string element) const
     return gap_eval("Factorization(G, " + element + " ));\n", true);
 }
 
-std::vector<std::string> AutGroup::getSubgroupFactorizations(std::string subgroup) const
+std::vector<std::string> AutGroup::getFactorizations(std::string subgroup) const
 {
+    if (subgroup == "") {
+        return m_factorizations;
+    }
 //    gap_eval("hom:=EpimorphismFromFreeGroup(G:names:=[\"x\",\"y\"]);\n", true);
     gap_eval("l:=[];\n", false);
 
@@ -303,26 +268,4 @@ std::vector<std::string> AutGroup::getSubgroupFactorizations(std::string subgrou
 //    qDebug() << "FACS" << QString(facs.c_str());
 
     return splitFactoredElements(facs);
-
-//    std::size_t start = facs.find('<');
-//    if (start == std::string::npos) {
-//        return;
-//    }
-
-//    facs.erase(0, start);
-
-//    bool cont = true;
-//    while (cont) {
-//        std::size_t limit = facs.find(',');
-//        if (limit == std::string::npos) {
-//            cont = false;
-//            limit = facs.find(']') - 1;
-//        }
-//        std::string fac = facs.substr(0, limit);
-//        m_factorizations.push_back(fac);
-
-//        facs.erase(0, limit + 2);
-
-//        qDebug() << "TEST" << QString(fac.c_str()) << "|||" << QString(facs.c_str());
-//    }
 }
