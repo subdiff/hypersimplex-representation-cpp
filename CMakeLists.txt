@@ -9,15 +9,16 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # Instruct CMake to run moc automatically when needed.
 set(CMAKE_AUTOMOC ON)
 
+set(CMAKE_AUTOUIC ON)
+
 set (CMAKE_CXX_STANDARD 11)
 
 # Find Qt libraries
 find_package( Qt5 REQUIRED
               Core
               Gui
-              Qml
-              Quick
               Concurrent
+              Widgets
             )
 
 include_directories(/home/roman/Studium/Masterarbeit/Software/libgap/install/include)    #TODOX
@@ -37,7 +38,7 @@ set( ALL_SRCS
      hypersimplex.cpp
      autgroup.cpp
      gimatrix.cpp
-     backend.cpp
+     gui/mainwindow.cpp
      )
 
 qt5_add_resources( ALL_SRCS
@@ -53,5 +54,5 @@ target_link_libraries( hypersimplex-representation
 target_link_libraries( hypersimplex-representation
                        Qt5::Core
                        Qt5::Gui
-                       Qt5::Quick
+                       Qt5::Widgets
                        )

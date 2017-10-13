@@ -16,16 +16,23 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************/
 
-#include "backend.h"
-#include "hypersimplex.h"
+#include "mainwindow.h"
+#include <hypersimplex.h>
 
 #include <QtConcurrent/QtConcurrentRun>
 
-BackEnd::BackEnd(QObject *parent) :
-    QObject(parent)
-{}
+#include "ui_mainwindow.h"
 
-BackEnd::~BackEnd()
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent),
+      m_ui(new Ui::MainWindow)
+{
+    setWindowTitle("Hypersimplex Representer");
+//    resize(400, 300);
+    m_ui->setupUi(this);
+}
+
+MainWindow::~MainWindow()
 {
     // TODO: Make sure running s_createHypersimplex calls are aborted
 
@@ -35,13 +42,13 @@ BackEnd::~BackEnd()
     }
 }
 
-void BackEnd::getHypersimplex(int d, int k)
+void MainWindow::getHypersimplex(int d, int k)
 {
     m_ready = false;
-    emit readyChanged();
+//    emit readyChanged();
 
     setVtxTrSubgroups(std::vector<std::string>());
-    setSelectedSubgroup(0);
+//    setSelectedSubgroup(0);
 
     QtConcurrent::run(::s_createHypersimplex, d, k);
 
@@ -50,7 +57,7 @@ void BackEnd::getHypersimplex(int d, int k)
     m_checkReadyTimer->start(1000);
 }
 
-void BackEnd::checkReady()
+void MainWindow::checkReady()
 {
     if (!::s_ready) {
         return;
@@ -58,7 +65,6 @@ void BackEnd::checkReady()
 
     if (!m_ready) {
         m_ready = ::s_ready;
-        emit readyChanged();
 
         if (m_checkReadyTimer) {
             delete m_checkReadyTimer;
@@ -69,7 +75,7 @@ void BackEnd::checkReady()
     }
 }
 
-void BackEnd::setVtxTrSubgroups(std::vector<std::string> subNames)
+void MainWindow::setVtxTrSubgroups(std::vector<std::string> subNames)
 {
     bool changed = false;
     if (subNames.size() != m_vtxTrSubgroups.size()) {
@@ -92,6 +98,54 @@ void BackEnd::setVtxTrSubgroups(std::vector<std::string> subNames)
         for (std::string sub : subNames) {
             m_vtxTrSubgroups.append(QString(sub.c_str()));
         }
-        emit vtxTrSubgroupsChanged();
     }
+
+    qDebug() << m_vtxTrSubgroups;
+    m_ui->vtxTrSubgrCombo->clear();
+    m_ui->vtxTrSubgrCombo->insertItems(0, m_vtxTrSubgroups);
+    m_ui->vtxTrSubgrCombo->setCurrentIndex(0);
+}
+
+void MainWindow::on_dSpin_valueChanged(int value)
+{
+    auto kValue = m_ui->kSpin->value();
+    if (kValue >= value) {
+        m_ui->kSpin->setValue(value - 1);
+    }
+    setButtonsEnabled(isChangedSpinValues());
+}
+
+void MainWindow::on_kSpin_valueChanged(int value)
+{
+    auto dValue = m_ui->dSpin->value();
+    if (dValue <= value) {
+        m_ui->kSpin->setValue(dValue - 1);
+    }
+    setButtonsEnabled(isChangedSpinValues());
+}
+
+void MainWindow::on_ApplyButton_clicked()
+{
+    m_curD = m_ui->dSpin->value();
+    m_curK = m_ui->kSpin->value();
+    setButtonsEnabled(false);
+
+    getHypersimplex(m_curD, m_curK);
+}
+
+void MainWindow::on_ResetButton_clicked()
+{
+    m_ui->dSpin->setValue(m_curD);
+    m_ui->kSpin->setValue(m_curK);
+}
+
+void MainWindow::setButtonsEnabled(bool enable)
+{
+    m_ui->ApplyButton->setEnabled(enable);
+    m_ui->ResetButton->setEnabled(enable);
+}
+
+bool MainWindow::isChangedSpinValues()
+{
+    return m_curD != m_ui->dSpin->value() || m_curK != m_ui->kSpin->value();
 }

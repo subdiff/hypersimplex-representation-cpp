@@ -16,26 +16,28 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************/
 
-#include <QGuiApplication>
-#include <QQuickView>
+#include <QtWidgets>
 
-#include "hypersimplex.h"
-#include "backend.h"
+#include <hypersimplex.h>
+#include "gui/mainwindow.h"
 
 int main(int argc, char** argv)
 {
-    QGuiApplication app(argc, argv);
+    QApplication app(argc, argv);
     app.setWindowIcon(QIcon::fromTheme(QStringLiteral("applications-education-mathematics")));
+
+    MainWindow window;
+    window.show();
 
 //    s_createHypersimplex(4,2);
 
-    qmlRegisterType<BackEnd>("subdiff.de.math.hypersimplex.representation", 1, 0, "BackEnd");
+//    qmlRegisterType<BackEnd>("subdiff.de.math.hypersimplex.representation", 1, 0, "BackEnd");
 
-    QQuickView view;
-    view.setSource(QUrl("qrc:/gui/Application.qml"));
-    view.show();
+//    QQuickView view;
+//    view.setSource(QUrl("qrc:/gui/Application.qml"));
+//    view.show();
 
-    QObject::connect((QObject*)view.engine(), SIGNAL(quit()), &app, SLOT(quit()));
+//    QObject::connect((QObject*)view.engine(), SIGNAL(quit()), &app, SLOT(quit()));
 
 //    return 0;
 
