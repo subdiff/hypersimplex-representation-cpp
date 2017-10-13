@@ -18,6 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "backend.h"
 #include "hypersimplex.h"
+#include "gimatrix.h"
+#include "convhull.h"
 
 #include <QtConcurrent/QtConcurrentRun>
 
@@ -33,6 +35,7 @@ BackEnd::~BackEnd()
         delete ::s_hypers;
         ::s_hypers = nullptr;
     }
+    delete m_reprMatrix;
 }
 
 void BackEnd::getHypersimplex(int d, int k)
@@ -48,6 +51,15 @@ void BackEnd::getHypersimplex(int d, int k)
     m_checkReadyTimer = new QTimer(this);
     connect(m_checkReadyTimer, SIGNAL(timeout()), this, SLOT(checkReady()));
     m_checkReadyTimer->start(1000);
+}
+
+void BackEnd::getGiMatrix(int subgroup)
+{
+    qDebug() << "getGiMatrix" << subgroup;
+    delete m_reprMatrix;
+
+    m_reprMatrix = new GiMatrix(::s_hypers->getGiMatrix(subgroup));
+    m_reprMatrix->init();
 }
 
 void BackEnd::checkReady()
@@ -92,6 +104,15 @@ void BackEnd::setVtxTrSubgroups(std::vector<std::string> subNames)
         for (std::string sub : subNames) {
             m_vtxTrSubgroups.append(QString(sub.c_str()));
         }
+        getGiMatrix(0);
+        calcNullSpRepr();
         emit vtxTrSubgroupsChanged();
     }
+}
+
+void BackEnd::calcNullSpRepr()
+{
+    MatrixXd points = m_reprMatrix->calcNullspaceRepr();
+    ConvHull hull(points);
+    //TODOX
 }

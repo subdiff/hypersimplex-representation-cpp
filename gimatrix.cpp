@@ -31,6 +31,10 @@ GiMatrix::GiMatrix(Hypersimplex *hypers, VtxTrnsSubgroup *group)
       m_hypers(hypers),
       m_group(group)
 {
+}
+
+void GiMatrix::init()
+{
     m_matrix.resize(m_dim, m_dim);
 
     for (int i = 0; i < m_dim; i++) {
@@ -42,7 +46,6 @@ GiMatrix::GiMatrix(Hypersimplex *hypers, VtxTrnsSubgroup *group)
         m_vars.push_back(1. / (double)eec->multiplicity / m_hypers->degree());
     }
     calculateMatrix();
-    calcNullspaceRepr();
 }
 
 void GiMatrix::calculateMatrix()
@@ -71,11 +74,8 @@ MatrixXd GiMatrix::calcNullspaceRepr()
 {
     qDebug() << "----------------";
     qDebug() << "----------------";
-    qDebug() << "----------------";
 
-    qDebug() << m_group->m_gapName.c_str();
-
-    qDebug() << "m_matrix";
+    qDebug() << "GiMatrix for" << m_group->m_gapName.c_str() << ":";
     std::cout << m_matrix  << std::endl;
 
     SelfAdjointEigenSolver<MatrixXd> eigensolver(m_matrix);

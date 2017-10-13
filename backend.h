@@ -23,6 +23,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QTimer>
 #include <QStringList>
 
+class GiMatrix;
+
 class BackEnd : public QObject
 {
     Q_OBJECT
@@ -35,6 +37,7 @@ public:
     ~BackEnd();
 
     Q_INVOKABLE void getHypersimplex(int d, int k);
+    Q_INVOKABLE void calcNullSpRepr();
 
     bool ready() const {
         return m_ready;
@@ -50,6 +53,7 @@ public:
     void setSelectedSubgroup(int set) {
         if (m_selectedSubgroup != set) {
             m_selectedSubgroup = set;
+            getGiMatrix(set);
             emit selectedSubgroupChanged();
         }
     }
@@ -63,10 +67,12 @@ Q_SIGNALS:
     void selectedSubgroupChanged();
 
 private:
+    void getGiMatrix(int subgroup);
     QTimer *m_checkReadyTimer = nullptr;
     bool m_ready;
     QStringList m_vtxTrSubgroups;
     int m_selectedSubgroup = 0;
+    GiMatrix *m_reprMatrix = nullptr;
 };
 
 #endif // BACKEND_H

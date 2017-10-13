@@ -59,6 +59,7 @@ public:
     inline int degree() { return m_degree; }
 
     std::vector<std::string> getVtxTrSubgroupNames();
+    GiMatrix getGiMatrix(int subgroup);
 
 protected:
     Hypersimplex(int d, int k);
@@ -90,10 +91,6 @@ private:
     bool isVtxTrnsSubgroup(int sub);
 
     std::vector<Edge> getEdgesToVertex(int vertex);
-
-    void calcGiMatrix();
-
-    GiMatrix * m_reprMatrix = nullptr;
 };
 
 class AsymHypers : public Hypersimplex {

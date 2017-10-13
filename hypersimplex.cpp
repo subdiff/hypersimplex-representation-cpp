@@ -211,7 +211,6 @@ Hypersimplex::Hypersimplex(int d, int k)
 Hypersimplex::~Hypersimplex()
 {
     delete m_group;
-    delete m_reprMatrix;
 }
 
 std::vector<std::string> Hypersimplex::getVtxTrSubgroupNames()
@@ -304,14 +303,12 @@ void Hypersimplex::initCalculations()
         }
     }
 
-    calcGiMatrix();
-
     qDebug() << "initCalculations DONE";
 }
 
-void Hypersimplex::calcGiMatrix()
+GiMatrix Hypersimplex::getGiMatrix(int subgroup)
 {
-    m_reprMatrix = new GiMatrix(this, m_vtxTrnsSubgroups[1]);
+    return GiMatrix(this, m_vtxTrnsSubgroups[subgroup]);
 }
 
 void Hypersimplex::calcVtxTrnsSubgroups()
