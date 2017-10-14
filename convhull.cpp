@@ -22,8 +22,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 #include <algorithm>
 
-#include <QDebug>
-
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Polygon_2.h>
 #include <CGAL/convex_hull_2.h>
@@ -53,14 +51,14 @@ ConvHull::ConvHull(MatrixXd &points)
 
         std::cout << "The convex hull contains " << poly.size() << " vertices" << std::endl;
 
-    } else {
+    } else if (points.rows() == 3) {
         std::vector<Point_3> cgalPoints;
 
         for (int i = 0; i < points.cols(); i++) {
             cgalPoints.push_back(Point_3(points(0, i), points(1, i), points(2, i)));
         }
 
-        qDebug() << "cgalPoints:";
+        std::cout << "cgalPoints:" << std::endl;
         for (auto v : cgalPoints)
             std::cout << v  << std::endl;
 
@@ -68,5 +66,7 @@ ConvHull::ConvHull(MatrixXd &points)
         CGAL::convex_hull_3(cgalPoints.begin(), cgalPoints.end(), poly);
 
         std::cout << "The convex hull contains " << poly.size_of_vertices() << " vertices" << std::endl;
+    } else {
+         std::cout << "No The convex hull for dimension > 3 available yet." << std::endl;
     }
 }

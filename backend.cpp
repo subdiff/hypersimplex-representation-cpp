@@ -112,6 +112,7 @@ void BackEnd::setVtxTrSubgroups(std::vector<std::string> subNames)
 
 void BackEnd::calcNullSpRepr()
 {
+    qDebug() << "calcNullSpRepr";
     MatrixXd points = m_reprMatrix->calcNullspaceRepr();
     ConvHull hull(points);
     //TODOX

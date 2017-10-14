@@ -54,6 +54,7 @@ public:
         if (m_selectedSubgroup != set) {
             m_selectedSubgroup = set;
             getGiMatrix(set);
+            calcNullSpRepr();
             emit selectedSubgroupChanged();
         }
     }
