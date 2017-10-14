@@ -29,6 +29,7 @@ struct Edge {
     Edge(int _v, int _w);
     inline bool operator==(Edge const& b) { return v == b.v && w == b.w; }
     inline bool operator!=(Edge const& b){ return !(*this == b); }
+    inline bool operator<(Edge const& b) const { return v <= b.v && w < b.w; }
     inline bool has(int vertex) { return v == vertex || w == vertex; }
     int v, w;
 };
@@ -60,6 +61,8 @@ public:
 
     std::vector<std::string> getVtxTrSubgroupNames();
     GiMatrix getGiMatrix(int subgroup);
+
+    bool isEdge(int vertex1, int vertex2);
 
 protected:
     Hypersimplex(int d, int k);

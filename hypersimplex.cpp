@@ -311,6 +311,19 @@ GiMatrix Hypersimplex::getGiMatrix(int subgroup)
     return GiMatrix(this, m_vtxTrnsSubgroups[subgroup]);
 }
 
+bool Hypersimplex::isEdge(int vertex1, int vertex2)
+{
+    Edge edge(vertex1, vertex2);
+
+    auto compOnFirstVertex = [](const Edge &e1, const Edge &e2) -> bool {
+        return e1.v <= e2.v;
+    };
+    auto range = std::equal_range(m_edges.begin(), m_edges.end(), edge, compOnFirstVertex);
+    auto ptr = std::lower_bound(range.first, range.second, edge);
+
+    return ptr != range.second && *ptr == edge;
+}
+
 void Hypersimplex::calcVtxTrnsSubgroups()
 {
     qDebug() << "calcVtxTrnsSubgroups";
