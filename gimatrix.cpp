@@ -70,7 +70,7 @@ void GiMatrix::calculateMatrix()
     }
 }
 
-MatrixXd GiMatrix::calcNullspaceRepr()
+std::vector<VectorXd> GiMatrix::calcNullspaceRepr()
 {
     qDebug() << "----------------";
     qDebug() << "----------------";
@@ -80,7 +80,7 @@ MatrixXd GiMatrix::calcNullspaceRepr()
 
     SelfAdjointEigenSolver<MatrixXd> eigensolver(m_matrix);
     if (eigensolver.info() != Success) {
-        return MatrixXd();
+        return std::vector<VectorXd>();
     }
 
     VectorXd eVals = eigensolver.eigenvalues();
@@ -97,5 +97,9 @@ MatrixXd GiMatrix::calcNullspaceRepr()
     MatrixXd nullspReprs = eVcts.block(0, m_dim - m_hypers->d(), m_dim, m_hypers->d() - 1).transpose();
     std::cout << nullspReprs  << std::endl;;
 
-    return nullspReprs;
+    std::vector<VectorXd> ret;
+    for (int i = 0; i < nullspReprs.cols(); i++) {
+        ret.push_back(nullspReprs.col(i));
+    }
+    return ret;
 }

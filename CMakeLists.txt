@@ -38,6 +38,7 @@ set( ALL_SRCS
      autgroup.cpp
      gimatrix.cpp
      backend.cpp
+     nllsprepr.cpp
      )
 
 qt5_add_resources( ALL_SRCS

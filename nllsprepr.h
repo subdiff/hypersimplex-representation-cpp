@@ -19,32 +19,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 #include <eigen3/Eigen/Dense>
 
-class Hypersimplex;
-class VtxTrnsSubgroup;
+class GiMatrix;
 
 using namespace Eigen;
 
-// Group invariant matrix with vanishing diagonal
-class GiMatrix {
+// Null space representation
+class NllSpRepr {
 public:
-    GiMatrix(Hypersimplex *hypers, VtxTrnsSubgroup *group);
-    void init();
+    NllSpRepr(GiMatrix *matrix);
+    ~NllSpRepr();
 
-    // TODOX:
-    // setVariables()
-    // getPossibleVariableCombinations()
-
-    std::vector<VectorXd> calcNullspaceRepr();
+    std::vector<VectorXd> calculate();
 
 private:
-    void calculateMatrix();
-
-    Hypersimplex *m_hypers;
-    VtxTrnsSubgroup *m_group;
-
-    MatrixXd m_matrix;     // Matrix<double, Dynamic, Dynamic>
-
-    std::vector<double> m_vars;
-
-    int m_dim;
+//    Hypersimplex *m_hypers = nullptr;
+    GiMatrix *m_reprMatrix = nullptr;
+    std::vector<VectorXd> m_points;
 };

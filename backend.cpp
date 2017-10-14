@@ -112,6 +112,6 @@ void BackEnd::setVtxTrSubgroups(std::vector<std::string> subNames)
 void BackEnd::calcNullSpRepr()
 {
     qDebug() << "calcNullSpRepr";
-    MatrixXd points = m_reprMatrix->calcNullspaceRepr();
+//    MatrixXd points = m_reprMatrix->calcNullspaceRepr();
     //TODOX
 }

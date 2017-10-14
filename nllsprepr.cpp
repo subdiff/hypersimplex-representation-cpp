@@ -16,35 +16,24 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************/
 
-#include <vector>
-#include <eigen3/Eigen/Dense>
+#include "nllsprepr.h"
+#include "gimatrix.h"
 
-class Hypersimplex;
-class VtxTrnsSubgroup;
+#include <algorithm>
 
-using namespace Eigen;
+NllSpRepr::NllSpRepr(GiMatrix *matrix)
+{
+    m_reprMatrix = new GiMatrix(*matrix);
+    calculate();
+}
 
-// Group invariant matrix with vanishing diagonal
-class GiMatrix {
-public:
-    GiMatrix(Hypersimplex *hypers, VtxTrnsSubgroup *group);
-    void init();
+NllSpRepr::~NllSpRepr()
+{
+    delete m_reprMatrix;
+}
 
-    // TODOX:
-    // setVariables()
-    // getPossibleVariableCombinations()
-
-    std::vector<VectorXd> calcNullspaceRepr();
-
-private:
-    void calculateMatrix();
-
-    Hypersimplex *m_hypers;
-    VtxTrnsSubgroup *m_group;
-
-    MatrixXd m_matrix;     // Matrix<double, Dynamic, Dynamic>
-
-    std::vector<double> m_vars;
-
-    int m_dim;
-};
+std::vector<Eigen::VectorXd> NllSpRepr::calculate()
+{
+    m_points = m_reprMatrix->calcNullspaceRepr();
+    return m_points;
+}
