@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "backend.h"
 #include "hypersimplex.h"
 #include "gimatrix.h"
-#include "convhull.h"
 
 #include <QtConcurrent/QtConcurrentRun>
 
@@ -114,6 +113,5 @@ void BackEnd::calcNullSpRepr()
 {
     qDebug() << "calcNullSpRepr";
     MatrixXd points = m_reprMatrix->calcNullspaceRepr();
-    ConvHull hull(points);
     //TODOX
 }

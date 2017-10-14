@@ -20,10 +20,6 @@ find_package( Qt5 REQUIRED
               Concurrent
             )
 
-find_package( CGAL COMPONENTS Core )
-
-include( ${CGAL_USE_FILE} )
-
 include_directories(/home/roman/Studium/Masterarbeit/Software/libgap/install/include)    #TODOX
 link_directories(/home/roman/Studium/Masterarbeit/Software/libgap/install/lib)
 
@@ -42,7 +38,6 @@ set( ALL_SRCS
      autgroup.cpp
      gimatrix.cpp
      backend.cpp
-     convhull.cpp
      )
 
 qt5_add_resources( ALL_SRCS
