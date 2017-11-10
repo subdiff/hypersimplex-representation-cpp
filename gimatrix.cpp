@@ -47,13 +47,33 @@ void GiMatrix::init()
 
 bool GiMatrix::setVars(std::vector<double> set)
 {
+    std::vector<double> varsTmp, multVarsTmp;
+
+    auto getCellVal = [this, &varsTmp](Edge e) -> double {
+        int index = 0;
+        for (auto eec : m_group->m_edgeEquivClasses) {
+            if (eec->has(e)) {
+                return eec->multiplicity * varsTmp[index];
+            }
+            index++;
+        }
+        return 0.;
+    };
+
     auto setSize = set.size();
     if (!setSize) {
         // set variable defaults
-        m_vars.clear();
         for (auto eec : m_group->m_edgeEquivClasses) {
-            m_vars.push_back(1. / (double)eec->multiplicity / m_hypers->degree());
+            varsTmp.push_back(1. / (double)eec->multiplicity / m_hypers->degree());
         }
+        for (int col = 0; col < m_dim; col++) {
+            multVarsTmp.push_back(getCellVal(Edge(col, m_dim - 1)));
+        }
+        m_vars.clear();
+        m_multVars.clear();
+        m_vars = varsTmp;
+        m_multVars = multVarsTmp;
+
         return true;
     }
 
@@ -61,16 +81,26 @@ bool GiMatrix::setVars(std::vector<double> set)
         return false;
     }
 
-    // TODO: test on sum
-
-    std::vector<double> tmp;
     for (auto s : set) {
         if (s < 0 || 1 < s) {
             return false;
         }
-        tmp.push_back(s);
+        varsTmp.push_back(s);
     }
-    m_vars = tmp;
+
+    double sum = 0;
+    for (int col = 0; col < m_dim; col++) {
+        auto multVarTmp = getCellVal(Edge(col, m_dim - 1));
+        multVarsTmp.push_back(multVarTmp);
+        sum += multVarTmp;
+    }
+
+    if (sum != 1.) {
+        qDebug() << "Error: Multiplied variable sum not one. It is:" << sum;
+        return false;
+    }
+    m_vars = varsTmp;
+    m_multVars = multVarsTmp;
     return true;
 }
 
@@ -80,7 +110,7 @@ void GiMatrix::calculateMatrix()
         int index = 0;
         for (auto eec : m_group->m_edgeEquivClasses) {
             if (eec->has(e)) {
-                return eec->multiplicity * m_vars[index];
+                return m_multVars[index];
             }
             index++;
         }

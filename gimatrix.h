@@ -45,6 +45,7 @@ private:
     MatrixXd m_matrix;     // Matrix<double, Dynamic, Dynamic>
 
     std::vector<double> m_vars;
+    std::vector<double> m_multVars;
 
     int m_dim;
 };
