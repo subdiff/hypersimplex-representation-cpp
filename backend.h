@@ -70,7 +70,7 @@ Q_SIGNALS:
 private:
     void getGiMatrix(int subgroup);
     QTimer *m_checkReadyTimer = nullptr;
-    bool m_ready;
+    bool m_ready = true;
     QStringList m_vtxTrSubgroups;
     int m_selectedSubgroup = 0;
     GiMatrix *m_reprMatrix = nullptr;
