@@ -89,7 +89,7 @@ Layouts.RowLayout {
                     id: applyButton
                     text: "Apply"
                     enabled: backend.ready && (dSpin.value != ctrls.curD || kSpin.value != ctrls.curK);
-                    onClicked: initHypers(dSpin.value, kSpin.value)
+                    onClicked: ctrls.initHypers(dSpin.value, kSpin.value)
                 }
                 Button {
                     id: resetButton
