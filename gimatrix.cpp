@@ -41,11 +41,37 @@ void GiMatrix::init()
         m_matrix(i, i) = 0;
     }
 
-    // set variables defaults
-    for (auto eec : m_group->m_edgeEquivClasses) {
-        m_vars.push_back(1. / (double)eec->multiplicity / m_hypers->degree());
-    }
+    setVars(std::vector<double>());
     calculateMatrix();
+}
+
+bool GiMatrix::setVars(std::vector<double> set)
+{
+    auto setSize = set.size();
+    if (!setSize) {
+        // set variable defaults
+        m_vars.clear();
+        for (auto eec : m_group->m_edgeEquivClasses) {
+            m_vars.push_back(1. / (double)eec->multiplicity / m_hypers->degree());
+        }
+        return true;
+    }
+
+    if (setSize != m_group->m_edgeEquivClasses.size() - 1) {
+        return false;
+    }
+
+    // TODO: test on sum
+
+    std::vector<double> tmp;
+    for (auto s : set) {
+        if (s < 0 || 1 < s) {
+            return false;
+        }
+        tmp.push_back(s);
+    }
+    m_vars = tmp;
+    return true;
 }
 
 void GiMatrix::calculateMatrix()

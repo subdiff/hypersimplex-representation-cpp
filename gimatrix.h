@@ -31,9 +31,9 @@ public:
     void init();
 
     // TODOX:
-    // setVariables()
     // getPossibleVariableCombinations()
 
+    bool setVars(std::vector<double> set);
     std::vector<VectorXd> calcNullspaceRepr();
 
 private:
