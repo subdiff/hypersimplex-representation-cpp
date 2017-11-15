@@ -70,7 +70,7 @@ Entity {
         viewCenter: Qt.vector3d( 0.0, 0.0, 0.0 )
     }
 
-    FirstPersonCameraController { camera: camera }
+    OrbitCameraController { camera: camera }
 
     components: [
         RenderSettings {

@@ -193,15 +193,6 @@ Layouts.RowLayout {
             anchors.margins: 50
 //            color: "darkRed"
 
-            transform: Rotation {
-                id: sceneRotation
-                axis.x: 1
-                axis.y: 0
-                axis.z: 0
-                origin.x: scene.width / 2
-                origin.y: scene.height / 2
-            }
-
             Scene3D {
                 id: scene3d
                 anchors.fill: parent
