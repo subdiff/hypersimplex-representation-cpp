@@ -33,7 +33,16 @@ public:
     // TODOX:
     // getPossibleVariableCombinations()
 
+    std::vector<double> getVars() const {
+        return m_vars;
+    }
+    std::vector<int> getMultiplicities() const {
+        return m_mult;
+    }
+
     bool setVars(std::vector<double> set);
+    bool setMultVars(std::vector<double> set);
+
     std::vector<VectorXd> calcNullspaceRepr();
 
 private:
@@ -44,6 +53,7 @@ private:
 
     MatrixXd m_matrix;     // Matrix<double, Dynamic, Dynamic>
 
+    std::vector<int> m_mult;
     std::vector<double> m_vars;
     std::vector<double> m_multVars;
 

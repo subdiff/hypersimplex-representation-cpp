@@ -31,6 +31,9 @@ GiMatrix::GiMatrix(Hypersimplex *hypers, VtxTrnsSubgroup *group)
       m_hypers(hypers),
       m_group(group)
 {
+    for (int i = 0; i < m_group->m_edgeEquivClasses.size(); i++) {
+        m_mult.push_back(m_group->m_edgeEquivClasses[i]->multiplicity);
+    }
 }
 
 void GiMatrix::init()
@@ -50,12 +53,11 @@ bool GiMatrix::setVars(std::vector<double> set)
     std::vector<double> varsTmp, multVarsTmp;
 
     auto getCellVal = [this, &varsTmp](Edge e) -> double {
-        int index = 0;
-        for (auto eec : m_group->m_edgeEquivClasses) {
+        for (int i = 0; i < m_group->m_edgeEquivClasses.size(); i++) {
+            auto eec = m_group->m_edgeEquivClasses[i];
             if (eec->has(e)) {
-                return eec->multiplicity * varsTmp[index];
+                return (double)eec->multiplicity * varsTmp[i];
             }
-            index++;
         }
         return 0.;
     };
@@ -100,6 +102,31 @@ bool GiMatrix::setVars(std::vector<double> set)
         return false;
     }
     m_vars = varsTmp;
+    m_multVars = multVarsTmp;
+    return true;
+}
+
+bool GiMatrix::setMultVars(std::vector<double> set)
+{
+    std::vector<double> multVarsTmp;
+
+    if (set.size() != m_group->m_edgeEquivClasses.size() - 1) {
+        return false;
+    }
+
+    double sum = 0;
+    for (auto s : set) {
+        if (s < 0 || 1 < s) {
+            return false;
+        }
+        multVarsTmp.push_back(s);
+        sum += s;
+    }
+
+    if (sum != 1.) {
+        qDebug() << "Error: Multiplied variable sum not one. It is:" << sum;
+        return false;
+    }
     m_multVars = multVarsTmp;
     return true;
 }
