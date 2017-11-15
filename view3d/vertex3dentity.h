@@ -16,30 +16,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************/
 
-#include <QGuiApplication>
-#include <QQuickView>
+#include <vector>
 
-#include "hypersimplex.h"
-#include "backend.h"
-#include "view3d/root3dentity.h"
+#include <Qt3DCore/QEntity>
+#include <Qt3DExtras/QSphereMesh>
+#include <Qt3DCore/QTransform>
+#include <Qt3DExtras/QPhongMaterial>
 
-int main(int argc, char** argv)
-{
-    QGuiApplication app(argc, argv);
-    app.setWindowIcon(QIcon::fromTheme(QStringLiteral("applications-education-mathematics")));
 
-//    s_createHypersimplex(4,2);
+class Vertex3DEntity : public Qt3DCore::QEntity {
+public:
+    Vertex3DEntity(QNode *parent = nullptr);
 
-    qmlRegisterType<BackEnd>("subdiff.de.math.hypersimplex.representation", 1, 0, "BackEnd");
-    qmlRegisterType<Root3DEntity>("subdiff.de.math.hypersimplex.representation", 1, 0, "Root3DEntity");
-
-    QQuickView view;
-    view.setSource(QUrl("qrc:/gui/Application.qml"));
-    view.show();
-
-    QObject::connect((QObject*)view.engine(), SIGNAL(quit()), &app, SLOT(quit()));
-
-//    return 0;
-
-    return app.exec();
-}
+private:
+    Qt3DExtras::QSphereMesh *m_mesh;
+    Qt3DExtras::QPhongMaterial *m_material;
+    Qt3DCore::QTransform *m_transform;
+};

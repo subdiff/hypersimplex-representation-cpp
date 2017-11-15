@@ -18,6 +18,10 @@ find_package( Qt5 REQUIRED
               Qml
               Quick
               Concurrent
+              3DCore
+              3DExtras
+              3DRender
+              3DInput
             )
 
 include_directories(/home/roman/Studium/Masterarbeit/Software/libgap/install/include)    #TODOX
@@ -39,6 +43,9 @@ set( ALL_SRCS
      gimatrix.cpp
      backend.cpp
      nllsprepr.cpp
+     view3d/root3dentity.cpp
+     view3d/vertex3dentity.cpp
+     view3d/edge3dentity.cpp
      )
 
 qt5_add_resources( ALL_SRCS
@@ -55,4 +62,8 @@ target_link_libraries( hypersimplex-representation
                        Qt5::Core
                        Qt5::Gui
                        Qt5::Quick
+                       Qt5::3DCore
+                       Qt5::3DExtras
+                       Qt5::3DRender
+                       Qt5::3DInput
                        )

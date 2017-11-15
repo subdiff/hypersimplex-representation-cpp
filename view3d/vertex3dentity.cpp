@@ -16,30 +16,27 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************/
 
-#include <QGuiApplication>
-#include <QQuickView>
+#include "vertex3dentity.h"
 
-#include "hypersimplex.h"
-#include "backend.h"
-#include "view3d/root3dentity.h"
+#include <QDebug>
 
-int main(int argc, char** argv)
+Vertex3DEntity::Vertex3DEntity(QNode *parent)
+    : Qt3DCore::QEntity(parent)
 {
-    QGuiApplication app(argc, argv);
-    app.setWindowIcon(QIcon::fromTheme(QStringLiteral("applications-education-mathematics")));
+    m_mesh = new Qt3DExtras::QSphereMesh();
+    m_mesh->setRadius(2);
+    m_mesh->setRings(100);
+    m_mesh->setSlices(20);
 
-//    s_createHypersimplex(4,2);
+    m_material = new Qt3DExtras::QPhongMaterial(this);
+    m_material->setDiffuse(QColor("blue"));
 
-    qmlRegisterType<BackEnd>("subdiff.de.math.hypersimplex.representation", 1, 0, "BackEnd");
-    qmlRegisterType<Root3DEntity>("subdiff.de.math.hypersimplex.representation", 1, 0, "Root3DEntity");
+    m_transform = new Qt3DCore::QTransform();
+//    m_transform->setScale(1.5f);
+    m_transform->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(1.0f, 0.0f, 0.0f), 45.0f));
+    m_transform->setTranslation(QVector3D(-5.0f, 4.0f, -1.5));
 
-    QQuickView view;
-    view.setSource(QUrl("qrc:/gui/Application.qml"));
-    view.show();
-
-    QObject::connect((QObject*)view.engine(), SIGNAL(quit()), &app, SLOT(quit()));
-
-//    return 0;
-
-    return app.exec();
+    addComponent(m_mesh);
+    addComponent(m_material);
+    addComponent(m_transform);
 }

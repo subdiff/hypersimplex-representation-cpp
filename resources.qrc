@@ -2,6 +2,5 @@
 <RCC version="1.0">
     <qresource>
         <file>gui/Application.qml</file>
-        <file>gui/Entity3D.qml</file>
     </qresource>
 </RCC>

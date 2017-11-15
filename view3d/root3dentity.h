@@ -16,30 +16,31 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************/
 
-#include <QGuiApplication>
-#include <QQuickView>
 
-#include "hypersimplex.h"
-#include "backend.h"
-#include "view3d/root3dentity.h"
+#include "vertex3dentity.h"
+#include "edge3dentity.h"
 
-int main(int argc, char** argv)
-{
-    QGuiApplication app(argc, argv);
-    app.setWindowIcon(QIcon::fromTheme(QStringLiteral("applications-education-mathematics")));
+#include <Qt3DCore/QEntity>
+#include <Qt3DRender/QCamera>
+#include <Qt3DRender/QCameraLens>
+#include <Qt3DCore/QTransform>
 
-//    s_createHypersimplex(4,2);
+#include <Qt3DRender/QRenderAspect>
+#include <Qt3DExtras/QForwardRenderer>
+#include <Qt3DExtras/QPhongMaterial>
+#include <Qt3DExtras/QCylinderMesh>
+#include <Qt3DExtras/QSphereMesh>
 
-    qmlRegisterType<BackEnd>("subdiff.de.math.hypersimplex.representation", 1, 0, "BackEnd");
-    qmlRegisterType<Root3DEntity>("subdiff.de.math.hypersimplex.representation", 1, 0, "Root3DEntity");
+#include <vector>
 
-    QQuickView view;
-    view.setSource(QUrl("qrc:/gui/Application.qml"));
-    view.show();
 
-    QObject::connect((QObject*)view.engine(), SIGNAL(quit()), &app, SLOT(quit()));
+class Root3DEntity : public Qt3DCore::QEntity {
+public:
+    Root3DEntity(QNode *parent = nullptr);
 
-//    return 0;
+private:
+    int test;
 
-    return app.exec();
-}
+    std::vector<Vertex3DEntity *> m_vertices;
+    std::vector<Edge3DEntity *> m_edges;
+};
