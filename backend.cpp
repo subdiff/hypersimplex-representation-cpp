@@ -113,5 +113,6 @@ void BackEnd::calcNullSpRepr()
 {
     qDebug() << "calcNullSpRepr";
 //    MatrixXd points = m_reprMatrix->calcNullspaceRepr();
+    m_reprMatrix->calcNullspaceRepr();
     //TODOX
 }

@@ -20,10 +20,14 @@ import QtQuick 2.3
 import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.3 as Layouts
 
+import QtQuick.Scene3D 2.0
+//import QtCanvas3D 1.1
+
 import subdiff.de.math.hypersimplex.representation 1.0
 
 Layouts.RowLayout {
 
+    spacing: 50
     Item {
         id: ctrls
         width: childrenRect.width//1000
@@ -131,11 +135,83 @@ Layouts.RowLayout {
 
             text: "TEST"
         }
+
+        Column {
+            id: sliders
+            anchors {
+                top: logOutput.bottom
+                left: logOutput.left
+                right: logOutput.right
+                topMargin: 10
+            }
+            Slider {
+                width: parent.width
+
+            }
+        }
     }
 
     Rectangle {
-        width: 500
-        height: 200
+        width: 600
+        height: 400
         color: "yellow"
+
+//        Canvas3D {
+//            id: canvas3d
+//            width: 500
+//            height: 200
+
+//            focus: true
+//            property var gl
+
+//            onInitializeGL: {
+//                gl = canvas3d.getContext("experimental-webgl");
+
+//                // Setup clear color to be a random color
+//                gl.clearColor(Math.random(), Math.random(), Math.random(), 1.0);
+
+//                // Setup viewport
+//                gl.viewport(0, 0, canvas3d.width * canvas3d.devicePixelRatio, canvas3d.height * canvas3d.devicePixelRatio);
+//            }
+
+//            onPaintGL: {
+//                // Clear background to current clear color
+//                gl.clear(gl.COLOR_BUFFER_BIT);
+//            }
+
+//            onResizeGL: {
+//                var pixelRatio = canvas3d.devicePixelRatio;
+//                canvas3d.pixelSize = Qt.size(canvas3d.width * pixelRatio, canvas3d.height * pixelRatio);
+//                if (gl)
+//                    gl.viewport(0, 0, canvas3d.width * canvas3d.devicePixelRatio, canvas3d.height * canvas3d.devicePixelRatio);
+//            }
+//        }
+
+        Rectangle {
+            id: scene
+            anchors.fill: parent
+            anchors.margins: 50
+//            color: "darkRed"
+
+            transform: Rotation {
+                id: sceneRotation
+                axis.x: 1
+                axis.y: 0
+                axis.z: 0
+                origin.x: scene.width / 2
+                origin.y: scene.height / 2
+            }
+
+            Scene3D {
+                id: scene3d
+                anchors.fill: parent
+                anchors.margins: 10
+                focus: true
+                aspects: ["input", "logic"]
+                cameraAspectRatioMode: Scene3D.AutomaticAspectRatio
+
+                Entity3D {}
+            }
+        }
     }
 }
