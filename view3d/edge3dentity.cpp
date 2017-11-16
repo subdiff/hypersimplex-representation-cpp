@@ -61,18 +61,19 @@ void Edge3DEntity::init (Vertex3DEntity *v, Vertex3DEntity *w)
 
 void Edge3DEntity::updateGeometry()
 {
-    auto posV = m_v[0]->pos();
-    auto posW = m_v[1]->pos();
+    const auto posV = m_v[0]->pos();
+    const auto posW = m_v[1]->pos();
 
-    auto posStart = posV;
-    auto posEnd = posW;
+    const auto oldDir = m_dir.isNull() ? QVector3D(0.0f, 1.0f, 0.0f) : m_dir;
+    const auto newDir = posW - posV;
 
-//    if (m_transform->)
+//    qDebug() << "Edge" << posV << posW << "|" << oldDir << newDir;
 
-    auto diff_vector = posW - posV;
+    m_mesh->setLength(newDir.length());
+    m_transform->setTranslation(posV + newDir / 2);
 
-    qDebug() << "Edge" << posV << posW << "|" << diff_vector;
+    QQuaternion rotQ = QQuaternion::rotationTo(oldDir, newDir);
+    m_transform->setRotation(rotQ);
 
-    m_transform->setTranslation(posV);
-    m_transform->setRotation(QQuaternion::fromDirection(diff_vector,diff_vector));
+    m_dir = newDir;
 }

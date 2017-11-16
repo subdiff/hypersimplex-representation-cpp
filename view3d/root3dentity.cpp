@@ -121,7 +121,6 @@ void Root3DEntity::initGeometries(GiMatrix *matrix)
     for (auto v : nullSpRepr) {
         Vertex3DEntity *v3d = new Vertex3DEntity(this, v);
         m_vertices.push_back(v3d);
-        qDebug() << v3d;
     }
 
     MatrixXd incidences = matrix->getMatrix();

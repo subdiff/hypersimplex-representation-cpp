@@ -48,16 +48,12 @@ Vertex3DEntity::Vertex3DEntity(QNode *parent, Eigen::VectorXd pos)
 
 void Vertex3DEntity::updateGeometry(Eigen::VectorXd pos)
 {
-    qDebug() << "updateGeometry" ;
     std::cout << pos  << std::endl;
 
     if (pos.rows() == 2) {
-        m_pos = QVector3D(pos[0], pos[1], 1);
+        m_pos = QVector3D(pos[0], pos[1], 0);
     } else if (pos.rows() == 3) {
         m_pos = QVector3D(pos[0], pos[1], pos[2]);
     }
     m_transform->setTranslation(m_pos);
-
-//    m_transform->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(1.0f, 0.0f, 0.0f), 45.0f));
-//    m_transform->setTranslation(QVector3D(-5.0f, 4.0f, -1.5));
 }

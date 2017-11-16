@@ -39,4 +39,5 @@ private:
     Qt3DCore::QTransform *m_transform;
 
     Vertex3DEntity *m_v[2];
+    QVector3D m_dir = QVector3D();
 };
