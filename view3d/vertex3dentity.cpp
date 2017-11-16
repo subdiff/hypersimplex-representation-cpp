@@ -23,15 +23,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 Vertex3DEntity::Vertex3DEntity(QNode *parent)
     : Qt3DCore::QEntity(parent)
 {
-    m_mesh = new Qt3DExtras::QSphereMesh();
-    m_mesh->setRadius(2);
+    m_mesh = new Qt3DExtras::QSphereMesh(this);
+    m_mesh->setRadius(5);
     m_mesh->setRings(100);
     m_mesh->setSlices(20);
 
     m_material = new Qt3DExtras::QPhongMaterial(this);
-    m_material->setDiffuse(QColor("blue"));
+    m_material->setDiffuse(QColor(QRgb(0x928327)));
 
-    m_transform = new Qt3DCore::QTransform();
+    m_transform = new Qt3DCore::QTransform(this);
 //    m_transform->setScale(1.5f);
     m_transform->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(1.0f, 0.0f, 0.0f), 45.0f));
     m_transform->setTranslation(QVector3D(-5.0f, 4.0f, -1.5));

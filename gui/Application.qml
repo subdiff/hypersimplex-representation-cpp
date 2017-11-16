@@ -155,14 +155,30 @@ Layouts.RowLayout {
         color: "yellow"
 
             Scene3D {
-                id: scene3d
+                id: scene3D
                 anchors.fill: parent
                 anchors.margins: 10
                 focus: true
                 aspects: ["input", "logic"]
                 cameraAspectRatioMode: Scene3D.AutomaticAspectRatio
 
-                Root3DEntity {}
+                Root3DEntity {
+                    id: root3D
+                }
             }
+    }
+
+    Root3DWrapper {
+        id: wrap3D
+        root3DPtr: root3D
+    }
+
+    Button {
+        text: "TEST INIT"
+        onClicked: wrap3D.initGeometries()
+    }
+    Button {
+        text: "TEST CLEAR"
+        onClicked: wrap3D.clearGeometries()
     }
 }

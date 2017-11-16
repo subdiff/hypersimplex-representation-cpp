@@ -21,6 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "hypersimplex.h"
 #include "backend.h"
+#include "view3d/root3dwrapper.h"
 #include "view3d/root3dentity.h"
 
 int main(int argc, char** argv)
@@ -31,6 +32,7 @@ int main(int argc, char** argv)
 //    s_createHypersimplex(4,2);
 
     qmlRegisterType<BackEnd>("subdiff.de.math.hypersimplex.representation", 1, 0, "BackEnd");
+    qmlRegisterType<Root3DWrapper>("subdiff.de.math.hypersimplex.representation", 1, 0, "Root3DWrapper");
     qmlRegisterType<Root3DEntity>("subdiff.de.math.hypersimplex.representation", 1, 0, "Root3DEntity");
 
     QQuickView view;

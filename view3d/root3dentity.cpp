@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************/
 
 #include "root3dentity.h"
+#include "vertex3dentity.h"
 
 #include <QDebug>
 
@@ -29,9 +30,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 Root3DEntity::Root3DEntity(QNode *parent)
     : Qt3DCore::QEntity(parent)
 {
-    // Material
-//    Qt3DRender::QMaterial *material = new Qt3DExtras::QPhongMaterial(this);
-
     // Camera
     Qt3DRender::QCamera *camera = new Qt3DRender::QCamera(this);
     camera->lens()->setPerspectiveProjection(45.0f, 16.0f/9.0f, 0.1f, 1000.0f);
@@ -78,4 +76,26 @@ Root3DEntity::Root3DEntity(QNode *parent)
     cylinderEntity->addComponent(cylinder);
     cylinderEntity->addComponent(cylinderMaterial);
     cylinderEntity->addComponent(cylinderTransform);
+}
+
+void Root3DEntity::initGeometries()
+{
+    qDebug() << "initGeometries";
+    m_vertices.push_back(new Vertex3DEntity(this));
+    for (auto v : m_vertices)
+        qDebug() << v;
+}
+
+void Root3DEntity::clearGeometries()
+{
+    for(auto v : m_vertices) {
+        delete v;
+        v = nullptr;
+    }
+    m_vertices.clear();
+}
+
+void Root3DEntity::resetGeometries()
+{
+
 }

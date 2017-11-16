@@ -16,36 +16,33 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************/
 
-#ifndef ROOT3DENTITY_H
-#define ROOT3DENTITY_H
+#ifndef ROOT3DWRAPPER_H
+#define ROOT3DWRAPPER_H
 
 #include <Qt3DCore/QEntity>
-#include <Qt3DRender/QCamera>
-#include <Qt3DRender/QCameraLens>
-#include <Qt3DCore/QTransform>
+#include <QObject>
 
-#include <Qt3DRender/QRenderAspect>
-#include <Qt3DExtras/QForwardRenderer>
-#include <Qt3DExtras/QPhongMaterial>
-#include <Qt3DExtras/QCylinderMesh>
-#include <Qt3DExtras/QSphereMesh>
+class Root3DWrapper : public QObject {
+    Q_OBJECT
 
-#include <vector>
-
-class Vertex3DEntity;
-class Edge3DEntity;
-
-class Root3DEntity : public Qt3DCore::QEntity {
+    Q_PROPERTY(Qt3DCore::QEntity * root3DPtr READ root3DPtr WRITE setRoot3DPtr NOTIFY root3DPtrChanged)
 public:
-    Root3DEntity(QNode *parent = nullptr);
+    Root3DWrapper(QObject *parent = nullptr);
 
-    void initGeometries();
-    void clearGeometries();
-    void resetGeometries();
+    Qt3DCore::QEntity *root3DPtr() {
+        return m_root3d;
+    }
+    void setRoot3DPtr(Qt3DCore::QEntity *set);
+
+    Q_INVOKABLE void initGeometries();
+    Q_INVOKABLE void clearGeometries();
+    Q_INVOKABLE void resetGeometries();
+
+Q_SIGNALS:
+    void root3DPtrChanged();
 
 private:
-    std::vector<Vertex3DEntity *> m_vertices;
-    std::vector<Edge3DEntity *> m_edges;
+    Qt3DCore::QEntity *m_root3d = nullptr;
 };
 
-#endif // ROOT3DENTITY_H
+#endif // ROOT3DWRAPPER_H

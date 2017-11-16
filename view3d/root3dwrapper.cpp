@@ -16,36 +16,39 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************/
 
-#ifndef ROOT3DENTITY_H
-#define ROOT3DENTITY_H
+#include "root3dwrapper.h"
 
-#include <Qt3DCore/QEntity>
-#include <Qt3DRender/QCamera>
-#include <Qt3DRender/QCameraLens>
-#include <Qt3DCore/QTransform>
+#include "root3dentity.h"
 
-#include <Qt3DRender/QRenderAspect>
-#include <Qt3DExtras/QForwardRenderer>
-#include <Qt3DExtras/QPhongMaterial>
-#include <Qt3DExtras/QCylinderMesh>
-#include <Qt3DExtras/QSphereMesh>
+#include <QDebug>
 
-#include <vector>
+Root3DWrapper::Root3DWrapper(QObject *parent)
+    : QObject(parent)
+{
+}
 
-class Vertex3DEntity;
-class Edge3DEntity;
+void Root3DWrapper::setRoot3DPtr(Qt3DCore::QEntity *set)
+{
+    if (m_root3d != set) {
+        m_root3d = set;
+    }
+    emit root3DPtrChanged();
+}
 
-class Root3DEntity : public Qt3DCore::QEntity {
-public:
-    Root3DEntity(QNode *parent = nullptr);
+void Root3DWrapper::initGeometries()
+{
+    Root3DEntity *root_entity = dynamic_cast<Root3DEntity *>(m_root3d);
+    root_entity->initGeometries();
+}
 
-    void initGeometries();
-    void clearGeometries();
-    void resetGeometries();
+void Root3DWrapper::clearGeometries()
+{
+    Root3DEntity *root_entity = dynamic_cast<Root3DEntity *>(m_root3d);
+    root_entity->clearGeometries();
+}
 
-private:
-    std::vector<Vertex3DEntity *> m_vertices;
-    std::vector<Edge3DEntity *> m_edges;
-};
-
-#endif // ROOT3DENTITY_H
+void Root3DWrapper::resetGeometries()
+{
+    Root3DEntity *root_entity = dynamic_cast<Root3DEntity *>(m_root3d);
+    root_entity->resetGeometries();
+}

@@ -43,6 +43,7 @@ set( ALL_SRCS
      gimatrix.cpp
      backend.cpp
      nllsprepr.cpp
+     view3d/root3dwrapper.cpp
      view3d/root3dentity.cpp
      view3d/vertex3dentity.cpp
      view3d/edge3dentity.cpp
