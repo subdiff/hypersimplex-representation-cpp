@@ -55,19 +55,84 @@ Root3DEntity::Root3DEntity(QNode *parent)
 
     Qt3DInput::QInputSettings *inputSettings = new Qt3DInput::QInputSettings(this);
     addComponent(inputSettings);
+
+    createCoordOrigin();
+    createCoordAxes();
+}
+
+void Root3DEntity::createCoordOrigin()
+{
+    auto zeroMesh = new Qt3DExtras::QSphereMesh(this);
+    auto zeroMaterial = new Qt3DExtras::QPhongMaterial(this);
+    auto zeroTransform = new Qt3DCore::QTransform(this);
+
+    zeroMesh->setRadius(0.1);
+    zeroMesh->setRings(100);
+    zeroMesh->setSlices(20);
+    zeroMaterial->setDiffuse(QColor("white"));
+
+    addComponent(zeroMesh);
+    addComponent(zeroMaterial);
+    addComponent(zeroTransform);
+}
+
+void Root3DEntity::createCoordAxes()
+{
+    const double length = 1;
+
+    auto createAxe = [length, this](QVector3D rotAxe, QVector3D trans, QString color) {
+        auto axeMesh = new Qt3DExtras::QCylinderMesh(this);
+        axeMesh->setLength(length);
+        axeMesh->setRadius(0.05);
+        axeMesh->setRings(100);
+        axeMesh->setSlices(20);
+
+        auto *axeTransform = new Qt3DCore::QTransform(this);
+        if (!rotAxe.isNull()) {
+            axeTransform->setRotation(QQuaternion::fromAxisAndAngle(rotAxe, 90.0f));
+        }
+        axeTransform->setTranslation(trans);
+
+        auto *axeMaterial = new Qt3DExtras::QPhongMaterial(this);
+        axeMaterial->setDiffuse(QColor(color));
+
+        auto *axeEntity = new Qt3DCore::QEntity(this);
+        axeEntity->addComponent(axeMesh);
+        axeEntity->addComponent(axeMaterial);
+        axeEntity->addComponent(axeTransform);
+
+    };
+    // X-axe
+    createAxe(QVector3D(0.0f, 0.0f, 1.0f), QVector3D(length/2, 0, 0), "red");
+    // Y-axe
+    createAxe(QVector3D(), QVector3D(0, length/2, 0), "green");
+    // Z-axe
+    createAxe(QVector3D(1.0f, 0.0f, 0.0f), QVector3D(0, 0, length/2), "blue");
 }
 
 void Root3DEntity::initGeometries(GiMatrix *matrix)
 {
     qDebug() << "initGeometries";
 
-    m_vertices.clear();
+    clearGeometries();
+
     auto nullSpRepr = matrix->getNullspaceRepr();
 
     for (auto v : nullSpRepr) {
         Vertex3DEntity *v3d = new Vertex3DEntity(this, v);
         m_vertices.push_back(v3d);
         qDebug() << v3d;
+    }
+
+    MatrixXd incidences = matrix->getMatrix();
+    for (int row=0; row < incidences.rows(); row++) {
+        for (int col=0; col < row; col++) {
+            if(incidences(row, col) != 0.) {
+//                qDebug() << "incidences" << row << col << "|" << incidences(row, col);
+                Edge3DEntity *e3d = new Edge3DEntity(this, m_vertices[row], m_vertices[col]);
+                m_edges.push_back(e3d);
+            }
+        }
     }
 }
 

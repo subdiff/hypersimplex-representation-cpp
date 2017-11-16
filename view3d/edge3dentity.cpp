@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************/
 
 #include "edge3dentity.h"
+#include "vertex3dentity.h"
 
 #include <QDebug>
 
@@ -27,8 +28,8 @@ Edge3DEntity::Edge3DEntity(QNode *parent)
     m_v[1] = nullptr;
 
     m_mesh = new Qt3DExtras::QCylinderMesh();
-    m_mesh->setRadius(1);
-    m_mesh->setLength(10);
+    m_mesh->setRadius(0.05);
+    m_mesh->setLength(1);
     m_mesh->setRings(100);
     m_mesh->setSlices(20);
 
@@ -60,6 +61,18 @@ void Edge3DEntity::init (Vertex3DEntity *v, Vertex3DEntity *w)
 
 void Edge3DEntity::updateGeometry()
 {
-    m_transform->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(1.0f, 0.0f, 0.0f), 45.0f));
-    m_transform->setTranslation(QVector3D(-5.0f, 4.0f, -1.5));
+    auto posV = m_v[0]->pos();
+    auto posW = m_v[1]->pos();
+
+    auto posStart = posV;
+    auto posEnd = posW;
+
+//    if (m_transform->)
+
+    auto diff_vector = posW - posV;
+
+    qDebug() << "Edge" << posV << posW << "|" << diff_vector;
+
+    m_transform->setTranslation(posV);
+    m_transform->setRotation(QQuaternion::fromDirection(diff_vector,diff_vector));
 }

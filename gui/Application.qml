@@ -150,8 +150,8 @@ Layouts.RowLayout {
     }
 
     Rectangle {
-        width: 600
-        height: 400
+        width: 1000
+        height: 800
         color: "yellow"
 
             Scene3D {

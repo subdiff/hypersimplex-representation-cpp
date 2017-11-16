@@ -48,6 +48,10 @@ public:
         return m_nullSpRepr;
     }
 
+    MatrixXd getMatrix() const {
+        return m_matrix;
+    }
+
 private:
     void calculateMatrix();
 

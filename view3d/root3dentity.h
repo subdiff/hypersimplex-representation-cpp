@@ -47,6 +47,8 @@ public:
     void updateGeometries(GiMatrix *matrix);
 
 private:
+    void createCoordOrigin();
+    void createCoordAxes();
     std::vector<Vertex3DEntity *> m_vertices;
     std::vector<Edge3DEntity *> m_edges;
 };

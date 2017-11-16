@@ -32,7 +32,7 @@ public:
 
 //    void init(Eigen::VectorXd pos);
 
-    Eigen::VectorXd pos() const {
+    QVector3D pos() const {
         return m_pos;
     }
 
@@ -43,5 +43,5 @@ private:
     Qt3DExtras::QPhongMaterial *m_material;
     Qt3DCore::QTransform *m_transform;
 
-    Eigen::VectorXd m_pos;
+    QVector3D m_pos;
 };
