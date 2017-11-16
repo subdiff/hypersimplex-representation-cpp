@@ -23,13 +23,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <Qt3DCore/QTransform>
 #include <Qt3DExtras/QPhongMaterial>
 
+class Vertex3DEntity;
 
 class Edge3DEntity : public Qt3DCore::QEntity {
 public:
     Edge3DEntity(QNode *parent = nullptr);
+    Edge3DEntity(QNode *parent, Vertex3DEntity *v, Vertex3DEntity *w);
+    void init (Vertex3DEntity *v, Vertex3DEntity *w);
+
+    void updateGeometry();
 
 private:
     Qt3DExtras::QCylinderMesh *m_mesh;
     Qt3DExtras::QPhongMaterial *m_material;
     Qt3DCore::QTransform *m_transform;
+
+    Vertex3DEntity *m_v[2];
 };

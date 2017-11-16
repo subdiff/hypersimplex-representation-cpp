@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "root3dwrapper.h"
 
 #include "root3dentity.h"
+#include "../gimatrix.h"
 
 #include <QDebug>
 
@@ -35,20 +36,33 @@ void Root3DWrapper::setRoot3DPtr(Qt3DCore::QEntity *set)
     emit root3DPtrChanged();
 }
 
+void Root3DWrapper::setBackEnd(BackEnd *set)
+{
+    if (m_backEnd != set) {
+        m_backEnd = set;
+    }
+    emit backEndChanged();
+}
+
 void Root3DWrapper::initGeometries()
 {
     Root3DEntity *root_entity = dynamic_cast<Root3DEntity *>(m_root3d);
-    root_entity->initGeometries();
+    GiMatrix *matrix = m_backEnd->getGiMatrix();
+
+    root_entity->initGeometries(matrix);
 }
 
 void Root3DWrapper::clearGeometries()
 {
     Root3DEntity *root_entity = dynamic_cast<Root3DEntity *>(m_root3d);
+
     root_entity->clearGeometries();
 }
 
-void Root3DWrapper::resetGeometries()
+void Root3DWrapper::updateGeometries()
 {
     Root3DEntity *root_entity = dynamic_cast<Root3DEntity *>(m_root3d);
-    root_entity->resetGeometries();
+    GiMatrix *matrix = m_backEnd->getGiMatrix();
+
+    root_entity->updateGeometries(matrix);
 }

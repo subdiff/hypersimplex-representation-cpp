@@ -30,18 +30,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <Qt3DExtras/QCylinderMesh>
 #include <Qt3DExtras/QSphereMesh>
 
+#include <eigen3/Eigen/Dense>
+
 #include <vector>
 
 class Vertex3DEntity;
 class Edge3DEntity;
+class GiMatrix;
 
 class Root3DEntity : public Qt3DCore::QEntity {
 public:
     Root3DEntity(QNode *parent = nullptr);
 
-    void initGeometries();
+    void initGeometries(GiMatrix *matrix);
     void clearGeometries();
-    void resetGeometries();
+    void updateGeometries(GiMatrix *matrix);
 
 private:
     std::vector<Vertex3DEntity *> m_vertices;

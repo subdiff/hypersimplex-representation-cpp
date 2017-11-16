@@ -52,9 +52,9 @@ void BackEnd::getHypersimplex(int d, int k)
     m_checkReadyTimer->start(1000);
 }
 
-void BackEnd::getGiMatrix(int subgroup)
+void BackEnd::setGiMatrix(int subgroup)
 {
-    qDebug() << "getGiMatrix" << subgroup;
+    qDebug() << "setGiMatrix" << subgroup;
     delete m_reprMatrix;
 
     m_reprMatrix = new GiMatrix(::s_hypers->getGiMatrix(subgroup));
@@ -103,7 +103,7 @@ void BackEnd::setVtxTrSubgroups(std::vector<std::string> subNames)
         for (std::string sub : subNames) {
             m_vtxTrSubgroups.append(QString(sub.c_str()));
         }
-        getGiMatrix(0);
+        setGiMatrix(0);
         calcNullSpRepr();
         emit vtxTrSubgroupsChanged();
     }
@@ -112,7 +112,5 @@ void BackEnd::setVtxTrSubgroups(std::vector<std::string> subNames)
 void BackEnd::calcNullSpRepr()
 {
     qDebug() << "calcNullSpRepr";
-//    MatrixXd points = m_reprMatrix->calcNullspaceRepr();
     m_reprMatrix->calcNullspaceRepr();
-    //TODOX
 }

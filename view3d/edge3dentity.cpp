@@ -23,6 +23,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 Edge3DEntity::Edge3DEntity(QNode *parent)
     : Qt3DCore::QEntity(parent)
 {
+    m_v[0] = nullptr;
+    m_v[1] = nullptr;
+
     m_mesh = new Qt3DExtras::QCylinderMesh();
     m_mesh->setRadius(1);
     m_mesh->setLength(10);
@@ -34,10 +37,29 @@ Edge3DEntity::Edge3DEntity(QNode *parent)
 
     m_transform = new Qt3DCore::QTransform();
 //    m_transform->setScale(1.5f);
-    m_transform->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(1.0f, 0.0f, 0.0f), 45.0f));
-    m_transform->setTranslation(QVector3D(-5.0f, 4.0f, -1.5));
 
     addComponent(m_mesh);
     addComponent(m_material);
     addComponent(m_transform);
+}
+
+
+Edge3DEntity::Edge3DEntity(QNode *parent, Vertex3DEntity *v, Vertex3DEntity *w)
+    : Edge3DEntity(parent)
+{
+    init(v,w);
+}
+
+void Edge3DEntity::init (Vertex3DEntity *v, Vertex3DEntity *w)
+{
+    m_v[0] = v;
+    m_v[1] = w;
+
+    updateGeometry();
+}
+
+void Edge3DEntity::updateGeometry()
+{
+    m_transform->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(1.0f, 0.0f, 0.0f), 45.0f));
+    m_transform->setTranslation(QVector3D(-5.0f, 4.0f, -1.5));
 }

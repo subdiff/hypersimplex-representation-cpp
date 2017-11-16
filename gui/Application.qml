@@ -171,6 +171,7 @@ Layouts.RowLayout {
     Root3DWrapper {
         id: wrap3D
         root3DPtr: root3D
+        backEnd: backend
     }
 
     Button {

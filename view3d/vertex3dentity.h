@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************/
 
 #include <vector>
+#include <eigen3/Eigen/Dense>
 
 #include <Qt3DCore/QEntity>
 #include <Qt3DExtras/QSphereMesh>
@@ -27,9 +28,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 class Vertex3DEntity : public Qt3DCore::QEntity {
 public:
     Vertex3DEntity(QNode *parent = nullptr);
+    Vertex3DEntity(QNode *parent, Eigen::VectorXd pos);
+
+//    void init(Eigen::VectorXd pos);
+
+    Eigen::VectorXd pos() const {
+        return m_pos;
+    }
+
+    void updateGeometry(Eigen::VectorXd pos);
 
 private:
     Qt3DExtras::QSphereMesh *m_mesh;
     Qt3DExtras::QPhongMaterial *m_material;
     Qt3DCore::QTransform *m_transform;
+
+    Eigen::VectorXd m_pos;
 };

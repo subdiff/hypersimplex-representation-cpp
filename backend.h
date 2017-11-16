@@ -28,6 +28,7 @@ class GiMatrix;
 class BackEnd : public QObject
 {
     Q_OBJECT
+
     Q_PROPERTY(bool ready READ ready NOTIFY readyChanged)
     Q_PROPERTY(QStringList vtxTrSubgroups READ vtxTrSubgroups NOTIFY vtxTrSubgroupsChanged)
     Q_PROPERTY(int selectedSubgroup READ selectedSubgroup WRITE setSelectedSubgroup NOTIFY selectedSubgroupChanged)
@@ -53,10 +54,14 @@ public:
     void setSelectedSubgroup(int set) {
         if (m_selectedSubgroup != set) {
             m_selectedSubgroup = set;
-            getGiMatrix(set);
+            setGiMatrix(set);
             calcNullSpRepr();
             emit selectedSubgroupChanged();
         }
+    }
+
+    GiMatrix *getGiMatrix() {
+        return m_reprMatrix;
     }
 
 public Q_SLOTS:
@@ -68,9 +73,11 @@ Q_SIGNALS:
     void selectedSubgroupChanged();
 
 private:
-    void getGiMatrix(int subgroup);
+    void setGiMatrix(int subgroup);
+
     QTimer *m_checkReadyTimer = nullptr;
     bool m_ready = true;
+
     QStringList m_vtxTrSubgroups;
     int m_selectedSubgroup = 0;
     GiMatrix *m_reprMatrix = nullptr;

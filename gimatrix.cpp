@@ -153,7 +153,7 @@ void GiMatrix::calculateMatrix()
     }
 }
 
-std::vector<VectorXd> GiMatrix::calcNullspaceRepr()
+void GiMatrix::calcNullspaceRepr()
 {
     qDebug() << "----------------";
     qDebug() << "----------------";
@@ -161,9 +161,11 @@ std::vector<VectorXd> GiMatrix::calcNullspaceRepr()
     qDebug() << "GiMatrix for" << m_group->m_gapName.c_str() << ":";
     std::cout << m_matrix  << std::endl;
 
+    m_nullSpRepr.clear();
+
     SelfAdjointEigenSolver<MatrixXd> eigensolver(m_matrix);
     if (eigensolver.info() != Success) {
-        return std::vector<VectorXd>();
+        return;
     }
 
     VectorXd eVals = eigensolver.eigenvalues();
@@ -180,9 +182,10 @@ std::vector<VectorXd> GiMatrix::calcNullspaceRepr()
     MatrixXd nullspReprs = eVcts.block(0, m_dim - m_hypers->d(), m_dim, m_hypers->d() - 1).transpose();
     std::cout << nullspReprs  << std::endl;;
 
-    std::vector<VectorXd> ret;
+    std::vector<VectorXd> nullSpRepr;
     for (int i = 0; i < nullspReprs.cols(); i++) {
-        ret.push_back(nullspReprs.col(i));
+        nullSpRepr.push_back(nullspReprs.col(i));
     }
-    return ret;
+
+    m_nullSpRepr = nullSpRepr;
 }

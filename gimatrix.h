@@ -43,7 +43,10 @@ public:
     bool setVars(std::vector<double> set);
     bool setMultVars(std::vector<double> set);
 
-    std::vector<VectorXd> calcNullspaceRepr();
+    void calcNullspaceRepr();
+    std::vector<VectorXd> getNullspaceRepr() const {
+        return m_nullSpRepr;
+    }
 
 private:
     void calculateMatrix();
@@ -56,6 +59,8 @@ private:
     std::vector<int> m_mult;
     std::vector<double> m_vars;
     std::vector<double> m_multVars;
+
+    std::vector<VectorXd> m_nullSpRepr;
 
     int m_dim;
 };

@@ -18,6 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "root3dentity.h"
 #include "vertex3dentity.h"
+#include "edge3dentity.h"
+#include "../gimatrix.h"
 
 #include <QDebug>
 
@@ -33,7 +35,7 @@ Root3DEntity::Root3DEntity(QNode *parent)
     // Camera
     Qt3DRender::QCamera *camera = new Qt3DRender::QCamera(this);
     camera->lens()->setPerspectiveProjection(45.0f, 16.0f/9.0f, 0.1f, 1000.0f);
-    camera->setPosition(QVector3D(0, 0, 40.0f));
+    camera->setPosition(QVector3D(0, 0, 4.0f));
     camera->setUpVector(QVector3D(0, 1, 0));
     camera->setViewCenter(QVector3D(0, 0, 0));
 
@@ -53,41 +55,30 @@ Root3DEntity::Root3DEntity(QNode *parent)
 
     Qt3DInput::QInputSettings *inputSettings = new Qt3DInput::QInputSettings(this);
     addComponent(inputSettings);
-
-
-    // Cylinder shape data
-    Qt3DExtras::QCylinderMesh *cylinder = new Qt3DExtras::QCylinderMesh();
-    cylinder->setRadius(1);
-    cylinder->setLength(10);
-    cylinder->setRings(100);
-    cylinder->setSlices(20);
-
-    // CylinderMesh Transform
-    Qt3DCore::QTransform *cylinderTransform = new Qt3DCore::QTransform();
-//    cylinderTransform->setScale(1.5f);
-    cylinderTransform->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(1.0f, 0.0f, 0.0f), 45.0f));
-    cylinderTransform->setTranslation(QVector3D(-5.0f, 4.0f, -1.5));
-
-    Qt3DExtras::QPhongMaterial *cylinderMaterial = new Qt3DExtras::QPhongMaterial();
-    cylinderMaterial->setDiffuse(QColor(QRgb(0x928327)));
-
-    // Cylinder
-    Qt3DCore::QEntity *cylinderEntity = new Qt3DCore::QEntity(this);
-    cylinderEntity->addComponent(cylinder);
-    cylinderEntity->addComponent(cylinderMaterial);
-    cylinderEntity->addComponent(cylinderTransform);
 }
 
-void Root3DEntity::initGeometries()
+void Root3DEntity::initGeometries(GiMatrix *matrix)
 {
     qDebug() << "initGeometries";
-    m_vertices.push_back(new Vertex3DEntity(this));
-    for (auto v : m_vertices)
-        qDebug() << v;
+
+    m_vertices.clear();
+    auto nullSpRepr = matrix->getNullspaceRepr();
+
+    for (auto v : nullSpRepr) {
+        Vertex3DEntity *v3d = new Vertex3DEntity(this, v);
+        m_vertices.push_back(v3d);
+        qDebug() << v3d;
+    }
 }
 
 void Root3DEntity::clearGeometries()
 {
+    for(auto e : m_edges) {
+        delete e;
+        e = nullptr;
+    }
+    m_edges.clear();
+
     for(auto v : m_vertices) {
         delete v;
         v = nullptr;
@@ -95,7 +86,10 @@ void Root3DEntity::clearGeometries()
     m_vertices.clear();
 }
 
-void Root3DEntity::resetGeometries()
+void Root3DEntity::updateGeometries(GiMatrix *matrix)
 {
-
+    auto nullSpRepr = matrix->getNullspaceRepr();
+    for (int i = 0; i<= nullSpRepr.size(); i++) {
+        m_vertices[i]->updateGeometry(nullSpRepr[i]);
+    }
 }

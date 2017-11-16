@@ -42,7 +42,6 @@ set( ALL_SRCS
      autgroup.cpp
      gimatrix.cpp
      backend.cpp
-     nllsprepr.cpp
      view3d/root3dwrapper.cpp
      view3d/root3dentity.cpp
      view3d/vertex3dentity.cpp
