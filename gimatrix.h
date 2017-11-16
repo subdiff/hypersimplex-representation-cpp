@@ -40,7 +40,7 @@ public:
         return m_mult;
     }
 
-    bool setVars(std::vector<double> set);
+    bool setVars(const std::vector<double> set);
     bool setMultVars(std::vector<double> set);
 
     void calcNullspaceRepr();
@@ -53,12 +53,14 @@ public:
     }
 
 private:
+    void calculateEecIndexMatrix();
     void calculateMatrix();
 
     Hypersimplex *m_hypers;
     VtxTrnsSubgroup *m_group;
 
-    MatrixXd m_matrix;     // Matrix<double, Dynamic, Dynamic>
+    MatrixXd m_matrix;          // Matrix<double, Dynamic, Dynamic>
+    MatrixXi m_eecIndexMatrix;  // Matrix<double, Dynamic, Dynamic>
 
     std::vector<int> m_mult;
     std::vector<double> m_vars;

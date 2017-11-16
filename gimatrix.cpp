@@ -39,76 +39,73 @@ GiMatrix::GiMatrix(Hypersimplex *hypers, VtxTrnsSubgroup *group)
 void GiMatrix::init()
 {
     m_matrix.resize(m_dim, m_dim);
+    m_eecIndexMatrix.resize(m_dim, m_dim);
 
+
+    // diagonal is always zero
     for (int i = 0; i < m_dim; i++) {
         m_matrix(i, i) = 0;
+        m_eecIndexMatrix(i, i) = 0;
     }
 
     setVars(std::vector<double>());
+    calculateEecIndexMatrix();
     calculateMatrix();
 }
 
-bool GiMatrix::setVars(std::vector<double> set)
+bool GiMatrix::setVars(const std::vector<double> set)
 {
     std::vector<double> varsTmp, multVarsTmp;
-
-    auto getCellVal = [this, &varsTmp](Edge e) -> double {
-        for (int i = 0; i < m_group->m_edgeEquivClasses.size(); i++) {
-            auto eec = m_group->m_edgeEquivClasses[i];
-            if (eec->has(e)) {
-                return (double)eec->multiplicity * varsTmp[i];
-            }
-        }
-        return 0.;
-    };
+    // first entry is always zero for more efficient queries
+    varsTmp.push_back(0.);
+    multVarsTmp.push_back(0.);
 
     auto setSize = set.size();
     if (!setSize) {
         // set variable defaults
         for (auto eec : m_group->m_edgeEquivClasses) {
-            varsTmp.push_back(1. / (double)eec->multiplicity / m_hypers->degree());
-        }
-        for (int col = 0; col < m_dim; col++) {
-            multVarsTmp.push_back(getCellVal(Edge(col, m_dim - 1)));
+            double multVar = 1. / m_hypers->degree();
+            varsTmp.push_back(multVar / (double)eec->multiplicity);
+            multVarsTmp.push_back(multVar);
         }
         m_vars.clear();
         m_multVars.clear();
         m_vars = varsTmp;
         m_multVars = multVarsTmp;
-
         return true;
     }
 
-    if (setSize != m_group->m_edgeEquivClasses.size() - 1) {
+    if (setSize != m_group->m_edgeEquivClasses.size()) {
         return false;
     }
 
-    for (auto s : set) {
+    double sum = 0;
+    for (int i = 0; i < setSize; i++) {
+        auto s = set[i];
         if (s < 0 || 1 < s) {
             return false;
         }
         varsTmp.push_back(s);
-    }
 
-    double sum = 0;
-    for (int col = 0; col < m_dim; col++) {
-        auto multVarTmp = getCellVal(Edge(col, m_dim - 1));
+        double multVarTmp = m_group->m_edgeEquivClasses[i]->multiplicity * s;
         multVarsTmp.push_back(multVarTmp);
         sum += multVarTmp;
     }
 
-    if (sum != 1.) {
+    if (!qFuzzyCompare(sum,1.)) {
         qDebug() << "Error: Multiplied variable sum not one. It is:" << sum;
         return false;
     }
     m_vars = varsTmp;
     m_multVars = multVarsTmp;
+
     return true;
 }
 
 bool GiMatrix::setMultVars(std::vector<double> set)
 {
     std::vector<double> multVarsTmp;
+    multVarsTmp.push_back(0.);
 
     if (set.size() != m_group->m_edgeEquivClasses.size() - 1) {
         return false;
@@ -131,22 +128,33 @@ bool GiMatrix::setMultVars(std::vector<double> set)
     return true;
 }
 
-void GiMatrix::calculateMatrix()
+void GiMatrix::calculateEecIndexMatrix()
 {
-    auto getCellVal = [this](Edge e) -> double {
-        int index = 0;
-        for (auto eec : m_group->m_edgeEquivClasses) {
-            if (eec->has(e)) {
-                return m_multVars[index];
-            }
-            index++;
-        }
-        return 0.;
-    };
-
     for (int row = 0; row < m_dim; row++) {
         for (int col = 0; col < row; col++) {
-            auto val = getCellVal(Edge(col, row));
+            const auto edge = Edge(col, row);
+
+            int foundIndex = 0;
+            int eecIndex = 1;
+            for (auto eec : m_group->m_edgeEquivClasses) {
+                if (eec->has(edge)) {
+                    foundIndex = eecIndex;
+                    break;
+                }
+                eecIndex++;
+            }
+            m_eecIndexMatrix(row, col) = foundIndex;
+            m_eecIndexMatrix(col, row) = foundIndex;
+        }
+    }
+}
+
+void GiMatrix::calculateMatrix()
+{
+    for (int row = 0; row < m_dim; row++) {
+        for (int col = 0; col < row; col++) {
+            auto eecIndex = m_eecIndexMatrix(row, col);
+            auto val = m_multVars[eecIndex];
             m_matrix(row, col) = val;
             m_matrix(col, row) = val;
         }
@@ -158,7 +166,9 @@ void GiMatrix::calcNullspaceRepr()
     qDebug() << "----------------";
     qDebug() << "----------------";
 
-    qDebug() << "GiMatrix for" << m_group->m_gapName.c_str() << ":";
+    qDebug() << "EECIndexMatrix for" << m_group->m_gapName.c_str() << ":";
+    std::cout << m_eecIndexMatrix  << std::endl;
+    qDebug() << "GiMatrix:";
     std::cout << m_matrix  << std::endl;
 
     m_nullSpRepr.clear();
