@@ -66,7 +66,7 @@ void Root3DEntity::createCoordOrigin()
     auto zeroMaterial = new Qt3DExtras::QPhongMaterial(this);
     auto zeroTransform = new Qt3DCore::QTransform(this);
 
-    zeroMesh->setRadius(0.1);
+    zeroMesh->setRadius(0.03);
     zeroMesh->setRings(100);
     zeroMesh->setSlices(20);
     zeroMaterial->setDiffuse(QColor("white"));
@@ -78,12 +78,12 @@ void Root3DEntity::createCoordOrigin()
 
 void Root3DEntity::createCoordAxes()
 {
-    const double length = 1;
+    const double length = 0.3;
 
     auto createAxe = [length, this](QVector3D rotAxe, QVector3D trans, QString color) {
         auto axeMesh = new Qt3DExtras::QCylinderMesh(this);
         axeMesh->setLength(length);
-        axeMesh->setRadius(0.05);
+        axeMesh->setRadius(0.015);
         axeMesh->setRings(100);
         axeMesh->setSlices(20);
 

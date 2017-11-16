@@ -28,7 +28,7 @@ Edge3DEntity::Edge3DEntity(QNode *parent)
     m_v[1] = nullptr;
 
     m_mesh = new Qt3DExtras::QCylinderMesh();
-    m_mesh->setRadius(0.05);
+    m_mesh->setRadius(0.02);
     m_mesh->setLength(1);
     m_mesh->setRings(100);
     m_mesh->setSlices(20);

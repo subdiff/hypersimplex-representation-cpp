@@ -25,7 +25,7 @@ Vertex3DEntity::Vertex3DEntity(QNode *parent)
     : Qt3DCore::QEntity(parent)
 {
     m_mesh = new Qt3DExtras::QSphereMesh(this);
-    m_mesh->setRadius(0.1);
+    m_mesh->setRadius(0.04);
     m_mesh->setRings(100);
     m_mesh->setSlices(20);
 
