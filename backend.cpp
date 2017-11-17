@@ -37,7 +37,7 @@ BackEnd::~BackEnd()
     delete m_reprMatrix;
 }
 
-void BackEnd::getHypersimplex(int d, int k)
+void BackEnd::createHypersimplex(int d, int k)
 {
     m_ready = false;
     emit readyChanged();
@@ -50,6 +50,48 @@ void BackEnd::getHypersimplex(int d, int k)
     m_checkReadyTimer = new QTimer(this);
     connect(m_checkReadyTimer, SIGNAL(timeout()), this, SLOT(checkReady()));
     m_checkReadyTimer->start(1000);
+}
+
+void BackEnd::setSelectedSubgroup(int set) {
+    if (m_selectedSubgroup != set) {
+        m_selectedSubgroup = set;
+        setGiMatrix(set);
+        calcNullSpRepr();
+        setEecWraps();
+        emit selectedSubgroupChanged();
+    }
+}
+
+void BackEnd::setEecWraps() {
+    auto clear = [this]() {
+        for (auto eW : m_eecWraps) {
+            delete eW;
+        }
+        m_eecWraps.clear();
+    };
+
+    if (m_reprMatrix) {
+        clear();
+        auto vars = m_reprMatrix->getVars();
+        auto mults = m_reprMatrix->getMultiplicities();
+        for (int i = 0; i < vars.size(); i++) {
+            auto eecWrap = new EecWrap(this, vars[i], mults[i]);
+            m_eecWraps.append(eecWrap);
+        }
+        for (int i = 0; i < m_eecWraps.size(); i++) {
+            auto e = static_cast<EecWrap*>(m_eecWraps[i]);
+            qDebug() << "m_eecWraps" << e->val() << e->mult();
+        }
+        emit eecWrapsChanged();
+    } else if (!m_eecWraps.isEmpty()) {
+        clear();
+        emit eecWrapsChanged();
+    }
+}
+
+void BackEnd::setVars(QList<double > vars)
+{
+
 }
 
 void BackEnd::setGiMatrix(int subgroup)
@@ -105,6 +147,7 @@ void BackEnd::setVtxTrSubgroups(std::vector<std::string> subNames)
         }
         setGiMatrix(0);
         calcNullSpRepr();
+        setEecWraps();
         emit vtxTrSubgroupsChanged();
     }
 }

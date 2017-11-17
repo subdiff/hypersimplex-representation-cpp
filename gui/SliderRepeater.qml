@@ -22,15 +22,16 @@ import QtQuick.Controls 1.4
 Repeater {
     id: slidersRepeater
 
-    model: 4//backend.eecCount    //TODO test
+    model: backend.eecWraps
     delegate: VarSlider{}
 
     function distrVals(changedIndex) {
-        if (model < 2) {
+        if (count < 2) {
             return;
         }
         var chItem = itemAt(changedIndex);
         console.log("Changed val:", chItem.oldVal, "to", chItem.val);
+
 
         var diff = (chItem.val - chItem.oldVal) * chItem.mult;
         console.log("diff:", diff, chItem.val, chItem.oldVal, chItem.mult);
@@ -38,7 +39,7 @@ Repeater {
         chItem.oldVal = chItem.val;
 
         var avails = [];
-        for (var i = 0; i < model; i++) {
+        for (i = 0; i < count; i++) {
             var itm = itemAt(i);
 
             if (itm == null) {
@@ -53,7 +54,13 @@ Repeater {
 
             avails.push([i, availVal]);
         }
-//                    console.log("avails1:", avails);
+
+        if (chItem.val * chItem.mult == 1) {
+            for (var i = 0; i < avails.length; i++) {
+                setItemVal(avails[i][0], 0);
+            }
+            return;
+        }
 
         avails.sort(function(a, b){return a[1] - b[1]});
 
@@ -64,6 +71,7 @@ Repeater {
         console.log("avails:", avails);
 
         if (!avails.length) {
+            updateBackend();
             return;
         }
         console.log("fillOrDistr:", avails[0][1], diff);
@@ -85,6 +93,7 @@ Repeater {
             var index = avails[i][0];
             setItemVal(index, itemAt(index).val - diffDistr / itemAt(index).mult);
         }
+        updateBackend();
     }
 
     function fillFirst(avails, diff) {
@@ -107,5 +116,13 @@ Repeater {
     function setItemVal(index, val) {
         itemAt(index).oldVal = val;
         itemAt(index).val = val;
+    }
+
+    function updateBackend() {
+        var vals = [];
+        for (var i = 0; i < count - 1; i++) {
+            vals = itemAt(i).val;
+        }
+        backend.setVars(vals);
     }
 }

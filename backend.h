@@ -25,6 +25,35 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 class GiMatrix;
 
+class EecWrap : public QObject
+{
+    Q_OBJECT
+
+    Q_PROPERTY(double val READ val NOTIFY valChanged)
+    Q_PROPERTY(int mult READ mult NOTIFY multChanged)
+
+public:
+    explicit EecWrap(QObject *parent, double val, int mult)
+        : m_val(val),
+          m_mult(mult)
+    {}
+
+    double val() const {
+        return m_val;
+    }
+    double mult() const {
+        return m_mult;
+    }
+
+Q_SIGNALS:
+    void valChanged();
+    void multChanged();
+
+private:
+    double m_val;
+    int m_mult;
+};
+
 class BackEnd : public QObject
 {
     Q_OBJECT
@@ -33,12 +62,16 @@ class BackEnd : public QObject
     Q_PROPERTY(QStringList vtxTrSubgroups READ vtxTrSubgroups NOTIFY vtxTrSubgroupsChanged)
     Q_PROPERTY(int selectedSubgroup READ selectedSubgroup WRITE setSelectedSubgroup NOTIFY selectedSubgroupChanged)
 
+    Q_PROPERTY(QList<QObject*> eecWraps READ eecWraps NOTIFY eecWrapsChanged)
+
 public:
     explicit BackEnd(QObject *parent = nullptr);
     ~BackEnd();
 
-    Q_INVOKABLE void getHypersimplex(int d, int k);
+    Q_INVOKABLE void createHypersimplex(int d, int k);
     Q_INVOKABLE void calcNullSpRepr();
+
+    Q_INVOKABLE void setVars(QList<double > vars);
 
     bool ready() const {
         return m_ready;
@@ -51,18 +84,17 @@ public:
     int selectedSubgroup() const {
         return m_selectedSubgroup;
     }
-    void setSelectedSubgroup(int set) {
-        if (m_selectedSubgroup != set) {
-            m_selectedSubgroup = set;
-            setGiMatrix(set);
-            calcNullSpRepr();
-            emit selectedSubgroupChanged();
-        }
-    }
+    void setSelectedSubgroup(int set);
 
     GiMatrix *getGiMatrix() {
         return m_reprMatrix;
     }
+
+    QList<QObject*> eecWraps() const {
+        return m_eecWraps;
+    }
+    void setEecWraps();
+
 
 public Q_SLOTS:
     void checkReady();
@@ -71,6 +103,7 @@ Q_SIGNALS:
     void readyChanged();
     void vtxTrSubgroupsChanged();
     void selectedSubgroupChanged();
+    void eecWrapsChanged();
 
 private:
     void setGiMatrix(int subgroup);
@@ -81,6 +114,8 @@ private:
     QStringList m_vtxTrSubgroups;
     int m_selectedSubgroup = 0;
     GiMatrix *m_reprMatrix = nullptr;
+
+    QList<QObject*> m_eecWraps;
 };
 
 #endif // BACKEND_H

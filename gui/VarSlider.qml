@@ -26,7 +26,7 @@ Row {
 
     property alias val: slider.value
     property alias oldVal: slider.oldVal
-    property int mult: 1
+    property int mult: model.modelData.mult
 
     spacing: 10
 
@@ -35,11 +35,13 @@ Row {
 
         width: parent.width - varText.width - parent.spacing
         minimumValue: 0.
-        maximumValue: 1 / mult
+        maximumValue: 1. / mult
+
+        enabled: count > 1
 
         property double oldVal: -1
 
-        value: 0.25    //TODO test
+        value: model.modelData.val
 
         onValueChanged: {
             if (oldVal == -1) {
@@ -58,6 +60,8 @@ Row {
         id: varText
 
         text: slider.value
+
+        enabled: count > 1
 
         width: fontMetrics.averageCharacterWidth * 6
 

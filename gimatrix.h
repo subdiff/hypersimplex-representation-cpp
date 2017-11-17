@@ -34,7 +34,7 @@ public:
     // getPossibleVariableCombinations()
 
     std::vector<double> getVars() const {
-        return m_vars;
+        return std::vector<double>(m_vars.begin() + 1, m_vars.end());
     }
     std::vector<int> getMultiplicities() const {
         return m_mult;

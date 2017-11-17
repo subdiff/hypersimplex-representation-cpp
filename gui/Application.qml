@@ -39,7 +39,7 @@ Layouts.RowLayout {
         function initHypers(d, k) {
             curD = d;
             curK = k;
-            backend.getHypersimplex(d, k);
+            backend.createHypersimplex(d, k);
         }
 
         BackEnd {
