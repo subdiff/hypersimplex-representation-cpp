@@ -78,10 +78,6 @@ void BackEnd::setEecWraps() {
             auto eecWrap = new EecWrap(this, vars[i], mults[i]);
             m_eecWraps.append(eecWrap);
         }
-        for (int i = 0; i < m_eecWraps.size(); i++) {
-            auto e = static_cast<EecWrap*>(m_eecWraps[i]);
-            qDebug() << "m_eecWraps" << e->val() << e->mult();
-        }
         emit eecWrapsChanged();
     } else if (!m_eecWraps.isEmpty()) {
         clear();

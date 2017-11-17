@@ -64,9 +64,9 @@ bool GiMatrix::setVars(const std::vector<double> set)
     if (!setSize) {
         // set variable defaults
         for (auto eec : m_group->m_edgeEquivClasses) {
-            double multVar = 1. / m_hypers->degree();
-            varsTmp.push_back(multVar / (double)eec->multiplicity);
-            multVarsTmp.push_back(multVar);
+            double var = 1. / m_hypers->degree();
+            varsTmp.push_back(var);
+            multVarsTmp.push_back(var / (double)eec->multiplicity);
         }
         m_vars.clear();
         m_multVars.clear();
