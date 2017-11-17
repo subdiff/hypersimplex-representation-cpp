@@ -39,7 +39,7 @@ Repeater {
         chItem.oldVal = chItem.val;
 
         var avails = [];
-        for (i = 0; i < count; i++) {
+        for (var i = 0; i < count; i++) {
             var itm = itemAt(i);
 
             if (itm == null) {
@@ -56,7 +56,7 @@ Repeater {
         }
 
         if (chItem.val * chItem.mult == 1) {
-            for (var i = 0; i < avails.length; i++) {
+            for (i = 0; i < avails.length; i++) {
                 setItemVal(avails[i][0], 0);
             }
             return;
@@ -121,7 +121,7 @@ Repeater {
     function updateBackend() {
         var vals = [];
         for (var i = 0; i < count - 1; i++) {
-            vals = itemAt(i).val;
+            vals.push(itemAt(i).val);
         }
         backend.setVars(vals);
     }
