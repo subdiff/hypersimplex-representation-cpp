@@ -2,6 +2,7 @@
 <RCC version="1.0">
     <qresource>
         <file>gui/Application.qml</file>
+        <file>gui/SliderRepeater.qml</file>
         <file>gui/VarSlider.qml</file>
     </qresource>
 </RCC>
