@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "hypersimplex.h"
 
+#include "combinadic.h"
 #include "autgroup.h"
 #include "gimatrix.h"
 
@@ -80,72 +81,6 @@ static void genSymSd_12(int dim, int *comp)
     comp[0] = comp[1];
     comp[1] = tmp;
     genSymS2_12(dim, comp);
-}
-
-static int binomCoeff(int d, int k)
-{
-    if (d < k || k <= 0) {
-        return 0;
-    }
-    double ret = 1.;
-    for (int i = 1; i <= k; i++) {
-        ret *= (d + 1 - i) / (double) i;
-    }
-    return (int)(ret + 0.5);
-}
-
-/*
- * Greedy algorithm for determining position
- * of k-combination.
- */
-static int combinadicCombMax(int k, int n, int &max)
-{
-    int i = k - 1;
-    max = 0;
-
-    while (true) {
-        int nextTry = binomCoeff(i + 1, k);
-        if (nextTry > n) {
-            break;
-        }
-        max = nextTry;
-        i++;
-    }
-    return i;
-}
-
-/*
- * Calculates the ninSet's k-combination 'comb' in the
- * lexicographic combinadic ordering.
- *
- * nInSet starts counting at 0.
- */
-static void combinadicComb(int k, int nInSet, int *comb)
-{
-    for (int i = k; i > 0; i--) {
-        int diff;
-        int combIndex = combinadicCombMax(i, nInSet, diff);
-
-//        if (tempN == 6 || tempN == 1)
-//            qDebug() << "i:" << i << "nInSet:" << nInSet << "combIndex:" << combIndex << "diff:" << diff;
-
-        comb[combIndex] = 1;
-        nInSet = nInSet - diff;
-    }
-}
-
-static int combinadicN(int d, const int *comb)
-{
-    int n = 0;
-    int j = 1;
-
-    for (int i = 0; i < d; i++) {
-        if (comb[i]) {
-            n += binomCoeff(i, j);
-            j++;
-        }
-    }
-    return n;
 }
 
 VtxTrnsSubgroup::VtxTrnsSubgroup(std::string sub, int index, AutGroup *parent)
