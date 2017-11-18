@@ -39,6 +39,7 @@ MESSAGE( STATUS "variable is now: " ${LIB_GAP} ) # TODOX
 set( ALL_SRCS
      main.cpp
      hypersimplex.cpp
+     vertex.cpp
      autgroup.cpp
      gimatrix.cpp
      backend.cpp
