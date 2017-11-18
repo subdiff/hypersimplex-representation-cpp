@@ -55,19 +55,18 @@ Repeater {
             avails.push([i, availVal]);
         }
 
-        if (chItem.val * chItem.mult == 1) {
+        var multVal = chItem.val * chItem.mult;
+        if (multVal == 1) {
             for (i = 0; i < avails.length; i++) {
                 setItemVal(avails[i][0], 0);
             }
             return;
         }
-
         avails.sort(function(a, b){return a[1] - b[1]});
-
-        fillOrDistr(avails, diff);
+        fillOrDistr(avails, diff, 1 - multVal);
     }
 
-    function fillOrDistr(avails, diff) {
+    function fillOrDistr(avails, diff, restSum) {
         console.log("avails:", avails);
 
         if (!avails.length) {
@@ -78,39 +77,57 @@ Repeater {
 
         if (avails[0][1] >= Math.abs(diff) / avails.length) {
             // enough available on all - just distribute the rest
-            distr(avails, diff);
+            distr(avails, diff, restSum);
         } else {
-            fillFirst(avails, diff);
+            fillFirst(avails, diff, restSum);
         }
     }
 
-    function distr(avails, diff) {
+    function distr(avails, diff, restSum) {
         console.log("distr:", diff);
         var diffDistr = diff / avails.length;
         console.log("distr:", diffDistr);
 
         for (var i = 0; i < avails.length; i++) {
             var index = avails[i][0];
-            setItemVal(index, itemAt(index).val - diffDistr / itemAt(index).mult);
+            var mult = itemAt(index).mult;
+
+            // make sure we don't add up too much through rounding errors
+            var nv = Math.min(itemAt(index).val - diffDistr / mult, restSum / mult);
+            setItemVal(index, nv);
+            restSum = restSum - nv * mult;
+        }
+        if (restSum > 0) {
+            // if through rounding error we have not distributed everything
+            for (i = 0; i < count; i++) {
+                var itm = itemAt(i);
+                if (1. - itm.val * itm.mult >= restSum) {
+                    // just put the little rest somewhere
+                    setItemVal(i, itm.val + restSum * 1. / itm.mult)
+                    break;
+                }
+            }
         }
         updateBackend();
     }
 
-    function fillFirst(avails, diff) {
+    function fillFirst(avails, diff, restSum) {
         console.log("fillFirst:", diff);
-        var newVal;
-        var mp = avails[0][1];
+        var nv;
+        var mnv = avails[0][1];
 
         if (diff > 0) {
-            newVal = 0;
-            diff -= mp;
+            nv = 0;
+            diff -= mnv;
         } else {
-            newVal = 1;
-            diff += mp;
+            nv = 1;
+            diff += mnv;
         }
-        setItemVal(avails[0][0], newVal);
+        setItemVal(avails[0][0], nv);
         avails.shift();
-        fillOrDistr(avails, diff);
+
+        restSum = restSum - mnv;
+        fillOrDistr(avails, diff, restSum);
     }
 
     function setItemVal(index, val) {
@@ -120,7 +137,7 @@ Repeater {
 
     function updateBackend() {
         var vals = [];
-        for (var i = 0; i < count - 1; i++) {
+        for (var i = 0; i < count; i++) {
             vals.push(itemAt(i).val);
         }
         backend.setVars(vals);
