@@ -44,6 +44,8 @@ Layouts.RowLayout {
 
         BackEnd {
             id: backend
+            onGeometryInitNeeded: wrap3D.initGeometries()
+            onGeometryUpdateNeeded: wrap3D.updateGeometries()
         }
 
         Row {
@@ -171,14 +173,5 @@ Layouts.RowLayout {
         id: wrap3D
         root3DPtr: root3D
         backEnd: backend
-    }
-
-    Button {
-        text: "TEST INIT"
-        onClicked: wrap3D.initGeometries()
-    }
-    Button {
-        text: "TEST CLEAR"
-        onClicked: wrap3D.clearGeometries()
     }
 }

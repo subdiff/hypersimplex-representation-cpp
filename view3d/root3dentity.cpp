@@ -153,7 +153,12 @@ void Root3DEntity::clearGeometries()
 void Root3DEntity::updateGeometries(GiMatrix *matrix)
 {
     auto nullSpRepr = matrix->getNullspaceRepr();
-    for (int i = 0; i<= nullSpRepr.size(); i++) {
+
+
+    for (int i = 0; i < nullSpRepr.size(); i++) {
         m_vertices[i]->updateGeometry(nullSpRepr[i]);
+    }
+    for (auto e : m_edges) {
+        e->updateGeometry();
     }
 }

@@ -56,7 +56,6 @@ void BackEnd::setSelectedSubgroup(int set) {
     if (m_selectedSubgroup != set) {
         m_selectedSubgroup = set;
         setGiMatrix(set);
-        calcNullSpRepr();
         setEecWraps();
         emit selectedSubgroupChanged();
     }
@@ -87,7 +86,8 @@ void BackEnd::setEecWraps() {
 
 void BackEnd::setVars(QList<double > vars)
 {
-
+    m_reprMatrix->setVars(vars.toVector().toStdVector());
+    emit geometryUpdateNeeded();
 }
 
 void BackEnd::setGiMatrix(int subgroup)
@@ -97,6 +97,8 @@ void BackEnd::setGiMatrix(int subgroup)
 
     m_reprMatrix = new GiMatrix(::s_hypers->getGiMatrix(subgroup));
     m_reprMatrix->init();
+
+    emit geometryInitNeeded();
 }
 
 void BackEnd::checkReady()
@@ -142,14 +144,7 @@ void BackEnd::setVtxTrSubgroups(std::vector<std::string> subNames)
             m_vtxTrSubgroups.append(QString(sub.c_str()));
         }
         setGiMatrix(0);
-        calcNullSpRepr();
         setEecWraps();
         emit vtxTrSubgroupsChanged();
     }
-}
-
-void BackEnd::calcNullSpRepr()
-{
-    qDebug() << "calcNullSpRepr";
-    m_reprMatrix->calcNullspaceRepr();
 }

@@ -69,8 +69,6 @@ public:
     ~BackEnd();
 
     Q_INVOKABLE void createHypersimplex(int d, int k);
-    Q_INVOKABLE void calcNullSpRepr();
-
     Q_INVOKABLE void setVars(QList<double > vars);
 
     bool ready() const {
@@ -104,6 +102,8 @@ Q_SIGNALS:
     void vtxTrSubgroupsChanged();
     void selectedSubgroupChanged();
     void eecWrapsChanged();
+    void geometryInitNeeded();
+    void geometryUpdateNeeded();
 
 private:
     void setGiMatrix(int subgroup);

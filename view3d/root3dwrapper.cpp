@@ -49,6 +49,7 @@ void Root3DWrapper::initGeometries()
     Root3DEntity *root_entity = dynamic_cast<Root3DEntity *>(m_root3d);
     GiMatrix *matrix = m_backEnd->getGiMatrix();
 
+    root_entity->clearGeometries();
     root_entity->initGeometries(matrix);
 }
 

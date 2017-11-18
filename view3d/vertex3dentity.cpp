@@ -18,9 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "vertex3dentity.h"
 
-#include <QDebug>
-#include <iostream>
-
 Vertex3DEntity::Vertex3DEntity(QNode *parent)
     : Qt3DCore::QEntity(parent)
 {
@@ -48,8 +45,6 @@ Vertex3DEntity::Vertex3DEntity(QNode *parent, Eigen::VectorXd pos)
 
 void Vertex3DEntity::updateGeometry(Eigen::VectorXd pos)
 {
-    std::cout << pos  << std::endl;
-
     if (pos.rows() == 2) {
         m_pos = QVector3D(pos[0], pos[1], 0);
     } else if (pos.rows() == 3) {

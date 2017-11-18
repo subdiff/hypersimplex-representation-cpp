@@ -19,8 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "edge3dentity.h"
 #include "vertex3dentity.h"
 
-#include <QDebug>
-
 Edge3DEntity::Edge3DEntity(QNode *parent)
     : Qt3DCore::QEntity(parent)
 {
@@ -64,16 +62,12 @@ void Edge3DEntity::updateGeometry()
     const auto posV = m_v[0]->pos();
     const auto posW = m_v[1]->pos();
 
-    const auto oldDir = m_dir.isNull() ? QVector3D(0.0f, 1.0f, 0.0f) : m_dir;
     const auto newDir = posW - posV;
-
-//    qDebug() << "Edge" << posV << posW << "|" << oldDir << newDir;
+    const auto newPos = posV + newDir / 2;
 
     m_mesh->setLength(newDir.length());
-    m_transform->setTranslation(posV + newDir / 2);
+    QQuaternion rotQ = QQuaternion::rotationTo(QVector3D(0.0f, 1.0f, 0.0f), newDir);
 
-    QQuaternion rotQ = QQuaternion::rotationTo(oldDir, newDir);
+    m_transform->setTranslation(newPos);
     m_transform->setRotation(rotQ);
-
-    m_dir = newDir;
 }

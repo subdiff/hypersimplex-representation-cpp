@@ -48,9 +48,8 @@ void GiMatrix::init()
         m_eecIndexMatrix(i, i) = 0;
     }
 
-    setVars(std::vector<double>());
     calculateEecIndexMatrix();
-    calculateMatrix();
+    setVars(std::vector<double>());
 }
 
 bool GiMatrix::setVars(const std::vector<double> set)
@@ -72,6 +71,8 @@ bool GiMatrix::setVars(const std::vector<double> set)
         m_multVars.clear();
         m_vars = varsTmp;
         m_multVars = multVarsTmp;
+
+        calculateMatrix();
         return true;
     }
 
@@ -99,6 +100,7 @@ bool GiMatrix::setVars(const std::vector<double> set)
     m_vars = varsTmp;
     m_multVars = multVarsTmp;
 
+    calculateMatrix();
     return true;
 }
 
@@ -159,6 +161,7 @@ void GiMatrix::calculateMatrix()
             m_matrix(col, row) = val;
         }
     }
+    calcNullspaceRepr();
 }
 
 void GiMatrix::calcNullspaceRepr()
