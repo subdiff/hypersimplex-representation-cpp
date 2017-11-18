@@ -22,6 +22,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 #include <vector>
 
+#include "vertex.h"
+
 class AutGroup;
 class GiMatrix;
 
@@ -64,6 +66,8 @@ public:
 
     bool isEdge(int vertex1, int vertex2);
 
+    std::pair<std::vector<Vertex>, std::vector<Vertex> > getFacetPair(int index = 0);
+
 protected:
     Hypersimplex(int d, int k);
 
@@ -89,11 +93,14 @@ protected:
 
 private:
     void calcEdgeEquivClasses();
+    void initVertices();
 
     void calcVtxTrnsSubgroups();
     bool isVtxTrnsSubgroup(int sub);
 
     std::vector<Edge> getEdgesToVertex(int vertex);
+
+    std::vector<Vertex> m_vertices;
 };
 
 class AsymHypers : public Hypersimplex {

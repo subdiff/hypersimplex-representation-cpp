@@ -139,6 +139,7 @@ Hypersimplex::Hypersimplex(int d, int k)
 {
     qDebug() << "Create H:" << d << k;
 
+    initVertices();
     initEdges();
     initGroup();
 }
@@ -175,6 +176,26 @@ bool Hypersimplex::haveEdge(int v, int w)
     }
 
     return sum == m_k - 1;
+}
+
+void Hypersimplex::initVertices()
+{
+    for (int i = 0; i < m_vertexCount; i++) {
+        m_vertices.push_back(Vertex(i, m_d, m_k));
+    }
+}
+
+std::pair<std::vector<Vertex>, std::vector<Vertex> > Hypersimplex::getFacetPair(int index)
+{
+    std::vector<Vertex> facet0, facet1;
+    for (auto v : m_vertices) {
+        if (v[index] == 0) {
+            facet0.push_back(v);
+        } else {
+            facet1.push_back(v);
+        }
+    }
+    return std::pair<std::vector<Vertex>, std::vector<Vertex> >(facet0, facet1);
 }
 
 void Hypersimplex::initEdges()

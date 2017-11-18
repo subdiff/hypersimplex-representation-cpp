@@ -34,6 +34,7 @@ public:
     Vertex operator+(const Vertex &b) const;
     Vertex operator-(const Vertex &b) const;
     Vertex operator-() const;
+    int operator[](const int index) const {return m_comps[index];}
 
     bool isVertex() const {
         return m_combIndex != -1;
