@@ -28,8 +28,8 @@ Layouts.RowLayout {
     spacing: 50
     Item {
         id: ctrls
-        width: childrenRect.width//1000
-        height: childrenRect.height//500
+        width: childrenRect.width
+        height: childrenRect.height
 
         Layouts.Layout.alignment: Qt.AlignTop
 
@@ -150,15 +150,20 @@ Layouts.RowLayout {
         }
     }
 
-    Rectangle {
-        width: 1000
-        height: 800
-        color: "yellow"
+    Item {
+        Layouts.Layout.minimumWidth: 1000
+        Layouts.Layout.minimumHeight: 800
+        Layouts.Layout.fillHeight: true
+        Layouts.Layout.fillWidth: true
+
+        Rectangle {
+            anchors.fill: parent
+            anchors.margins: 10
+            color: "yellow"
 
             Scene3D {
                 id: scene3D
                 anchors.fill: parent
-                anchors.margins: 10
                 focus: true
                 aspects: ["input", "logic"]
                 cameraAspectRatioMode: Scene3D.AutomaticAspectRatio
@@ -167,6 +172,7 @@ Layouts.RowLayout {
                     id: root3D
                 }
             }
+        }
     }
 
     Root3DWrapper {

@@ -36,6 +36,7 @@ int main(int argc, char** argv)
     qmlRegisterType<Root3DEntity>("subdiff.de.math.hypersimplex.representation", 1, 0, "Root3DEntity");
 
     QQuickView view;
+    view.setResizeMode(QQuickView::SizeRootObjectToView);
     view.setSource(QUrl("qrc:/gui/Application.qml"));
     view.show();
 
