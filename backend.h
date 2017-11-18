@@ -23,6 +23,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QTimer>
 #include <QStringList>
 
+#include <vector>
+
+#include <vertex.h>
+
 class GiMatrix;
 
 class EecWrap : public QObject
@@ -93,6 +97,7 @@ public:
     }
     void setEecWraps();
 
+    std::pair<std::vector<Vertex>, std::vector<Vertex> > getFacetPair(int index = 0) const;
 
 public Q_SLOTS:
     void checkReady();

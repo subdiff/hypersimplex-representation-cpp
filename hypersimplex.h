@@ -66,7 +66,7 @@ public:
 
     bool isEdge(int vertex1, int vertex2);
 
-    std::pair<std::vector<Vertex>, std::vector<Vertex> > getFacetPair(int index = 0);
+    std::pair<std::vector<Vertex>, std::vector<Vertex> > getFacetPair(int index = 0) const;
 
 protected:
     Hypersimplex(int d, int k);
