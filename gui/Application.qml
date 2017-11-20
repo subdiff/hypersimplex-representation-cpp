@@ -178,15 +178,15 @@ Layouts.RowLayout {
                     spacing: 10
 
                     SpinBox {
-                        id: projFacet
+                        id: projFacetSpin
                         width: dSpin.width
                         enabled: ctrls.curD == 5
-                        value: 0
-                        minimumValue: 0
-                        maximumValue: ctrls.curD - 1
+                        value: 1
+                        minimumValue: 1
+                        maximumValue: ctrls.curD
                     }
                     Label {
-                        enabled: projFacet.enabled
+                        enabled: projFacetSpin.enabled
                         text: "Projection facet"
                     }
                 }
@@ -198,11 +198,11 @@ Layouts.RowLayout {
                     property bool singleVertexFacet: ctrls.curK == 1 || ctrls.curK == ctrls.curD - 1
                     CheckBox {
                         id: projToLargerFacetCheckbox
-                        enabled: projFacet.enabled && !parent.singleVertexFacet
+                        enabled: projFacetSpin.enabled && !parent.singleVertexFacet
                         checked: true
                     }
                     Label {
-                        enabled: projFacet.enabled
+                        enabled: projFacetSpin.enabled
                         text: "Project to larger facet"
                     }
                 }
@@ -233,5 +233,6 @@ Layouts.RowLayout {
         root3DPtr: root3D
         backEnd: backend
         projToLargerFacet: projToLargerFacetCheckbox.checked
+        projFacet: projFacetSpin.value - 1
     }
 }
