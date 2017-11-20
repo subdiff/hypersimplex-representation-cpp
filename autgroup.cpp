@@ -241,7 +241,7 @@ std::vector<std::string> AutGroup::getFactorizations(int subIndex) const
 
     std::string subgroup = m_subgroups[subIndex];
 
-    qDebug() << "getFactorizations" << subgroup.c_str();
+//    qDebug() << "getFactorizations" << subgroup.c_str();
 
     if (gap_eval(subgroup + "=" + m_gapName + ";\n", true, "e").substr(0, 4) == "true") {
         return m_factorizations;
