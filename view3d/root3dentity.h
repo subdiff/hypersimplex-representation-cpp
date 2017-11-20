@@ -49,6 +49,7 @@ public:
 private:
     void createCoordOrigin();
     void createCoordAxes();
+    std::vector<Eigen::VectorXd> getNullspaceRepr(GiMatrix *matrix);
     std::vector<Vertex3DEntity *> m_vertices;
     std::vector<Edge3DEntity *> m_edges;
 };

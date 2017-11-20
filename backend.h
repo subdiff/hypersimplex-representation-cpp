@@ -29,6 +29,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 class GiMatrix;
 
+typedef std::pair<std::vector<Vertex>, std::vector<Vertex> > facet_pair;
+
 class EecWrap : public QObject
 {
     Q_OBJECT
@@ -97,7 +99,7 @@ public:
     }
     void setEecWraps();
 
-    std::pair<std::vector<Vertex>, std::vector<Vertex> > getFacetPair(int index = 0) const;
+    facet_pair getFacetPair(int index = 0) const;
 
 public Q_SLOTS:
     void checkReady();

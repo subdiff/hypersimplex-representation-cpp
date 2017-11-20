@@ -45,8 +45,10 @@ public:
 
     void calcNullspaceRepr();
     std::vector<VectorXd> getNullspaceRepr() const {
-        return m_nullSpRepr;
+        return m_nullSpReprList;
     }
+
+    std::vector<VectorXd> getSchlegelDiagram(int projFacet, int &error);
 
     MatrixXd getMatrix() const {
         return m_matrix;
@@ -66,7 +68,8 @@ private:
     std::vector<double> m_vars;
     std::vector<double> m_multVars;
 
-    std::vector<VectorXd> m_nullSpRepr;
+    MatrixXd m_nullSpRepr;
+    std::vector<VectorXd> m_nullSpReprList;
 
     int m_dim;
 };

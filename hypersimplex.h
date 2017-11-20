@@ -27,6 +27,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 class AutGroup;
 class GiMatrix;
 
+typedef std::pair<std::vector<Vertex>, std::vector<Vertex> > facet_pair;
+
 struct Edge {
     Edge(int _v, int _w);
     inline bool operator==(Edge const& b) { return v == b.v && w == b.w; }
@@ -66,7 +68,7 @@ public:
 
     bool isEdge(int vertex1, int vertex2);
 
-    std::pair<std::vector<Vertex>, std::vector<Vertex> > getFacetPair(int index = 0) const;
+    facet_pair getFacetPair(int index = 0) const;
 
 protected:
     Hypersimplex(int d, int k);
@@ -87,7 +89,6 @@ protected:
     int m_k;
     int m_degree;
     AutGroup *m_group;
-    std::vector<VtxTrnsSubgroup *> m_vtxTrnsSubgroups;
     std::vector<Edge> m_edges;
     int m_vertexCount;
 
@@ -100,6 +101,7 @@ private:
 
     std::vector<Edge> getEdgesToVertex(int vertex);
 
+    std::vector<VtxTrnsSubgroup *> m_vtxTrnsSubgroups;
     std::vector<Vertex> m_vertices;
 };
 

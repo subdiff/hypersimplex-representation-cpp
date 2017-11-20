@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "gimatrix.h"
 #include "hypersimplex.h"
+#include "schlegel.h"
 
 #include <algorithm>
 #include <eigen3/Eigen/Eigenvalues>
@@ -174,7 +175,7 @@ void GiMatrix::calcNullspaceRepr()
     qDebug() << "GiMatrix:";
     std::cout << m_matrix  << std::endl;
 
-    m_nullSpRepr.clear();
+    m_nullSpReprList.clear();
 
     SelfAdjointEigenSolver<MatrixXd> eigensolver(m_matrix);
     if (eigensolver.info() != Success) {
@@ -192,13 +193,20 @@ void GiMatrix::calcNullspaceRepr()
 
     qDebug() << "----------------";
     qDebug() << "Null Space Representation:";
-    MatrixXd nullspReprs = eVcts.block(0, m_dim - m_hypers->d(), m_dim, m_hypers->d() - 1).transpose();
-    std::cout << nullspReprs  << std::endl;;
+    MatrixXd nullSpRepr = eVcts.block(0, m_dim - m_hypers->d(), m_dim, m_hypers->d() - 1).transpose();
+    std::cout << nullSpRepr  << std::endl;;
+    m_nullSpRepr = nullSpRepr;
 
-    std::vector<VectorXd> nullSpRepr;
-    for (int i = 0; i < nullspReprs.cols(); i++) {
-        nullSpRepr.push_back(nullspReprs.col(i));
+    std::vector<VectorXd> nullSpReprList;
+    for (int i = 0; i < nullSpRepr.cols(); i++) {
+        nullSpReprList.push_back(nullSpRepr.col(i));
     }
 
-    m_nullSpRepr = nullSpRepr;
+    m_nullSpReprList = nullSpReprList;
+}
+
+std::vector<VectorXd> GiMatrix::getSchlegelDiagram(int projFacet, int &error)
+{
+    Schlegel s(m_hypers, projFacet, m_nullSpRepr);
+    return s.getDiagram(error);
 }

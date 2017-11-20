@@ -185,7 +185,7 @@ void Hypersimplex::initVertices()
     }
 }
 
-std::pair<std::vector<Vertex>, std::vector<Vertex> > Hypersimplex::getFacetPair(int index) const
+facet_pair Hypersimplex::getFacetPair(int index) const
 {
     std::vector<Vertex> facet0, facet1;
     for (auto v : m_vertices) {
@@ -195,7 +195,7 @@ std::pair<std::vector<Vertex>, std::vector<Vertex> > Hypersimplex::getFacetPair(
             facet1.push_back(v);
         }
     }
-    return std::pair<std::vector<Vertex>, std::vector<Vertex> >(facet0, facet1);
+    return facet_pair(facet0, facet1);
 }
 
 void Hypersimplex::initEdges()

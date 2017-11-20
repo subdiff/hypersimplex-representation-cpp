@@ -37,10 +37,10 @@ BackEnd::~BackEnd()
     delete m_reprMatrix;
 }
 
-std::pair<std::vector<Vertex>, std::vector<Vertex> > BackEnd::getFacetPair(int index) const
+facet_pair BackEnd::getFacetPair(int index) const
 {
     if (::s_hypers = nullptr) {
-        return std::pair<std::vector<Vertex>, std::vector<Vertex> >(std::vector<Vertex>(), std::vector<Vertex>());
+        return facet_pair(std::vector<Vertex>(), std::vector<Vertex>());
     }
     return ::s_hypers->getFacetPair(index);
 }

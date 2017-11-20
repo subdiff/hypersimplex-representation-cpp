@@ -110,13 +110,36 @@ void Root3DEntity::createCoordAxes()
     createAxe(QVector3D(1.0f, 0.0f, 0.0f), QVector3D(0, 0, length/2), "blue");
 }
 
+std::vector<VectorXd> Root3DEntity::getNullspaceRepr(GiMatrix *matrix)
+{
+    auto nullSpRepr = matrix->getNullspaceRepr();
+    auto dim = nullSpRepr[0].rows();
+
+    if (dim > 4) {
+        // geometries only available for <= dimension 4
+        return std::vector<VectorXd>();
+    } else if (dim == 4) {
+        int error = 0;
+        nullSpRepr = matrix->getSchlegelDiagram(0, error);
+        if (error != 0) {
+            qDebug() << "Root3DEntity::initGeometries ERROR";
+            return std::vector<VectorXd>();
+        }
+    }
+    return nullSpRepr;
+}
+
 void Root3DEntity::initGeometries(GiMatrix *matrix)
 {
     qDebug() << "initGeometries";
 
     clearGeometries();
 
-    auto nullSpRepr = matrix->getNullspaceRepr();
+    auto nullSpRepr = getNullspaceRepr(matrix);
+    if (!nullSpRepr.size()) {
+        return;
+    }
+
 
     for (auto v : nullSpRepr) {
         Vertex3DEntity *v3d = new Vertex3DEntity(this, v);
@@ -152,7 +175,10 @@ void Root3DEntity::clearGeometries()
 
 void Root3DEntity::updateGeometries(GiMatrix *matrix)
 {
-    auto nullSpRepr = matrix->getNullspaceRepr();
+    auto nullSpRepr = getNullspaceRepr(matrix);
+    if (!nullSpRepr.size()) {
+        return;
+    }
 
 
     for (int i = 0; i < nullSpRepr.size(); i++) {

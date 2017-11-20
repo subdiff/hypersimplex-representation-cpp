@@ -46,6 +46,9 @@ public:
     std::vector<int> comps() const {
         return m_comps;
     }
+    std::vector<double> compsAsDouble() const {
+        return std::vector<double>(m_comps.begin(), m_comps.end());
+    }
     int k() const {
         return m_k;
     }
