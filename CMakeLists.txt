@@ -24,18 +24,6 @@ find_package( Qt5 REQUIRED
               3DInput
             )
 
-include_directories(/home/roman/Studium/Masterarbeit/Software/libgap/install/include)    #TODOX
-link_directories(/home/roman/Studium/Masterarbeit/Software/libgap/install/lib)
-
-# find_library(LIB_GAP gap REQUIRED)
-find_library(LIB_GAP NAMES gap PATHS /home/roman/Studium/Masterarbeit/Software/libgap/install/lib REQUIRED)
-
-MESSAGE( STATUS "variable is now: " ${LIB_GAP} ) # TODOX
-
-# find_library(LIB_POLYMAKE polymake REQUIRED) # TODOX
-
-# MESSAGE( STATUS "LIB_POLYMAKE variable is now: " ${LIB_POLYMAKE} ) # TODOX
-
 set( ALL_SRCS
      main.cpp
      hypersimplex.cpp
@@ -55,10 +43,6 @@ qt5_add_resources( ALL_SRCS
                    )
 
 add_executable( hypersimplex-representation ${ALL_SRCS} )
-
-target_link_libraries( hypersimplex-representation
-                       ${LIB_GAP}
-                       )
 
 target_link_libraries( hypersimplex-representation
                        Qt5::Core
