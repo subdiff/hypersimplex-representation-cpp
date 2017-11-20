@@ -1,3 +1,6 @@
 # hypersimplex-representation
 
-Prerequisites: Qt, libgap, Eigen3
+Prerequisites:
+
+Compile time: Qt, Eigen3
+Run time: Gap
