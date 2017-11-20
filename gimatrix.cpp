@@ -205,8 +205,8 @@ void GiMatrix::calcNullspaceRepr()
     m_nullSpReprList = nullSpReprList;
 }
 
-std::vector<VectorXd> GiMatrix::getSchlegelDiagram(int projFacet, int &error)
+std::vector<VectorXd> GiMatrix::getSchlegelDiagram(int projFacet, bool projToLargerFacet, int &error)
 {
-    Schlegel s(m_hypers, projFacet, m_nullSpRepr);
+    Schlegel s(m_hypers, projFacet, projToLargerFacet, m_nullSpRepr);
     return s.getDiagram(error);
 }

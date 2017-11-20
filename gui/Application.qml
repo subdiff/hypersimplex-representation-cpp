@@ -46,6 +46,8 @@ Layouts.RowLayout {
             id: backend
             onGeometryInitNeeded: wrap3D.initGeometries()
             onGeometryUpdateNeeded: wrap3D.updateGeometries()
+
+//            Component.onCompleted: ctrls.initHypers(dSpin.value, kSpin.value)
         }
 
         Row {
@@ -68,6 +70,7 @@ Layouts.RowLayout {
                 SpinBox {
                     id: dSpin
                     width: applyButton.width / 2
+//                    value: 5
                     minimumValue: 3
                     maximumValue: 20
                 }
@@ -77,6 +80,7 @@ Layouts.RowLayout {
                 SpinBox {
                     id: kSpin
                     width: dSpin.width
+//                    value: 2
                     minimumValue: 1
                     maximumValue: dSpin.value - 1
                 }
@@ -156,20 +160,69 @@ Layouts.RowLayout {
         Layouts.Layout.fillHeight: true
         Layouts.Layout.fillWidth: true
 
-        Rectangle {
+        Column {
             anchors.fill: parent
+
+            spacing: 10
             anchors.margins: 10
-            color: "yellow"
 
-            Scene3D {
-                id: scene3D
-                anchors.fill: parent
-                focus: true
-                aspects: ["input", "logic"]
-                cameraAspectRatioMode: Scene3D.AutomaticAspectRatio
+            Row {
+                id: ctrls3D
+                anchors.horizontalCenter: parent.horizontalCenter
+                height: childrenRect.height
 
-                Root3DEntity {
-                    id: root3D
+                spacing: 20
+
+                Row {
+                    height: childrenRect.height
+                    spacing: 10
+
+                    SpinBox {
+                        id: projFacet
+                        width: dSpin.width
+                        enabled: ctrls.curD == 5
+                        value: 0
+                        minimumValue: 0
+                        maximumValue: ctrls.curD - 1
+                    }
+                    Label {
+                        enabled: projFacet.enabled
+                        text: "Projection facet"
+                    }
+                }
+
+                Row {
+                    height: childrenRect.height
+                    spacing: 10
+
+                    property bool singleVertexFacet: ctrls.curK == 1 || ctrls.curK == ctrls.curD - 1
+                    CheckBox {
+                        id: projToLargerFacetCheckbox
+                        enabled: projFacet.enabled && !parent.singleVertexFacet
+                        checked: true
+                    }
+                    Label {
+                        enabled: projFacet.enabled
+                        text: "Project to larger facet"
+                    }
+                }
+            }
+
+            Rectangle {
+                width: parent.width
+                height: parent.height - ctrls3D.height
+                color: "yellow"
+
+                Scene3D {
+                    id: scene3D
+                    anchors.fill: parent
+                    focus: true
+                    aspects: ["input", "logic"]
+                    cameraAspectRatioMode: Scene3D.AutomaticAspectRatio
+
+                    Root3DEntity {
+                        id: root3D
+                    }
                 }
             }
         }
@@ -179,5 +232,6 @@ Layouts.RowLayout {
         id: wrap3D
         root3DPtr: root3D
         backEnd: backend
+        projToLargerFacet: projToLargerFacetCheckbox.checked
     }
 }

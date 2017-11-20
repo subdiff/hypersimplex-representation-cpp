@@ -32,7 +32,7 @@ typedef std::pair<std::vector<Vertex>, std::vector<Vertex> > facet_pair;
 
 class Schlegel {
 public:
-    Schlegel(Hypersimplex *hypers, int projFacet, const MatrixXd &pts);
+    Schlegel(Hypersimplex *hypers, int projFacet, bool projToLargerFacet, const MatrixXd &pts);
 
     std::vector<VectorXd> getDiagram(int &error) const;
 
@@ -41,8 +41,11 @@ public:
     }
 
 private:
+    void setImageProj(facet_pair &fp) const;
+
     Hypersimplex *m_hypers = nullptr;
     int m_facetPairIndex = 0;
+    bool m_projToLargerFacet = true;
     facet_pair m_facetPair;
     MatrixXd m_pts;
 };

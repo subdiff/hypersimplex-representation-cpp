@@ -26,9 +26,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <iostream>
 
-Schlegel::Schlegel(Hypersimplex *hypers, int projFacet, const MatrixXd &pts)
+Schlegel::Schlegel(Hypersimplex *hypers, int projFacet, bool projToLargerFacet, const MatrixXd &pts)
     : m_hypers(hypers),
       m_facetPairIndex(projFacet),
+      m_projToLargerFacet(projToLargerFacet),
       m_pts(pts)
 {
 }
@@ -41,10 +42,23 @@ struct Point {
 };
 
 // After calling fp.first is the image plane - currently always the bigger one
-static void setImageProj(facet_pair &fp)
+void Schlegel::setImageProj(facet_pair &fp) const
 {
     std::vector<Vertex> proj, imgPlane;
-    if (fp.first.size() < fp.second.size()) {
+    bool projToLargerFacet = m_projToLargerFacet;
+
+    int fSize = fp.first.size();
+    int sSize = fp.second.size();
+
+    if (fSize == 1 || sSize == 1) {
+        projToLargerFacet = true;
+    }
+
+    bool fstSmSec = fSize < sSize;
+    bool facetSwitch = (fstSmSec && projToLargerFacet) ||
+            (!fstSmSec && !projToLargerFacet);
+
+    if (facetSwitch) {
         imgPlane = fp.second;
         proj = fp.first;
     } else {

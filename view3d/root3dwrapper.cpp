@@ -44,17 +44,58 @@ void Root3DWrapper::setBackEnd(BackEnd *set)
     emit backEndChanged();
 }
 
+void Root3DWrapper::setProjFacet(int set)
+{
+    if (m_projFacet != set) {
+        m_projFacet = set;
+
+        initGeometries();
+        emit projFacetChanged();
+    }
+}
+
+void Root3DWrapper::setProjToLargerFacet(bool set)
+{
+    if (m_projToLargerFacet != set) {
+        m_projToLargerFacet = set;
+
+        initGeometries();
+        emit projToLargerFacetChanged();
+    }
+}
+
+void Root3DWrapper::setEntityData()
+{
+    if (!m_root3d) {
+        return;
+    }
+    Root3DEntity *root_entity = dynamic_cast<Root3DEntity *>(m_root3d);
+
+    root_entity->setProjFacet(m_projFacet);
+    root_entity->setProjToLargerFacet(m_projToLargerFacet);
+}
+
 void Root3DWrapper::initGeometries()
 {
+    if (!m_root3d) {
+        return;
+    }
     Root3DEntity *root_entity = dynamic_cast<Root3DEntity *>(m_root3d);
-    GiMatrix *matrix = m_backEnd->getGiMatrix();
-
     root_entity->clearGeometries();
+    setEntityData();
+
+    GiMatrix *matrix = m_backEnd->getGiMatrix();
+    if (!matrix) {
+        return;
+    }
     root_entity->initGeometries(matrix);
 }
 
 void Root3DWrapper::clearGeometries()
 {
+    if (!m_root3d) {
+        return;
+    }
     Root3DEntity *root_entity = dynamic_cast<Root3DEntity *>(m_root3d);
 
     root_entity->clearGeometries();
@@ -62,8 +103,15 @@ void Root3DWrapper::clearGeometries()
 
 void Root3DWrapper::updateGeometries()
 {
+    if (!m_root3d) {
+        return;
+    }
     Root3DEntity *root_entity = dynamic_cast<Root3DEntity *>(m_root3d);
+
     GiMatrix *matrix = m_backEnd->getGiMatrix();
+    if (!matrix) {
+        return;
+    }
 
     root_entity->updateGeometries(matrix);
 }

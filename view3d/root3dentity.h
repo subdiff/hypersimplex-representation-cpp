@@ -42,6 +42,13 @@ class Root3DEntity : public Qt3DCore::QEntity {
 public:
     Root3DEntity(QNode *parent = nullptr);
 
+    void setProjFacet(int set) {
+        m_projFacet = set;
+    }
+    void setProjToLargerFacet(bool set) {
+        m_projToLargerFacet = set;
+    }
+
     void initGeometries(GiMatrix *matrix);
     void clearGeometries();
     void updateGeometries(GiMatrix *matrix);
@@ -52,6 +59,9 @@ private:
     std::vector<Eigen::VectorXd> getNullspaceRepr(GiMatrix *matrix);
     std::vector<Vertex3DEntity *> m_vertices;
     std::vector<Edge3DEntity *> m_edges;
+
+    int m_projFacet = 0;
+    bool m_projToLargerFacet = true;
 };
 
 #endif // ROOT3DENTITY_H

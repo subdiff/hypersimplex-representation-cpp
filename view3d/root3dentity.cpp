@@ -120,7 +120,7 @@ std::vector<VectorXd> Root3DEntity::getNullspaceRepr(GiMatrix *matrix)
         return std::vector<VectorXd>();
     } else if (dim == 4) {
         int error = 0;
-        nullSpRepr = matrix->getSchlegelDiagram(0, error);
+        nullSpRepr = matrix->getSchlegelDiagram(m_projFacet, m_projToLargerFacet, error);
         if (error != 0) {
             qDebug() << "Root3DEntity::initGeometries ERROR";
             return std::vector<VectorXd>();

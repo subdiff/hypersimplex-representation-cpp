@@ -48,7 +48,7 @@ public:
         return m_nullSpReprList;
     }
 
-    std::vector<VectorXd> getSchlegelDiagram(int projFacet, int &error);
+    std::vector<VectorXd> getSchlegelDiagram(int projFacet, bool projToLargerFacet, int &error);
 
     MatrixXd getMatrix() const {
         return m_matrix;

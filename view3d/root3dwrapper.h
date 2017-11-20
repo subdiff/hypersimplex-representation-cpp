@@ -29,6 +29,9 @@ class Root3DWrapper : public QObject {
 
     Q_PROPERTY(Qt3DCore::QEntity * root3DPtr READ root3DPtr WRITE setRoot3DPtr NOTIFY root3DPtrChanged)
     Q_PROPERTY(BackEnd * backEnd READ backEnd WRITE setBackEnd NOTIFY backEndChanged)
+
+    Q_PROPERTY(int projFacet READ projFacet WRITE setProjFacet NOTIFY projFacetChanged)
+    Q_PROPERTY(bool projToLargerFacet READ projToLargerFacet WRITE setProjToLargerFacet NOTIFY projToLargerFacetChanged)
 public:
     Root3DWrapper(QObject *parent = nullptr);
 
@@ -36,6 +39,15 @@ public:
         return m_root3d;
     }
     void setRoot3DPtr(Qt3DCore::QEntity *set);
+
+    int projFacet() {
+        return m_projFacet;
+    }
+    void setProjFacet(int set);
+    bool projToLargerFacet() {
+        return m_projToLargerFacet;
+    }
+    void setProjToLargerFacet(bool set);
 
     BackEnd *backEnd() {
         return m_backEnd;
@@ -49,10 +61,15 @@ public:
 Q_SIGNALS:
     void root3DPtrChanged();
     void backEndChanged();
+    void projFacetChanged();
+    void projToLargerFacetChanged();
 
 private:
+    void setEntityData();
     Qt3DCore::QEntity *m_root3d = nullptr;
     BackEnd *m_backEnd = nullptr;
+    int m_projFacet = 0;
+    bool m_projToLargerFacet = true;
 };
 
 #endif // ROOT3DWRAPPER_H
