@@ -18,20 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "autgroup.h"
 
-extern "C" {
-#include <gap/system.h>
-#include <gap/gasman.h>
-#include <gap/objects.h>
-#include <gap/code.h>
-#include <gap/calls.h>
-#include <gap/gap.h>
+#include <algorithm>
 
-#include <gap/libgap.h>
-#include <gap/libgap_internal.h>
-
-#include <gap/vars.h>
-#include <gap/read.h>
-}
+#include <stdio.h>
+#include <unistd.h>
 
 #include <QDebug>
 
@@ -40,71 +30,47 @@ static int factorial(int n)
   return (n == 1 || n == 0) ? 1 : factorial(n - 1) * n;
 }
 
-static void gap_error_handler(char *msg)
+std::string AutGroup::gap_eval(const std::string _cmd, bool readOutput, std::string end) const
 {
-    qDebug() << "GAP Error:" << QString(msg);
-}
-
-//static std::string gap_eval(const char *_cmd)
-static std::string gap_eval(const std::string _cmd, bool readOutput = true)
-{
-    char *cmd = const_cast<char*>(_cmd.c_str());
-
+    const char *cmd = _cmd.c_str();
     std::string ret;
 
-//    qDebug() << "GAP Input:" << cmd;
-    libgap_enter();
-    libgap_start_interaction(cmd);
+    const int endSize = end.size();
 
-    auto status = libGAP_ReadEvalCommand(libGAP_BottomLVars, NULL);
-    if (status != libGAP_STATUS_END) {
-        qDebug() << "GAP STATUS ERROR";
-    } else {
-//        qDebug() << "GAP SUCCESS";
+//    qDebug() << "GAP cmd:" << readOutput;
+//    qDebug() << cmd;
+
+    while (1) {
+        if (write(m_writePipe, cmd, strlen(cmd)) == strlen(cmd)) {
+            break;
+        }
     }
 
-    char *out = nullptr;
-    if (readOutput) {
-        libGAP_ViewObjHandler(libGAP_ReadEvalResult);
-        out = libgap_get_output();
+    if(readOutput) {
+        char byte = 0;
+        while (read(m_readPipe, &byte, 1) == 1) {
+            ret += byte;
+
+            std::string comp;
+            int retSize = ret.size();
+            if (retSize < endSize) {
+                continue;
+            } else {
+                comp = ret.substr(retSize - endSize);
+            }
+            if (!end.compare(comp)) {
+                break;
+            }
+        }
+//        qDebug() << "GAP result:";
+//        qDebug() << ret.c_str();
     }
-    if (out) {
-        ret = std::string(out);
-//        qDebug() << "GAP Output:" << QString(out);
-    }
-    libgap_exit();
-    libgap_finish_interaction();
+    ret.erase(std::remove(ret.begin(), ret.end(), '\n'), ret.end());
 
     return ret;
 }
 
-static bool gapIsInitialized = false;
-static void initGap()
-{
-    if (gapIsInitialized) {
-        return;
-    }
-
-    libgap_set_error_handler(&gap_error_handler);
-
-    char const *argv[8];
-    argv[0] = "gap";
-    argv[1] = "-l";
-    argv[2] = "/home/roman/Studium/Masterarbeit/Software/gap/gap4r8/";//"/usr/bin"; // TODOX
-    argv[3] = "-m";
-    argv[4] = "64M";
-    argv[5] = "-q";
-    argv[6] = "-T";
-    argv[7] = NULL;
-    int argc=7;
-
-    libgap_initialize(argc, const_cast<char**>(argv));
-    qDebug() << "GAP initialized";
-
-    gapIsInitialized = true;
-}
-
-static void gapCreateGroup(int d, bool semi)
+void AutGroup::gapCreateGroup(int d, bool semi)
 {
     auto sDCmdGenerate = [d]() {
         std::string cmd;
@@ -112,16 +78,16 @@ static void gapCreateGroup(int d, bool semi)
         for (int i = 1; i < d; i++) {
             cmd.append(std::to_string(i) + ",");
         }
-        return cmd + std::to_string(d) + "),(1,2));\n";
+        return cmd + std::to_string(d) + "),(1,2));;\n";
     };
 
     if (semi) {
         // semidirect product S_d with S_2
-        gap_eval("Sd:=" + sDCmdGenerate());
-        gap_eval("S2:=Group((1,2));\n", false);
-        gap_eval("Sdhom:=GroupHomomorphismByFunction(Sd,Sd,function(g) return (1,2)*g*(1,2);end);\n", false);
-        gap_eval("hom:=GroupHomomorphismByImages(S2, AutomorphismGroup(Sd), [(1,2)], [Sdhom]);\n", false);
-        gap_eval("G:=SemidirectProduct(S2, hom, Sd);\n", false);
+        gap_eval("Sd:=" + sDCmdGenerate(), false);
+        gap_eval("S2:=Group((1,2));;\n", false);
+        gap_eval("Sdhom:=GroupHomomorphismByFunction(Sd,Sd,function(g) return (1,2)*g*(1,2);end);;\n", false);
+        gap_eval("hom:=GroupHomomorphismByImages(S2, AutomorphismGroup(Sd), [(1,2)], [Sdhom]);;\n", false);
+        gap_eval("G:=SemidirectProduct(S2, hom, Sd);;\n", false);
     } else {
         // S_d
         gap_eval("G:=" + sDCmdGenerate(), false);
@@ -130,6 +96,39 @@ static void gapCreateGroup(int d, bool semi)
 
 AutGroup::AutGroup(int d, int k)
 {
+    int pipeStdIn[2];
+    int pipeStdOut[2];
+    pipe(pipeStdIn);
+    pipe(pipeStdOut);
+
+    pid_t pid = 0;
+    pid = fork();
+
+    if (pid == 0) {
+        // child
+
+      dup2(pipeStdIn[0], STDIN_FILENO);
+      dup2(pipeStdOut[1], STDOUT_FILENO);
+
+      close(pipeStdIn[0]);
+      close(pipeStdOut[1]);
+      close(pipeStdIn[1]);
+      close(pipeStdOut[0]);
+
+      std::string lineLength = std::to_string(50);
+      int childRet = execlp("gap", "gap", "-q", "-m", "64M", "-x", lineLength.c_str(), (char*) NULL);
+
+      qDebug() << "CHILD ERROR" << childRet;
+      exit(childRet);
+    }
+
+    // parent
+    close(pipeStdIn[0]);
+    close(pipeStdOut[1]);
+
+    m_readPipe = pipeStdOut[0];
+    m_writePipe = pipeStdIn[1];
+
     if (d == 2*k) {
         // semidirect product S_d with S_2
         m_factorizations.reserve(2 * factorial(d));
@@ -139,14 +138,8 @@ AutGroup::AutGroup(int d, int k)
         m_factorizations.reserve(factorial(d));
     }
 
-    initGap();
-
-    libgap_enter()
-    libGAP_CollectBags(0,1);
-    libgap_exit()
-
     gapCreateGroup(d, d == 2*k);
-    m_gapName = gap_eval("G;\n", true);
+    m_gapName = gap_eval("G;\n", true, "\n");
 
     qDebug() << "Full automorphism group:" << m_gapName.c_str();
 
@@ -156,7 +149,6 @@ AutGroup::AutGroup(int d, int k)
 
 AutGroup::~AutGroup()
 {
-    libgap_finalize();
     delete[] m_subFactorizations;
     m_subFactorizations = nullptr;
 }
@@ -164,23 +156,25 @@ AutGroup::~AutGroup()
 void AutGroup::calcSubgroups()
 {
     m_subgroups.clear();
+    m_subgroups.push_back("Group(())");
     delete[] m_subFactorizations;
     m_subFactorizations = nullptr;
 
-    std::string subgroupList = gap_eval("Subs:=AllSubgroups(G);\n", true);
-//    gap_eval("Subs:=AllSubgroups(G);\n", false);
+    std::string subgroupList = gap_eval("Subs:=AllSubgroups(G);\n", true, ") ]\n");
 
-    std::size_t limit = 0;
+    std::size_t limit = 6;
     bool cont = true;
+
     while (cont) {
         std::size_t pos = subgroupList.find("Group", limit);
-        limit = subgroupList.find("), Group", pos);
+
+        limit = subgroupList.find("]),", pos);
 
         if (limit == std::string::npos) {
             cont = false;
-            limit = subgroupList.find(") ]\n", pos);
+            limit = subgroupList.find("]) ]", pos);
         }
-        limit++;
+        limit += 2;
 
         std::string subgr = subgroupList.substr(pos, limit - pos);
         m_subgroups.push_back(subgr);
@@ -219,14 +213,7 @@ static std::vector<std::string> splitFactoredElements(std::string elements)
         ret.push_back(el);
 
         elements.erase(0, limit + 2);
-
-//        qDebug() << "TEST" << QString(fac.c_str()) << "|||" << QString(facs.c_str());
     }
-
-//    std::string debug;
-//    for (auto s : ret)
-//        debug += s;
-//    qDebug() << "FACS ->" << debug.c_str();
     return ret;
 }
 
@@ -234,14 +221,9 @@ void AutGroup::createFactoredElements()
 {
     m_factorizations.clear();
 
-    gap_eval("l:=[];\n", false);
+    gap_eval("l:=[];;\n", false);
 
-//    gap_eval("hom:=EpimorphismFromFreeGroup(G:names:=[\"x\",\"y\"]);\n", true);
-//    gap_eval("for g in G do Add(l, PreImagesRepresentative(hom,g)); od;\n", false);
-
-    gap_eval("for g in G do Add(l, Factorization(G,g)); od;\n", false);
-
-    std::string facs = gap_eval("l;\n");
+    std::string facs = gap_eval("for g in G do Add(l, Factorization(G,g)); od;l;\n", true, "]");
     m_factorizations = splitFactoredElements(facs);
 
     qDebug() << "-----------------";
@@ -253,24 +235,24 @@ void AutGroup::createFactoredElements()
 
 std::vector<std::string> AutGroup::getFactorizations(int subIndex) const
 {
-//    qDebug() << "getFactorizations" << subgroup.c_str();
-
     if (subIndex == -1) {
         return m_factorizations;
     }
 
     std::string subgroup = m_subgroups[subIndex];
 
-    if (gap_eval(subgroup + "=" + m_gapName + ";\n").substr(0, 4) == "true") {
+    qDebug() << "getFactorizations" << subgroup.c_str();
+
+    if (gap_eval(subgroup + "=" + m_gapName + ";\n", true, "e").substr(0, 4) == "true") {
         return m_factorizations;
     }
     if (m_subFactorizations[subIndex].size() > 0) {
         return m_subFactorizations[subIndex];
     }
 
-    gap_eval("l:=[];\n", false);
+    gap_eval("l:=[];;\n", false);
     gap_eval("for g in " + subgroup + " do Add(l, Factorization(G,g)); od;\n", false);
-    std::string facs = gap_eval("l;\n");
+    std::string facs = gap_eval("l;\n", true, "]");
 
 //    qDebug() << "FACS" << QString(facs.c_str());
 

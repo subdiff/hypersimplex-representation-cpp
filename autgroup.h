@@ -36,10 +36,16 @@ private:
 
     void calcVtxTrnsSubgroups();
 
+    void gapCreateGroup(int d, bool semi);
+    std::string gap_eval(const std::string _cmd, bool readOutput = true, std::string end = std::string()) const;
+
     std::vector<std::string> m_factorizations;
     std::vector<std::string> m_subgroups;
 
     std::vector<std::string> *m_subFactorizations = nullptr;
 
     std::string m_gapName;
+
+    int m_writePipe;
+    int m_readPipe;
 };
