@@ -16,6 +16,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************/
 
+#ifndef SCHLEGEL_H
+#define SCHLEGEL_H
+
 #include "vertex.h"
 
 #include <vector>
@@ -43,3 +46,5 @@ private:
     facet_pair m_facetPair;
     MatrixXd m_pts;
 };
+
+#endif // SCHLEGEL_H
