@@ -177,6 +177,7 @@ void AutGroup::calcSubgroups()
         limit += 2;
 
         std::string subgr = subgroupList.substr(pos, limit - pos);
+        subgr.erase(remove_if(subgr.begin(), subgr.end(), ::isspace), subgr.end());
         m_subgroups.push_back(subgr);
     }
     m_subFactorizations = new std::vector<std::string>[m_subgroups.size()];
@@ -210,6 +211,7 @@ static std::vector<std::string> splitFactoredElements(std::string elements)
             limit = elements.find(']') - 1;
         }
         std::string el = elements.substr(0, limit);
+        el.erase(remove_if(el.begin(), el.end(), ::isspace), el.end());
         ret.push_back(el);
 
         elements.erase(0, limit + 2);
