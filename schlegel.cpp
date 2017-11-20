@@ -264,19 +264,20 @@ std::vector<VectorXd> Schlegel::getDiagram(int &error) const
     std::sort(planeZ.begin(), planeZ.end(), [](const Point &a, const Point &b) {return a.cI < b.cI;});
     std::sort(plane.begin(), plane.end(), [](const Point &a, const Point &b) {return a.cI < b.cI;});
 
-    std::vector<VectorXd> ret;
-    qDebug() << "ret:" << planeZ.size();
+    std::vector<Point> pts;
     for (auto p : planeZ) {
         VectorXd _val = basisZinv * p.val;
         VectorXd val = _val.head(_val.size() - 1);
 
-        ret.push_back(val);
-
-//        qDebug() << "---";
-//        std::cout << *(ret.end() - 1)  << std::endl;
+        pts.push_back(Point(val, p.cI));
     }
 
-    qDebug() << "Schlegel::getDiagram END";
+    auto middlePtOfPts = average(pts);
+
+    std::vector<VectorXd> ret;
+    for (auto p : pts) {
+        ret.push_back(p.val - middlePtOfPts.val);
+    }
 
     return ret;
 }
