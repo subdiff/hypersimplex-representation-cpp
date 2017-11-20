@@ -179,9 +179,6 @@ std::vector<VectorXd> Schlegel::getDiagram(int &error) const
     for (int i = 0; i < fp.second.size(); i++) {
         int cI = fp.second[i].combIndex();
         proj.push_back(Point(m_pts.col(cI), cI));
-
-        qDebug() << "proj" << i << ":";
-        std::cout << proj[i].val  << std::endl;
     }
     // substract from projected points first component of plane
     std::vector<Point> projZ;
