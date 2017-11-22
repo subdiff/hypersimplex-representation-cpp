@@ -41,7 +41,6 @@ public:
     }
 
     bool setVars(const std::vector<double> set);
-    bool setMultVars(std::vector<double> set);
 
     void calcNullspaceRepr();
     std::vector<VectorXd> getNullspaceRepr() const {
@@ -62,6 +61,7 @@ private:
     VtxTrnsSubgroup *m_group;
 
     MatrixXd m_matrix;          // Matrix<double, Dynamic, Dynamic>
+    MatrixXd m_multMatrix;          // Matrix<double, Dynamic, Dynamic>
     MatrixXi m_eecIndexMatrix;  // Matrix<double, Dynamic, Dynamic>
 
     std::vector<int> m_mult;

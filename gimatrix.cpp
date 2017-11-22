@@ -40,6 +40,7 @@ GiMatrix::GiMatrix(Hypersimplex *hypers, VtxTrnsSubgroup *group)
 void GiMatrix::init()
 {
     m_matrix.resize(m_dim, m_dim);
+    m_multMatrix.resize(m_dim, m_dim);
     m_eecIndexMatrix.resize(m_dim, m_dim);
 
 
@@ -105,32 +106,6 @@ bool GiMatrix::setVars(const std::vector<double> set)
     return true;
 }
 
-bool GiMatrix::setMultVars(std::vector<double> set)
-{
-    std::vector<double> multVarsTmp;
-    multVarsTmp.push_back(0.);
-
-    if (set.size() != m_group->m_edgeEquivClasses.size() - 1) {
-        return false;
-    }
-
-    double sum = 0;
-    for (auto s : set) {
-        if (s < 0 || 1 < s) {
-            return false;
-        }
-        multVarsTmp.push_back(s);
-        sum += s;
-    }
-
-    if (sum != 1.) {
-        qDebug() << "Error: Multiplied variable sum not one. It is:" << sum;
-        return false;
-    }
-    m_multVars = multVarsTmp;
-    return true;
-}
-
 void GiMatrix::calculateEecIndexMatrix()
 {
     for (int row = 0; row < m_dim; row++) {
@@ -157,9 +132,12 @@ void GiMatrix::calculateMatrix()
     for (int row = 0; row < m_dim; row++) {
         for (int col = 0; col < row; col++) {
             auto eecIndex = m_eecIndexMatrix(row, col);
-            auto val = m_multVars[eecIndex];
+            auto val = m_vars[eecIndex];
+            auto multVal = m_multVars[eecIndex];
             m_matrix(row, col) = val;
             m_matrix(col, row) = val;
+            m_multMatrix(row, col) = val;
+            m_multMatrix(col, row) = val;
         }
     }
     calcNullspaceRepr();
@@ -172,8 +150,10 @@ void GiMatrix::calcNullspaceRepr()
 
     qDebug() << "EECIndexMatrix for" << m_group->m_gapName.c_str() << ":";
     std::cout << m_eecIndexMatrix  << std::endl;
-    qDebug() << "GiMatrix:";
+    qDebug() << "GiMatrix (doubly stochastic matrix):";
     std::cout << m_matrix  << std::endl;
+    qDebug() << "GiMatrix multiplied (this matrix stores values already multiplied by eec multiplicity -> it is not the doubly stochastic matrix!):";
+    std::cout << m_multMatrix  << std::endl;
 
     m_nullSpReprList.clear();
 
