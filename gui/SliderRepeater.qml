@@ -19,11 +19,52 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import QtQuick 2.7
 import QtQuick.Controls 1.4
 
+Column {
+    id: slidersCol
+
+    spacing: 5
+
 Repeater {
     id: slidersRepeater
 
     model: backend.eecWraps
     delegate: VarSlider{}
+
+    function hasManualChanges() {
+        for (var i = 0; i < count; i++) {
+            var itm = itemAt(i);
+            if (itm.val != itm.text) {
+                return manualTextIsValid();
+            }
+        }
+        return false;
+    }
+
+    function manualTextIsValid() {
+        var sum = 0;
+        for (var i = 0; i < count; i++) {
+            var itm = itemAt(i);
+            if (itm.text < 0 || itm.text > 1) {
+                // TODO: error message
+                return false;
+            }
+            sum += itm.text * itm.mult;
+        }
+        return sum == 1;
+    }
+
+    function applyManualVals() {
+        if (manualTextIsValid()) {
+            for (var i = 0; i < count; i++) {
+                var itm = itemAt(i);
+                itm.oldVal = itm.text;
+                itm.val = itm.text;
+            }
+            updateBackend();
+        } else {
+            console.log("Error: manual values are not valid.");
+        }
+    }
 
     function distrVals(changedIndex) {
         if (count < 2) {
@@ -142,4 +183,13 @@ Repeater {
         }
         backend.setVars(vals);
     }
+}
+Button {
+    visible: slidersRepeater.count > 1
+    text: "Set"
+    width: slidersCol.width * 0.25
+    anchors.right: slidersCol.right
+    enabled: slidersRepeater.hasManualChanges()
+    onClicked: slidersRepeater.applyManualVals()
+}
 }

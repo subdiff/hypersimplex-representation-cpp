@@ -28,6 +28,9 @@ Row {
     property alias oldVal: slider.oldVal
     property int mult: model.modelData.mult
 
+    property alias text: varText.text
+    property int textFieldWidth: varText.width
+
     spacing: 10
 
     Slider {
@@ -37,7 +40,7 @@ Row {
         minimumValue: 0.
         maximumValue: 1. / mult
 
-        enabled: count > 1
+        enabled: slidersRepeater.count > 1
 
         property double oldVal: -1
 
@@ -50,6 +53,8 @@ Row {
             }
             console.log("onVarValChanged", index + ":", oldVal, "|", value);
 
+            varText.text = value;
+
             if (value != oldVal) {
                 console.log("onVarValChanged -> distrVals!");
                 slidersRepeater.distrVals(index);
@@ -61,12 +66,12 @@ Row {
 
         text: slider.value
 
-        enabled: count > 1
+        enabled: slidersRepeater.count > 1
 
         width: fontMetrics.averageCharacterWidth * 6
 
         horizontalAlignment: TextInput.AlignHCenter
-        readOnly: true
+        readOnly: !enabled
         maximumLength: 5
 
         FontMetrics {

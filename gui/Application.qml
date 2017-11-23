@@ -140,17 +140,13 @@ Layouts.RowLayout {
             text: "TEST"
         }
 
-        Column {
-            id: slidersCol
+        SliderRepeater {
             anchors {
                 top: logOutput.bottom
                 left: logOutput.left
                 right: logOutput.right
                 topMargin: 10
             }
-            spacing: 5
-
-            SliderRepeater {}
         }
     }
 
