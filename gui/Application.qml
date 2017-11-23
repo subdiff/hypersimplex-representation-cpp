@@ -44,10 +44,10 @@ Layouts.RowLayout {
 
         BackEnd {
             id: backend
+
+            selEigenvectByMult: eigenVectorSelectionPerMultiplicityCheckbox.checked
             onGeometryInitNeeded: wrap3D.initGeometries()
             onGeometryUpdateNeeded: wrap3D.updateGeometries()
-
-//            Component.onCompleted: ctrls.initHypers(dSpin.value, kSpin.value)
         }
 
         Row {
@@ -168,6 +168,22 @@ Layouts.RowLayout {
                 height: childrenRect.height
 
                 spacing: 20
+
+                Row {
+                    height: childrenRect.height
+                    spacing: 10
+
+                    property bool singleVertexFacet: ctrls.curK == 1 || ctrls.curK == ctrls.curD - 1
+                    CheckBox {
+                        id: eigenVectorSelectionPerMultiplicityCheckbox
+                        enabled: backend.ready
+                        checked: true
+                    }
+                    Label {
+                        enabled: backend.ready
+                        text: "Select eigenvectors by multiplicity"
+                    }
+                }
 
                 Row {
                     height: childrenRect.height

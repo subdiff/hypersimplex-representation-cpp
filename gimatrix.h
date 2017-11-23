@@ -53,6 +53,10 @@ public:
         return m_matrix;
     }
 
+    void setSelEigenvectByMult(bool set) {
+        m_selEigenvectByMult = set;
+    }
+
 private:
     void calculateEecIndexMatrix();
     void calculateMatrix();
@@ -73,4 +77,6 @@ private:
     std::vector<VectorXd> m_nullSpReprList;
 
     int m_dim;
+
+    bool m_selEigenvectByMult = true;
 };

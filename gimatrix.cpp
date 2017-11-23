@@ -149,31 +149,34 @@ MatrixXd GiMatrix::getMaxDimensionalNullspBasis(const VectorXd &eVals, const Mat
 {
     int nullSpDim = m_hypers->d() - 1;
 
-    auto nearIndices = [nullSpDim, &eVals, &eVcts](double epsilon) {
-        std::vector<int> hits;
-        for (int i = eVals.rows() - 1; i >= 0; i--) {
-            hits = std::vector<int>();
-            for (int j = i; j >= 0; j--) {
-                if (std::abs(eVals(i) - eVals(j)) < epsilon) {
-                    hits.push_back(j);
+    if (m_selEigenvectByMult) {
+        auto nearIndices = [nullSpDim, &eVals, &eVcts](double epsilon) {
+            std::vector<int> hits;
+            for (int i = eVals.rows() - 1; i >= 0; i--) {
+                hits = std::vector<int>();
+                for (int j = i; j >= 0; j--) {
+                    if (std::abs(eVals(i) - eVals(j)) < epsilon) {
+                        hits.push_back(j);
+                    }
+                }
+                if (hits.size() == nullSpDim) {
+                    return hits[nullSpDim - 1];
                 }
             }
-            if (hits.size() == nullSpDim) {
-                return hits[nullSpDim - 1];
-            }
-        }
-        return -1;
-    };
+            return -1;
+        };
 
-    int hit = nearIndices(0.01);
-    // first try with small tolerance
-    if (hit != -1) {
-        return eVcts.block(0, hit, m_dim, nullSpDim).transpose();
-    }
-    // try with larger tolerance
-    hit = nearIndices(0.1);
-    if (hit != -1) {
-        return eVcts.block(0, hit, m_dim, nullSpDim).transpose();
+        int hit = nearIndices(0.01);
+        // first try with small tolerance
+        if (hit != -1) {
+            return eVcts.block(0, hit, m_dim, nullSpDim).transpose();
+        }
+        // try with larger tolerance
+        hit = nearIndices(0.1);
+        if (hit != -1) {
+            return eVcts.block(0, hit, m_dim, nullSpDim).transpose();
+        }
+
     }
     // fall back to the highest indices after the first one
     return eVcts.block(0, m_dim - 1 - nullSpDim, m_dim, nullSpDim).transpose();

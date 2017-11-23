@@ -69,6 +69,19 @@ void BackEnd::setSelectedSubgroup(int set) {
     }
 }
 
+void BackEnd::setSelEigenvectByMult(bool set)
+{
+    if (m_selEigenvectByMult != set) {
+        m_selEigenvectByMult = set;
+        if(m_reprMatrix) {
+            m_reprMatrix->setSelEigenvectByMult(set);
+            m_reprMatrix->calcNullspaceRepr();
+        }
+        emit selEigenvectByMultChanged();
+        emit geometryInitNeeded();
+    }
+}
+
 void BackEnd::setEecWraps() {
     auto clear = [this]() {
         for (auto eW : m_eecWraps) {
@@ -104,6 +117,7 @@ void BackEnd::setGiMatrix(int subgroup)
     delete m_reprMatrix;
 
     m_reprMatrix = new GiMatrix(::s_hypers->getGiMatrix(subgroup));
+    m_reprMatrix->setSelEigenvectByMult(m_selEigenvectByMult);
     m_reprMatrix->init();
 
     emit geometryInitNeeded();
