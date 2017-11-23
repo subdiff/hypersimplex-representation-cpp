@@ -25,7 +25,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <QDebug>
 
+#include <cmath>
 #include <iostream>
+
 
 GiMatrix::GiMatrix(Hypersimplex *hypers, VtxTrnsSubgroup *group)
     : m_dim(hypers->vertexCount()),
@@ -136,11 +138,45 @@ void GiMatrix::calculateMatrix()
             auto multVal = m_multVars[eecIndex];
             m_matrix(row, col) = val;
             m_matrix(col, row) = val;
-            m_multMatrix(row, col) = val;
-            m_multMatrix(col, row) = val;
+            m_multMatrix(row, col) = multVal;
+            m_multMatrix(col, row) = multVal;
         }
     }
     calcNullspaceRepr();
+}
+
+MatrixXd GiMatrix::getMaxDimensionalNullspBasis(const VectorXd &eVals, const MatrixXd &eVcts)
+{
+    int nullSpDim = m_hypers->d() - 1;
+
+    auto nearIndices = [nullSpDim, &eVals, &eVcts](double epsilon) {
+        std::vector<int> hits;
+        for (int i = eVals.rows() - 1; i >= 0; i--) {
+            hits = std::vector<int>();
+            for (int j = i; j >= 0; j--) {
+                if (std::abs(eVals(i) - eVals(j)) < epsilon) {
+                    hits.push_back(j);
+                }
+            }
+            if (hits.size() == nullSpDim) {
+                return hits[nullSpDim - 1];
+            }
+        }
+        return -1;
+    };
+
+    int hit = nearIndices(0.01);
+    // first try with small tolerance
+    if (hit != -1) {
+        return eVcts.block(0, hit, m_dim, nullSpDim).transpose();
+    }
+    // try with larger tolerance
+    hit = nearIndices(0.1);
+    if (hit != -1) {
+        return eVcts.block(0, hit, m_dim, nullSpDim).transpose();
+    }
+    // fall back to the highest indices after the first one
+    return eVcts.block(0, m_dim - 1 - nullSpDim, m_dim, nullSpDim).transpose();
 }
 
 void GiMatrix::calcNullspaceRepr()
@@ -173,7 +209,7 @@ void GiMatrix::calcNullspaceRepr()
 
     qDebug() << "----------------";
     qDebug() << "Null Space Representation:";
-    MatrixXd nullSpRepr = eVcts.block(0, m_dim - m_hypers->d(), m_dim, m_hypers->d() - 1).transpose();
+    MatrixXd nullSpRepr = getMaxDimensionalNullspBasis(eVals, eVcts);
     std::cout << nullSpRepr  << std::endl;;
     m_nullSpRepr = nullSpRepr;
 

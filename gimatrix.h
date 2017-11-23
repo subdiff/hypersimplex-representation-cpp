@@ -56,6 +56,7 @@ public:
 private:
     void calculateEecIndexMatrix();
     void calculateMatrix();
+    MatrixXd getMaxDimensionalNullspBasis(const VectorXd &eVals, const MatrixXd &eVcts);
 
     Hypersimplex *m_hypers;
     VtxTrnsSubgroup *m_group;
