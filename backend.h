@@ -67,7 +67,7 @@ class BackEnd : public QObject
     Q_PROPERTY(bool ready READ ready NOTIFY readyChanged)
     Q_PROPERTY(QStringList vtxTrSubgroups READ vtxTrSubgroups NOTIFY vtxTrSubgroupsChanged)
     Q_PROPERTY(int selectedSubgroup READ selectedSubgroup WRITE setSelectedSubgroup NOTIFY selectedSubgroupChanged)
-    Q_PROPERTY(bool selEigenvectByMult READ selEigenvectByMult WRITE setSelEigenvectByMult NOTIFY selEigenvectByMultChanged)
+    Q_PROPERTY(int selEigenvectMode READ selEigenvectMode WRITE setSelEigenvectMode NOTIFY selEigenvectModeChanged)
 
     Q_PROPERTY(QList<QObject*> eecWraps READ eecWraps NOTIFY eecWrapsChanged)
 
@@ -91,10 +91,10 @@ public:
     }
     void setSelectedSubgroup(int set);
 
-    bool selEigenvectByMult() const {
-        return m_selEigenvectByMult;
+    int selEigenvectMode() const {
+        return m_selEigenvectMode;
     }
-    void setSelEigenvectByMult(bool set);
+    void setSelEigenvectMode(int mode);
 
     GiMatrix *getGiMatrix() {
         return m_reprMatrix;
@@ -117,7 +117,7 @@ Q_SIGNALS:
     void eecWrapsChanged();
     void geometryInitNeeded();
     void geometryUpdateNeeded();
-    void selEigenvectByMultChanged();
+    void selEigenvectModeChanged();
 
 private:
     void setGiMatrix(int subgroup);
@@ -130,7 +130,7 @@ private:
     GiMatrix *m_reprMatrix = nullptr;
 
     QList<QObject*> m_eecWraps;
-    bool m_selEigenvectByMult = true;
+    int m_selEigenvectMode = 0;
 };
 
 #endif // BACKEND_H

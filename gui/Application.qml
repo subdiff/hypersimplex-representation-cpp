@@ -16,7 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************/
 
-import QtQuick 2.3
+import QtQuick 2.6
 import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.3 as Layouts
 import QtQuick.Scene3D 2.0
@@ -25,13 +25,13 @@ import subdiff.de.math.hypersimplex.representation 1.0
 
 Layouts.RowLayout {
 
-    spacing: 50
-    Item {
+    Column {
         id: ctrls
-        width: childrenRect.width
-        height: childrenRect.height
 
         Layouts.Layout.alignment: Qt.AlignTop
+
+        spacing: 10
+        padding: 10
 
         property int curD: 0
         property int curK: 0
@@ -42,21 +42,11 @@ Layouts.RowLayout {
             backend.createHypersimplex(d, k);
         }
 
-        BackEnd {
-            id: backend
-
-            selEigenvectByMult: eigenVectorSelectionPerMultiplicityCheckbox.checked
-            onGeometryInitNeeded: wrap3D.initGeometries()
-            onGeometryUpdateNeeded: wrap3D.updateGeometries()
-        }
-
         Row {
-            id: hypersSelector
-            anchors {
-                left: parent.left
-                leftMargin: 10
-            }
             spacing: 10
+            padding: 10
+
+            anchors.horizontalCenter: parent.horizontalCenter
 
             Row {
                 id: parametersRow
@@ -70,7 +60,6 @@ Layouts.RowLayout {
                 SpinBox {
                     id: dSpin
                     width: applyButton.width / 2
-//                    value: 5
                     minimumValue: 3
                     maximumValue: 20
                 }
@@ -80,7 +69,6 @@ Layouts.RowLayout {
                 SpinBox {
                     id: kSpin
                     width: dSpin.width
-//                    value: 2
                     minimumValue: 1
                     maximumValue: dSpin.value - 1
                 }
@@ -113,12 +101,9 @@ Layouts.RowLayout {
 
         ComboBox {
             id: subgroupSelector
-            anchors {
-                top: hypersSelector.bottom
-                left: hypersSelector.left
-                right: hypersSelector.right
-                topMargin: 20
-            }
+
+            width: eigenVectorSelectionCol.width
+
             enabled: count > 1
             model: backend.vtxTrSubgroups
 
@@ -126,27 +111,61 @@ Layouts.RowLayout {
             onCurrentIndexChanged: backend.selectedSubgroup = currentIndex;
         }
 
-        TextArea {
-            id: logOutput
-            anchors {
-                top: subgroupSelector.bottom
-                left: hypersSelector.left
-                right: hypersSelector.right
-                topMargin: 10
-            }
-            readOnly: true
-            selectByKeyboard: true
+        GroupBox {
+            id: eigenVectorSelectionCol
 
-            text: "TEST"
+            enabled: backend.ready
+
+            title: "Eigenvectors by:"
+
+            property int mode: 0
+
+
+            Column {
+                height: childrenRect.height
+                width: childrenRect.width
+                spacing: 10
+
+                ExclusiveGroup { id: eigenVectorSelectionGroup }
+
+                RadioButton {
+                    id: eigenVectorSelectionPerMultiplicity
+                    checked: true
+                    exclusiveGroup: eigenVectorSelectionGroup
+                    text: "Similar multiplicity"
+                    onCheckedChanged: {
+                        if (checked) {
+                            eigenVectorSelectionCol.mode = 0;
+                        }
+                    }
+                }
+
+                RadioButton {
+                    id: eigenVectorSelection2ndHighestAndBelow
+                    exclusiveGroup: eigenVectorSelectionGroup
+                    text: "2nd highest Eigenvalue and below"
+                    onCheckedChanged: {
+                        if (checked) {
+                            eigenVectorSelectionCol.mode = 1;
+                        }
+                    }
+                }
+
+                RadioButton {
+                    id: eigenVectorSelection2ndHighestOnly
+                    exclusiveGroup: eigenVectorSelectionGroup
+                    text: "2nd highest Eigenvalue only"
+                    onCheckedChanged: {
+                        if (checked) {
+                            eigenVectorSelectionCol.mode = 2;
+                        }
+                    }
+                }
+            }
         }
 
         SliderRepeater {
-            anchors {
-                top: logOutput.bottom
-                left: logOutput.left
-                right: logOutput.right
-                topMargin: 10
-            }
+            width: eigenVectorSelectionCol.width
         }
     }
 
@@ -168,22 +187,6 @@ Layouts.RowLayout {
                 height: childrenRect.height
 
                 spacing: 20
-
-                Row {
-                    height: childrenRect.height
-                    spacing: 10
-
-                    property bool singleVertexFacet: ctrls.curK == 1 || ctrls.curK == ctrls.curD - 1
-                    CheckBox {
-                        id: eigenVectorSelectionPerMultiplicityCheckbox
-                        enabled: backend.ready
-                        checked: true
-                    }
-                    Label {
-                        enabled: backend.ready
-                        text: "Select eigenvectors by multiplicity"
-                    }
-                }
 
                 Row {
                     height: childrenRect.height
@@ -238,6 +241,14 @@ Layouts.RowLayout {
                 }
             }
         }
+    }
+
+    BackEnd {
+        id: backend
+
+        selEigenvectMode: eigenVectorSelectionCol.mode
+        onGeometryInitNeeded: wrap3D.initGeometries()
+        onGeometryUpdateNeeded: wrap3D.updateGeometries()
     }
 
     Root3DWrapper {

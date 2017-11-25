@@ -53,8 +53,8 @@ public:
         return m_matrix;
     }
 
-    void setSelEigenvectByMult(bool set) {
-        m_selEigenvectByMult = set;
+    void setSelEigenvectMode(int mode) {
+        m_selEigenvectMode = mode;
     }
 
 private:
@@ -78,5 +78,5 @@ private:
 
     int m_dim;
 
-    bool m_selEigenvectByMult = true;
+    int m_selEigenvectMode = 0;
 };

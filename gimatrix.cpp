@@ -149,10 +149,10 @@ MatrixXd GiMatrix::getMaxDimensionalNullspBasis(const VectorXd &eVals, const Mat
 {
     int nullSpDim = m_hypers->d() - 1;
 
-    if (m_selEigenvectByMult) {
+    if (m_selEigenvectMode == 0) {
         auto nearIndices = [nullSpDim, &eVals, &eVcts](double epsilon) {
             std::vector<int> hits;
-            for (int i = eVals.rows() - 1; i >= 0; i--) {
+            for (int i = eVals.rows() - 2; i >= 0; i--) {
                 hits = std::vector<int>();
                 for (int j = i; j >= 0; j--) {
                     if (std::abs(eVals(i) - eVals(j)) < epsilon) {
@@ -176,10 +176,22 @@ MatrixXd GiMatrix::getMaxDimensionalNullspBasis(const VectorXd &eVals, const Mat
         if (hit != -1) {
             return eVcts.block(0, hit, m_dim, nullSpDim).transpose();
         }
-
     }
-    // fall back to the highest indices after the first one
-    return eVcts.block(0, m_dim - 1 - nullSpDim, m_dim, nullSpDim).transpose();
+    // highest indices after the first one
+    int count = nullSpDim;
+    if (m_selEigenvectMode == 2) {
+        // only for same eigenvalue
+        count = 1;
+        double ev = eVals(eVals.rows() - 2);
+        for (int i = eVals.rows() - 3; i >= 0; i--) {
+            if (std::abs(eVals(i) - ev) < std::numeric_limits<double>::epsilon()) {
+                count++;
+            } else {
+                break;
+            }
+        }
+    }
+    return eVcts.block(0, m_dim - 1 - count, m_dim, count).transpose();
 }
 
 void GiMatrix::calcNullspaceRepr()

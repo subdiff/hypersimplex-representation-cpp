@@ -69,15 +69,15 @@ void BackEnd::setSelectedSubgroup(int set) {
     }
 }
 
-void BackEnd::setSelEigenvectByMult(bool set)
+void BackEnd::setSelEigenvectMode(int mode)
 {
-    if (m_selEigenvectByMult != set) {
-        m_selEigenvectByMult = set;
+    if (m_selEigenvectMode != mode) {
+        m_selEigenvectMode = mode;
         if(m_reprMatrix) {
-            m_reprMatrix->setSelEigenvectByMult(set);
+            m_reprMatrix->setSelEigenvectMode(mode);
             m_reprMatrix->calcNullspaceRepr();
         }
-        emit selEigenvectByMultChanged();
+        emit selEigenvectModeChanged();
         emit geometryInitNeeded();
     }
 }
@@ -117,7 +117,7 @@ void BackEnd::setGiMatrix(int subgroup)
     delete m_reprMatrix;
 
     m_reprMatrix = new GiMatrix(::s_hypers->getGiMatrix(subgroup));
-    m_reprMatrix->setSelEigenvectByMult(m_selEigenvectByMult);
+    m_reprMatrix->setSelEigenvectMode(m_selEigenvectMode);
     m_reprMatrix->init();
 
     emit geometryInitNeeded();
