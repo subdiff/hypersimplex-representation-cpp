@@ -144,15 +144,15 @@ std::vector<VectorXd> Schlegel::getDiagram(int &error) const
         spanPlaneZ.block(0, i, spanPlaneZ.rows(), 1) = planeZ[i].val;
     }
 
-    qDebug() << "spanPlaneZ:";
-    std::cout << spanPlaneZ  << std::endl;
+//    qDebug() << "spanPlaneZ:";
+//    std::cout << spanPlaneZ  << std::endl;
 
     FullPivLU<MatrixXd> luDecomp(spanPlaneZ);
     MatrixXd basisPlaneZ = luDecomp.image(spanPlaneZ);
 
-    qDebug() << "Rank of basisPlaneZ:"<< luDecomp.rank();
-    qDebug() << "basisPlaneZ:";
-    std::cout << basisPlaneZ  << std::endl;
+//    qDebug() << "Rank of basisPlaneZ:"<< luDecomp.rank();
+//    qDebug() << "basisPlaneZ:";
+//    std::cout << basisPlaneZ  << std::endl;
 
     if (basisPlaneZ.cols() != dim - 1) {
         error = 1;
@@ -163,8 +163,8 @@ std::vector<VectorXd> Schlegel::getDiagram(int &error) const
     // find orthonormal basis of zeroed image plane points
     MatrixXd orthBasisPlaneZ = gramSchmidt(basisPlaneZ);
 
-    qDebug() << "orthBasisPlaneZ:";
-    std::cout << orthBasisPlaneZ  << std::endl;
+//    qDebug() << "orthBasisPlaneZ:";
+//    std::cout << orthBasisPlaneZ  << std::endl;
 
     // find normal vector on image plane and normalize it
     FullPivLU<MatrixXd> luDecomp2(orthBasisPlaneZ.transpose());
@@ -172,8 +172,8 @@ std::vector<VectorXd> Schlegel::getDiagram(int &error) const
     VectorXd normalPlaneZ = _normalPlaneZ.col(0);
     normalPlaneZ.normalize();
 
-    qDebug() << "normalPlaneZ:";
-    std::cout << normalPlaneZ  << std::endl;
+//    qDebug() << "normalPlaneZ:";
+//    std::cout << normalPlaneZ  << std::endl;
 
     // set all projected points
     std::vector<Point> proj;
@@ -185,33 +185,25 @@ std::vector<VectorXd> Schlegel::getDiagram(int &error) const
     // substract from projected points first component of plane
     std::vector<Point> projZ;
 
-    qDebug() << "proj size:" << proj.size();
     for (int i = 0; i < proj.size(); i++) {
-        qDebug() << "---";
-        std::cout << proj[i].val - plane[0].val  << std::endl;
         projZ.push_back(Point(proj[i].val - plane[0].val, proj[i].cI));
     }
 
     // set basis for R^d -> test such that normal vector is pointing away
     MatrixXd basisZ(dim, dim);
-
-    qDebug() << "Schlegel::getDiagram0" << dim << orthBasisPlaneZ.cols();
     basisZ.block(0, 0, dim, dim - 1) = orthBasisPlaneZ;
     basisZ.block(0, dim - 1, dim, 1) = normalPlaneZ;
 
-    qDebug() << "basisZ:";
-    std::cout << basisZ  << std::endl;
+//    qDebug() << "basisZ:";
+//    std::cout << basisZ  << std::endl;
 
     MatrixXd basisZinv = basisZ.inverse();
-
-    qDebug() << "Schlegel::getDiagram1" << (basisZinv * proj[0].val)[dim - 1];
     if ((basisZinv * proj[0].val)[dim - 1] > 0) {
         // turn normal vector
         normalPlaneZ = -normalPlaneZ;
         basisZ.block(0, dim - 1, dim, 1) = normalPlaneZ;
         basisZinv = basisZ.inverse();
     }
-    qDebug() << "Schlegel::getDiagram2";
     assert((basisZinv * proj[0].val)[dim - 1] < 0);
 
     // first iteration of projection center
@@ -243,19 +235,11 @@ std::vector<VectorXd> Schlegel::getDiagram(int &error) const
 
     projCenterZ = planeMiddleZ.val + normalPlaneZ * normalPlaneCoeff;
 
-
-    qDebug() << "projZ:" << projZ.size();
-
     for (auto p : projZ) {
         auto imgZ = intersectLineHyperplane(p.val, projCenterZ, normalPlaneZ);
         Point imgP(imgZ + plane[0].val, p.cI);
-
         Point imgPZ(imgZ, p.cI);
         planeZ.push_back(imgPZ);
-
-//        qDebug() << "---";
-//        std::cout << imgP.val << std::endl;
-
         plane.push_back(imgP);
     }
 
@@ -277,6 +261,5 @@ std::vector<VectorXd> Schlegel::getDiagram(int &error) const
     for (auto p : pts) {
         ret.push_back(p.val - middlePtOfPts.val);
     }
-
     return ret;
 }

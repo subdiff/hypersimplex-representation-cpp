@@ -34,11 +34,7 @@ std::string AutGroup::gap_eval(const std::string _cmd, bool readOutput, std::str
 {
     const char *cmd = _cmd.c_str();
     std::string ret;
-
     const int endSize = end.size();
-
-//    qDebug() << "GAP cmd:" << readOutput;
-//    qDebug() << cmd;
 
     while (1) {
         if (write(m_writePipe, cmd, strlen(cmd)) == strlen(cmd)) {
@@ -62,8 +58,6 @@ std::string AutGroup::gap_eval(const std::string _cmd, bool readOutput, std::str
                 break;
             }
         }
-//        qDebug() << "GAP result:";
-//        qDebug() << ret.c_str();
     }
     ret.erase(std::remove(ret.begin(), ret.end(), '\n'), ret.end());
 
@@ -118,7 +112,7 @@ AutGroup::AutGroup(int d, int k)
       std::string lineLength = std::to_string(50);
       int childRet = execlp("gap", "gap", "-q", "-m", "64M", "-x", lineLength.c_str(), (char*) NULL);
 
-      qDebug() << "CHILD ERROR" << childRet;
+      qDebug() << "Critical fork error" << childRet;
       exit(childRet);
     }
 
@@ -183,19 +177,13 @@ void AutGroup::calcSubgroups()
     m_subFactorizations = new std::vector<std::string>[m_subgroups.size()];
 
     qDebug() << "-----------------";
-    qDebug() << "-----------------";
     qDebug() << "Subgroup Count" << m_subgroups.size();
-//    for (auto s : m_subgroups)
-//        qDebug() << "m_subgroups" << QString(s.c_str());
-
     qDebug() << "-----------------";
 }
 
 static std::vector<std::string> splitFactoredElements(std::string elements)
 {
     std::vector<std::string> ret;
-
-//    qDebug() << "FACS DO" << elements.c_str();
 
     std::size_t start = elements.find_first_of("<x(");
     if (start == std::string::npos) {
@@ -229,10 +217,8 @@ void AutGroup::createFactoredElements()
     m_factorizations = splitFactoredElements(facs);
 
     qDebug() << "-----------------";
+    qDebug() << "Group element count" << m_factorizations.size();
     qDebug() << "-----------------";
-    qDebug() << "Factorizations Count" << m_factorizations.size();
-//    for (auto f : m_factorizations)
-//        qDebug() << "m_factorizations" << QString(f.c_str());
 }
 
 std::vector<std::string> AutGroup::getFactorizations(int subIndex) const
@@ -242,8 +228,6 @@ std::vector<std::string> AutGroup::getFactorizations(int subIndex) const
     }
 
     std::string subgroup = m_subgroups[subIndex];
-
-//    qDebug() << "getFactorizations" << subgroup.c_str();
 
     if (gap_eval(subgroup + "=" + m_gapName + ";\n", true, "e").substr(0, 4) == "true") {
         return m_factorizations;
@@ -255,8 +239,6 @@ std::vector<std::string> AutGroup::getFactorizations(int subIndex) const
     gap_eval("l:=[];;\n", false);
     gap_eval("for g in " + subgroup + " do Add(l, Factorization(G,g)); od;\n", false);
     std::string facs = gap_eval("l;\n", true, "]");
-
-//    qDebug() << "FACS" << QString(facs.c_str());
 
     m_subFactorizations[subIndex] = splitFactoredElements(facs);
     return m_subFactorizations[subIndex];

@@ -21,8 +21,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "edge3dentity.h"
 #include "../gimatrix.h"
 
-#include <QDebug>
-
 #include <QRenderSettings>
 #include <QForwardRenderer>
 #include <QInputSettings>
@@ -133,8 +131,6 @@ std::vector<VectorXd> Root3DEntity::getNullspaceRepr(GiMatrix *matrix)
 
 void Root3DEntity::initGeometries(GiMatrix *matrix)
 {
-    qDebug() << "initGeometries";
-
     clearGeometries();
 
     auto nullSpRepr = getNullspaceRepr(matrix);

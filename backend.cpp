@@ -113,7 +113,6 @@ void BackEnd::setVars(QList<double > vars)
 
 void BackEnd::setGiMatrix(int subgroup)
 {
-    qDebug() << "setGiMatrix" << subgroup;
     delete m_reprMatrix;
 
     m_reprMatrix = new GiMatrix(::s_hypers->getGiMatrix(subgroup));
@@ -138,7 +137,6 @@ void BackEnd::checkReady()
             m_checkReadyTimer = nullptr;
         }
         setVtxTrSubgroups(::s_hypers->getVtxTrSubgroupNames());
-        qDebug() << "checkReady";
     }
 }
 

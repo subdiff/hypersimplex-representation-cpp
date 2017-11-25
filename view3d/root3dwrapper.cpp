@@ -21,8 +21,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "root3dentity.h"
 #include "../gimatrix.h"
 
-#include <QDebug>
-
 Root3DWrapper::Root3DWrapper(QObject *parent)
     : QObject(parent)
 {
