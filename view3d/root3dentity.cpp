@@ -113,6 +113,9 @@ void Root3DEntity::createCoordAxes()
 std::vector<VectorXd> Root3DEntity::getNullspaceRepr(GiMatrix *matrix)
 {
     auto nullSpRepr = matrix->getNullspaceRepr();
+    if (nullSpRepr.size() == 0) {
+        return std::vector<VectorXd>();
+    }
     auto dim = nullSpRepr[0].rows();
 
     if (dim > 4) {
@@ -122,7 +125,6 @@ std::vector<VectorXd> Root3DEntity::getNullspaceRepr(GiMatrix *matrix)
         int error = 0;
         nullSpRepr = matrix->getSchlegelDiagram(m_projFacet, m_projToLargerFacet, error);
         if (error != 0) {
-            qDebug() << "Root3DEntity::initGeometries ERROR";
             return std::vector<VectorXd>();
         }
     }
@@ -150,7 +152,6 @@ void Root3DEntity::initGeometries(GiMatrix *matrix)
     for (int row=0; row < incidences.rows(); row++) {
         for (int col=0; col < row; col++) {
             if(incidences(row, col) != 0.) {
-//                qDebug() << "incidences" << row << col << "|" << incidences(row, col);
                 Edge3DEntity *e3d = new Edge3DEntity(this, m_vertices[row], m_vertices[col]);
                 m_edges.push_back(e3d);
             }

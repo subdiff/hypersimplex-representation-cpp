@@ -115,6 +115,9 @@ std::vector<VectorXd> Schlegel::getDiagram(int &error) const
     facet_pair fp = m_hypers->getFacetPair(m_facetPairIndex);
 
     int dim = m_hypers->d() - 1;
+    if (dim > 4) {
+        return std::vector<VectorXd>();
+    }
 
     setImageProj(fp);
 
