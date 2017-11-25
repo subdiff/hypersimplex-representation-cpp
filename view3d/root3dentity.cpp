@@ -176,8 +176,14 @@ void Root3DEntity::clearGeometries()
 void Root3DEntity::updateGeometries(GiMatrix *matrix)
 {
     auto nullSpRepr = getNullspaceRepr(matrix);
-    if (!nullSpRepr.size()) {
+    int nullSpReprSize = nullSpRepr.size();
+    if (nullSpReprSize == 0) {
+        clearGeometries();
         return;
+    }
+
+    if (nullSpReprSize != m_vertices.size()) {
+        initGeometries(matrix);
     }
 
 

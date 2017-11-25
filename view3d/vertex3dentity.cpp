@@ -30,7 +30,6 @@ Vertex3DEntity::Vertex3DEntity(QNode *parent)
     m_material->setDiffuse(QColor(QRgb(0x928327)));
 
     m_transform = new Qt3DCore::QTransform(this);
-//    m_transform->setScale(1.5f);
 
     addComponent(m_mesh);
     addComponent(m_material);
@@ -45,10 +44,14 @@ Vertex3DEntity::Vertex3DEntity(QNode *parent, Eigen::VectorXd pos)
 
 void Vertex3DEntity::updateGeometry(Eigen::VectorXd pos)
 {
-    if (pos.rows() == 2) {
+    if (pos.rows() == 1) {
+        m_pos = QVector3D(pos[0], 0, 0);
+    } else if (pos.rows() == 2) {
         m_pos = QVector3D(pos[0], pos[1], 0);
     } else if (pos.rows() == 3) {
         m_pos = QVector3D(pos[0], pos[1], pos[2]);
+    } else {
+        return;
     }
     m_transform->setTranslation(m_pos);
 }

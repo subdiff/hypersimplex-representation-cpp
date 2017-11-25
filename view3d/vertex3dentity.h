@@ -16,6 +16,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************/
 
+#ifndef VERTEX3DENTITY_H
+#define VERTEX3DENTITY_H
+
 #include <vector>
 #include <eigen3/Eigen/Dense>
 
@@ -45,3 +48,5 @@ private:
 
     QVector3D m_pos;
 };
+
+#endif // VERTEX3DENTITY_H
