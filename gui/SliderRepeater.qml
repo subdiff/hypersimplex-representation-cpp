@@ -71,12 +71,7 @@ Repeater {
             return;
         }
         var chItem = itemAt(changedIndex);
-        console.log("Changed val:", chItem.oldVal, "to", chItem.val);
-
-
         var diff = (chItem.val - chItem.oldVal) * chItem.mult;
-        console.log("diff:", diff, chItem.val, chItem.oldVal, chItem.mult);
-
         chItem.oldVal = chItem.val;
 
         var avails = [];
@@ -89,10 +84,7 @@ Repeater {
             if (i == changedIndex) {
                 continue;
             }
-
             var availVal = (diff > 0 ? itm.val : 1 - itm.val) * itm.mult;
-            console.log("availVal", + i + ":", availVal);
-
             avails.push([i, availVal]);
         }
 
@@ -108,13 +100,10 @@ Repeater {
     }
 
     function fillOrDistr(avails, diff, restSum) {
-        console.log("avails:", avails);
-
         if (!avails.length) {
             updateBackend();
             return;
         }
-        console.log("fillOrDistr:", avails[0][1], diff);
 
         if (avails[0][1] >= Math.abs(diff) / avails.length) {
             // enough available on all - just distribute the rest
@@ -125,9 +114,7 @@ Repeater {
     }
 
     function distr(avails, diff, restSum) {
-        console.log("distr:", diff);
         var diffDistr = diff / avails.length;
-        console.log("distr:", diffDistr);
 
         for (var i = 0; i < avails.length; i++) {
             var index = avails[i][0];
@@ -153,7 +140,6 @@ Repeater {
     }
 
     function fillFirst(avails, diff, restSum) {
-        console.log("fillFirst:", diff);
         var nv;
         var mnv = avails[0][1];
 

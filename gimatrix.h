@@ -16,6 +16,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************/
 
+#ifndef GIMATRIX_H
+#define GIMATRIX_H
+
 #include <vector>
 #include <eigen3/Eigen/Dense>
 
@@ -80,3 +83,5 @@ private:
 
     int m_selEigenvectMode = 0;
 };
+
+#endif // GIMATRIX_H

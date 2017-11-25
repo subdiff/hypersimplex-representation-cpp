@@ -51,12 +51,10 @@ Row {
                 oldVal = value;
                 return;
             }
-            console.log("onVarValChanged", index + ":", oldVal, "|", value);
 
             varText.text = value;
 
             if (value != oldVal) {
-                console.log("onVarValChanged -> distrVals!");
                 slidersRepeater.distrVals(index);
             }
         }

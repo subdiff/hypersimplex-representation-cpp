@@ -199,12 +199,10 @@ void GiMatrix::calcNullspaceRepr()
     qDebug() << "----------------";
     qDebug() << "----------------";
 
-    qDebug() << "EECIndexMatrix for" << m_group->m_gapName.c_str() << ":";
+    qDebug() << "Edge equivalence classes for" << m_group->m_gapName.c_str() << ":";
     std::cout << m_eecIndexMatrix  << std::endl;
-    qDebug() << "GiMatrix (doubly stochastic matrix):";
+    qDebug() << "Doubly stochastic matrix:";
     std::cout << m_matrix  << std::endl;
-    qDebug() << "GiMatrix multiplied (this matrix stores values already multiplied by eec multiplicity -> it is not the doubly stochastic matrix!):";
-    std::cout << m_multMatrix  << std::endl;
 
     m_nullSpReprList.clear();
 
