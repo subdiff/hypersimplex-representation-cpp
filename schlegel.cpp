@@ -152,10 +152,9 @@ std::vector<VectorXd> Schlegel::getDiagram(int &error) const
     std::cout << basisPlaneZ  << std::endl;
 
     if (basisPlaneZ.cols() != dim - 1) {
-        // image plane points don't lie on a hyperplane
         error = 1;
-        qDebug() << "Schlegel::getDiagram ERROR";
         return std::vector<VectorXd>();
+        qDebug() << "Warning: Schlegel diagram not possible. Image plane points lie not on one hyperplane.";
     }
 
     // find orthonormal basis of zeroed image plane points
