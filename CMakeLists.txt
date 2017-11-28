@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.1.0)
 
-project (hypersimplex-representation)
+project (hypersimplex-representer)
 #set(PROJECT_VERSION "1.0")
 #set(PROJECT_VERSION_MAJOR 1)
 
@@ -42,9 +42,9 @@ qt5_add_resources( ALL_SRCS
                    resources.qrc
                    )
 
-add_executable( hypersimplex-representation ${ALL_SRCS} )
+add_executable( hypersimplex-representer ${ALL_SRCS} )
 
-target_link_libraries( hypersimplex-representation
+target_link_libraries( hypersimplex-representer
                        Qt5::Core
                        Qt5::Gui
                        Qt5::Quick

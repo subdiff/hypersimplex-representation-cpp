@@ -28,8 +28,7 @@ int main(int argc, char** argv)
 {
     QGuiApplication app(argc, argv);
     app.setWindowIcon(QIcon::fromTheme(QStringLiteral("applications-education-mathematics")));
-
-//    s_createHypersimplex(4,2);
+    app.setApplicationName("Hypersimplex Representer");
 
     qmlRegisterType<BackEnd>("subdiff.de.math.hypersimplex.representation", 1, 0, "BackEnd");
     qmlRegisterType<Root3DWrapper>("subdiff.de.math.hypersimplex.representation", 1, 0, "Root3DWrapper");
@@ -41,8 +40,6 @@ int main(int argc, char** argv)
     view.show();
 
     QObject::connect((QObject*)view.engine(), SIGNAL(quit()), &app, SLOT(quit()));
-
-//    return 0;
 
     return app.exec();
 }

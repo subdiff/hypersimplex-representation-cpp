@@ -1,6 +1,6 @@
-# hypersimplex-representation
+# Hypersimplex Representer
 
 Prerequisites:
 
-Compile time: Qt, Eigen3
-Run time: Gap
+* Compile time: Qt, Eigen3
+* Run time: Gap
