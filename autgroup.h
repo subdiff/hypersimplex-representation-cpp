@@ -36,7 +36,7 @@ private:
 
     void calcVtxTrnsSubgroups();
 
-    void gapCreateGroup(int d, bool semi);
+    void gapCreateGroup(int d, bool product);
     std::string gap_eval(const std::string _cmd, bool readOutput = true, std::string end = std::string()) const;
 
     std::vector<std::string> m_factorizations;

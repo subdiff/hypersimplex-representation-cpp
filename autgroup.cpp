@@ -64,7 +64,7 @@ std::string AutGroup::gap_eval(const std::string _cmd, bool readOutput, std::str
     return ret;
 }
 
-void AutGroup::gapCreateGroup(int d, bool semi)
+void AutGroup::gapCreateGroup(int d, bool product)
 {
     auto sDCmdGenerate = [d]() {
         std::string cmd;
@@ -75,13 +75,11 @@ void AutGroup::gapCreateGroup(int d, bool semi)
         return cmd + std::to_string(d) + "),(1,2));;\n";
     };
 
-    if (semi) {
-        // semidirect product S_d with S_2
+    if (product) {
+        // direct product S_d with S_2
         gap_eval("Sd:=" + sDCmdGenerate(), false);
         gap_eval("S2:=Group((1,2));;\n", false);
-        gap_eval("Sdhom:=GroupHomomorphismByFunction(Sd,Sd,function(g) return (1,2)*g*(1,2);end);;\n", false);
-        gap_eval("hom:=GroupHomomorphismByImages(S2, AutomorphismGroup(Sd), [(1,2)], [Sdhom]);;\n", false);
-        gap_eval("G:=SemidirectProduct(S2, hom, Sd);;\n", false);
+        gap_eval("G:=DirectProduct(Sd, S2);;\n", false);
     } else {
         // S_d
         gap_eval("G:=" + sDCmdGenerate(), false);
@@ -124,7 +122,7 @@ AutGroup::AutGroup(int d, int k)
     m_writePipe = pipeStdIn[1];
 
     if (d == 2*k) {
-        // semidirect product S_d with S_2
+        // direct product S_d with S_2
         m_factorizations.reserve(2 * factorial(d));
 
     } else {
