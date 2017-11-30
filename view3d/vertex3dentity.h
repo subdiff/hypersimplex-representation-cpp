@@ -33,8 +33,6 @@ public:
     Vertex3DEntity(QNode *parent = nullptr);
     Vertex3DEntity(QNode *parent, Eigen::VectorXd pos);
 
-//    void init(Eigen::VectorXd pos);
-
     QVector3D pos() const {
         return m_pos;
     }

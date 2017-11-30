@@ -35,7 +35,6 @@ Edge3DEntity::Edge3DEntity(QNode *parent)
     m_material->setDiffuse(QColor(QRgb(0x928327)));
 
     m_transform = new Qt3DCore::QTransform();
-//    m_transform->setScale(1.5f);
 
     addComponent(m_mesh);
     addComponent(m_material);

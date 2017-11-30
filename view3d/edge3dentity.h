@@ -16,6 +16,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************/
 
+#ifndef EDGE3DENTITY_H
+#define EDGE3DENTITY_H
+
 #include <vector>
 
 #include <Qt3DCore/QEntity>
@@ -40,3 +43,5 @@ private:
 
     Vertex3DEntity *m_v[2];
 };
+
+#endif // EDGE3DENTITY_H
