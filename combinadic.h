@@ -60,9 +60,6 @@ static void combinadicComb(int k, int nInSet, int *comb)
         int diff;
         int combIndex = combinadicCombMax(i, nInSet, diff);
 
-//        if (tempN == 6 || tempN == 1)
-//            qDebug() << "i:" << i << "nInSet:" << nInSet << "combIndex:" << combIndex << "diff:" << diff;
-
         comb[combIndex] = 1;
         nInSet = nInSet - diff;
     }
