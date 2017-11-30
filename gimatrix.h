@@ -33,9 +33,6 @@ public:
     GiMatrix(Hypersimplex *hypers, VtxTrnsSubgroup *group);
     void init();
 
-    // TODOX:
-    // getPossibleVariableCombinations()
-
     std::vector<double> getVars() const {
         return std::vector<double>(m_vars.begin() + 1, m_vars.end());
     }
@@ -69,7 +66,7 @@ private:
     VtxTrnsSubgroup *m_group;
 
     MatrixXd m_matrix;          // Matrix<double, Dynamic, Dynamic>
-    MatrixXd m_multMatrix;          // Matrix<double, Dynamic, Dynamic>
+    MatrixXd m_multMatrix;      // Matrix<double, Dynamic, Dynamic>
     MatrixXi m_eecIndexMatrix;  // Matrix<double, Dynamic, Dynamic>
 
     std::vector<int> m_mult;

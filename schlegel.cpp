@@ -21,10 +21,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "hypersimplex.h"
 
 #include <algorithm>
-
-#include <QDebug>
-
 #include <iostream>
+#include <QDebug>
 
 Schlegel::Schlegel(Hypersimplex *hypers, int projFacet, bool projToLargerFacet, const MatrixXd &pts)
     : m_hypers(hypers),
@@ -229,8 +227,6 @@ std::vector<VectorXd> Schlegel::getDiagram(int &error) const
         scTry = 1;
 
         // calculate conv comb matrix of image plane points
-        MatrixXd convCmbPlane(2 * dim + 2 * planeZ.size(), planeZ.size());
-
     }
 
     projCenterZ = planeMiddleZ.val + normalPlaneZ * normalPlaneCoeff;

@@ -109,18 +109,10 @@ int EdgeEquivClass::calcMultiplicity()
     int mult = 0;
     auto v = m_edges[0].v;
 
-//    qDebug() << "calcMultiplicity" << v;
-//    std::string debug;
-//    for (auto e : m_edges)
-//        debug += std::to_string(e.v) + std::to_string(e.w) + "|";
-//    qDebug() << (debug + std::to_string(multiplicity)).c_str();
-
     for (auto e : m_edges) {
-//        qDebug() << "IN" << e.v << e.w;
         if (e.has(v)) {
             mult++;
         }
-//        qDebug() << "OUT" << mult;
     }
     multiplicity = mult;
 
@@ -164,14 +156,11 @@ bool Hypersimplex::haveEdge(int v, int w)
     int vComb[m_d] = {0};
     int wComb[m_d] = {0};
 
-//    qDebug() << "haveEdge:" << v << w;
-
     combinadicComb(m_k, v, vComb);
     combinadicComb(m_k, w, wComb);
 
     int sum = 0;
     for (int i = 0; i < m_d; i++) {
-//        qDebug() << "IN" << i <<":" << vComb[i] << wComb[i];
         sum += vComb[i] && wComb[i];
     }
 
@@ -282,9 +271,6 @@ bool Hypersimplex::isEdge(int vertex1, int vertex2)
 
 void Hypersimplex::calcVtxTrnsSubgroups()
 {
-    qDebug() << "calcVtxTrnsSubgroups";
-
-//    auto sub = m_group->getSubgroups()[97];   //TODOX
     int index = 0;
     for (auto sub : m_group->getSubgroups()) {
         if (isVtxTrnsSubgroup(index)) {
@@ -298,22 +284,11 @@ bool Hypersimplex::isVtxTrnsSubgroup(int sub)
 {
     bool vertexHits[m_vertexCount] = {false};
 
-//    if (sub != "Group([ (1,2)(3,5)(4,6) ])")
-//        return false;
-
-//    qDebug() << "test:" << QString(sub.c_str());
-
     for (auto factored : m_group->getFactorizations(sub)) {
-//        qDebug() << "-----------------";
-//        qDebug() << "FACTORED:" << QString(factored.c_str());
-
         int res[m_vertexCount];
         startPermutate(factored, res);
 
-//        qDebug() << "permutated:" << res[0];
-
         vertexHits[res[0]] = true;
-
     }
 
     for (auto hit : vertexHits) {
@@ -337,13 +312,10 @@ std::vector<Edge> Hypersimplex::getEdgesToVertex(int vertex)
 
 void Hypersimplex::calcEdgeEquivClasses()
 {
-    qDebug() << "calcEdgeEquivClasses!";
 
     auto hasEdge = [](std::vector<Edge> &edges, Edge &e) {
         return std::any_of(edges.begin(), edges.end(), [&e](Edge comp){return comp == e;});
     };
-
-//    auto sub = m_vtxTrnsSubgroups[16];
     for (auto sub : m_vtxTrnsSubgroups) {
         qDebug() << QString(sub->m_gapName.c_str());
 
@@ -355,24 +327,8 @@ void Hypersimplex::calcEdgeEquivClasses()
             int *vertices = new int[m_vertexCount];
             startPermutate(fac, vertices);
 
-//            qDebug() << "Perm" << QString(fac.c_str());
-//            std::string debug;
-//            for (int i = 0; i<m_vertexCount; i++) {
-//                debug += std::to_string(vertices[i]) + " ";
-//            }
-//            qDebug() << QString(debug.c_str());
-
             imgList.push_back(vertices);
         }
-
-//        qDebug() << "... permutations:";
-//        for (auto img : imgList) {
-//            std::string debug;
-//            for (int i = 0; i<m_vertexCount; i++) {
-//                debug += std::to_string(img[i]) + " ";
-//            }
-//            qDebug() << QString(debug.c_str());
-//        }
 
         std::vector<int> vertexHits;
 
@@ -391,25 +347,18 @@ void Hypersimplex::calcEdgeEquivClasses()
              * to a vertex whose edges already have been tested
              */
             if (testOnHit(vertex)) {
-//                qDebug() << "HIT" << vertex;
                 continue;
             }
             vertexHits.push_back(vertex);
             std::vector<Edge> vertexEdges = getEdgesToVertex(vertex);
-
-//            qDebug() << "vertexEdges";
-//            for (auto e: vertexEdges)
-//                qDebug() << e.v << e.w;
 
             for (auto vEdge : vertexEdges) {
                 std::vector<Edge> edgeImgs;
 
                 for (auto el :  m_group->getFactorizations(sub->m_index)) {
                     auto edgeImg = [this](Edge e, std::string factoredPerm) {
-//                        qDebug() << "XXX1" << e.v << e.w << QString(factoredPerm.c_str());
                         auto imgV = permutateVertex(factoredPerm, e.v);
                         auto imgW = permutateVertex(factoredPerm, e.w);
-//                        qDebug() << "XXX2" << imgV << imgW;
                         return Edge(imgV, imgW);
                     };
                     auto eI = edgeImg(vEdge, el);
@@ -445,10 +394,8 @@ void Hypersimplex::calcEdgeEquivClasses()
                         std::string debug;
                         for (auto e : c->m_edges)
                             debug += std::to_string(e.v) + std::to_string(e.w) + "|";
-//                        qDebug() << "ADD:" << debug.c_str();
 
                         for (auto eI : edgeImgs) {
-//                            qDebug() << "test:" << eI.v << eI.w;
                             if (!hasEdge(c->m_edges, eI)) {
                                 c->m_edges.push_back(eI);
                             }
@@ -474,23 +421,11 @@ void Hypersimplex::calcEdgeEquivClasses()
         sub->m_edgeEquivClasses = eecs;
 
         for_each(imgList.begin(), imgList.end(), [](int *ptr){delete ptr;});
-
-//        qDebug() << "######";
-//        qDebug() << "FINAL EECs:";
-//        for (auto c : sub->m_edgeEquivClasses) {
-//            std::string debug;
-//            for (auto e : c->m_edges)
-//                debug += std::to_string(e.v) + std::to_string(e.w) + "|";
-//            qDebug() << (debug + std::to_string(c->multiplicity)).c_str();
-//        }
-//        qDebug() << "######";
-
     }
 }
 
 void Hypersimplex::startPermutate(std::string factoredPerm, int *result)
 {
-//    qDebug() << "startPermutate";
     for (int i = 0; i < m_vertexCount; i++) {
         result[i] = i;
     }
@@ -506,8 +441,6 @@ void Hypersimplex::permutateVertices(std::string factoredPerm, int *vertices)
     int input[m_vertexCount];
     std::copy(vertices, vertices + m_vertexCount, input);
 
-//    qDebug() << "permutateVertices";
-
     std::vector<int *>parsedFactoredPerm = parsePermutation(factoredPerm);
 
     for (auto factor : parsedFactoredPerm) {
@@ -517,10 +450,6 @@ void Hypersimplex::permutateVertices(std::string factoredPerm, int *vertices)
             vertices[factor[i]] = input[i];
         }
     }
-
-//    for (int i = 0; i < m_vertexCount; i++) {
-//        qDebug() << "Perm Vert:" << input[i] << vertices[i];
-//    }
 }
 
 int Hypersimplex::permutateVertex(std::string factoredPerm, int vertex)
@@ -552,17 +481,6 @@ AsymHypers::AsymHypers(int d, int k)
         genAsymSd_1d(m_d, genAsymSd_1d_result[i]);
         genAsymSd_1d_inv(m_d, genAsymSd_1d_inv_result[i]);
         genAsymSd_12(m_d, genAsymSd_12_result[i]);
-
-//        qDebug() << "---------------";
-//        qDebug() << "------" << i << "------";
-//        for (int j = 0; j < m_d; j++) {
-//            qDebug() << j << ":" << comps[j]
-//                        << genAsymSd_1d_result[i][j]
-//                           << genAsymSd_12_result[i][j];
-//        }
-//        qDebug() << "---------------";
-//        qDebug() << "TEST:" << combinadicN(m_d, comps);
-//        qDebug() << "---------------";
     }
 
     for (int i = 0; i < m_vertexCount; i++) {
@@ -570,11 +488,6 @@ AsymHypers::AsymHypers(int d, int k)
         m_genAsymSd_1d_inv[i] = combinadicN(m_d, genAsymSd_1d_inv_result[i]);
         m_genAsymSd_12[i] = combinadicN(m_d, genAsymSd_12_result[i]);
     }
-
-//    int test[m_vertexCount];
-//    qDebug() << "---------";
-//    qDebug() << "---------";
-//    startPermutate(m_group->getFactorizations()[4], test);
 
     initCalculations();
 }
@@ -603,11 +516,6 @@ SymHypers::SymHypers(int d, int k)
         int comps[m_d] = {0};
         combinadicComb(m_k, i, comps);
 
-//        qDebug() << "---------------";
-//        qDebug() << "vertex:" << i;
-//        for (int i = 0; i < m_d; i++)
-//            qDebug() << comps[i];
-
         std::copy(comps, comps + m_d, genSymS2_12_result[i]);
         std::copy(comps, comps + m_d, genSymSd_1d_result[i]);
         std::copy(comps, comps + m_d, genSymSd_1d_inv_result[i]);
@@ -617,17 +525,6 @@ SymHypers::SymHypers(int d, int k)
         genSymSd_1d(m_d, genSymSd_1d_result[i]);
         genSymSd_1d_inv(m_d, genSymSd_1d_inv_result[i]);
         genSymSd_12(m_d, genSymSd_12_result[i]);
-
-//        qDebug() << "---------------";
-//        qDebug() << "------" << i << "------";
-//        for (int j = 0; j < m_d; j++) {
-//            qDebug() << j << ":" << comps[j] << genSymS2_12_result[i][j]
-//                        << genSymSd_1d_result[i][j]
-//                           << genSymSd_12_result[i][j];
-//        }
-//        qDebug() << "---------------";
-//        qDebug() << "TEST:" << combinadicN(m_d, comps);
-//        qDebug() << "---------------";
     }
 
     for (int i = 0; i < m_vertexCount; i++) {
@@ -638,11 +535,6 @@ SymHypers::SymHypers(int d, int k)
     }
 
     initCalculations();
-
-//    int test[m_vertexCount];
-//    qDebug() << "---------";
-//    qDebug() << "---------";
-//    startPermutate(m_group->getFactorizations()[38], test);
 }
 
 SymHypers::~SymHypers()
@@ -657,8 +549,6 @@ std::string Hypersimplex::prepareForParsing(const std::string &perm)
 {
     std::string ret;
     std::size_t pos = 0;
-
-//    qDebug() << "prepareForParsing" << QString(perm.c_str());
 
     auto inverteParsedPart = [](const std::string part) {
         std::size_t pos = 0;
@@ -689,21 +579,16 @@ std::string Hypersimplex::prepareForParsing(const std::string &perm)
         std::size_t partEnd;
         std::string part;
 
-//        qDebug() << "IN" << pos << perm[pos] << ret.c_str();
-
         if (perm[pos] == '(') {
             int brackets = 1;
             std::size_t subpos = pos;
             while (brackets > 0) {
-//                qDebug() << "BRACKETS" << subpos << perm[subpos] << brackets;
                 partEnd = perm.find_first_of("()", subpos + 1);
                 if (perm[partEnd] == ')') {
                     brackets--;
                 } else {
                     brackets++;
                 }
-//                qDebug() << "BRACKETS" << partEnd << perm[partEnd] << brackets;
-//                brackets += perm[partEnd] == ')' ? -1 : 1;
                 subpos = partEnd + 1;
             }
             part = prepareForParsing(perm.substr(pos + 1, partEnd - (pos + 1)));
@@ -730,7 +615,6 @@ std::string Hypersimplex::prepareForParsing(const std::string &perm)
         } else {
             partEnd = perm.find('(', pos + 1);
             part = perm.substr(pos, partEnd - pos);
-//            qDebug() << "READIN" << partEnd << perm[partEnd] << part.c_str();
             ret += part;
             pos = partEnd;
         }
@@ -745,16 +629,10 @@ std::vector<int *> AsymHypers::parsePermutation(std::string perm)
 
     perm = prepareForParsing(perm);
 
-//    qDebug() << "parsePermutation1" << QString(perm.c_str());
-
-//    qDebug() << m_genAsymSd_1d << m_genAsymSd_1d_inv << m_genAsymSd_12;
-
     while (pos != std::string::npos) {
         char symbol = perm[pos + 1];
         int times = 1;
         bool inverse = false;
-
-//        qDebug() << "IN1" << pos << symbol;
 
         if (perm[pos + 2] == '^') {
             if (perm[pos + 3] == '-') {
@@ -764,8 +642,6 @@ std::vector<int *> AsymHypers::parsePermutation(std::string perm)
                 times = perm[pos + 3] - '0';
             }
         }
-
-//        qDebug() << "IN2" << inverse << times;
 
         int *ptr;
         if (symbol == '1') {
@@ -779,13 +655,8 @@ std::vector<int *> AsymHypers::parsePermutation(std::string perm)
             times--;
         }
 
-//        qDebug() << "IN3" << ret[0];
-
         pos = perm.find('x', pos + 1);
     }
-
-//    for (auto i : ret)
-//        qDebug() << "pPRet:" << i;
 
     return ret;
 }
@@ -795,19 +666,12 @@ std::vector<int *> SymHypers::parsePermutation(std::string perm)
     std::vector<int *> ret;
     std::size_t pos = 0;
 
-//    qDebug() << "parsePermutation VORHER" << QString(perm.c_str());
-
-
     perm = prepareForParsing(perm);
-
-//    qDebug() << "parsePermutation NACHHER" << QString(perm.c_str());
 
     while (pos != std::string::npos) {
         char symbol = perm[pos + 1];
         int times = 1;
         bool inverse = false;
-
-//        qDebug() << "IN1" << pos << symbol;
 
         if (perm[pos + 2] == '^') {
             if (perm[pos + 3] == '-') {
@@ -817,8 +681,6 @@ std::vector<int *> SymHypers::parsePermutation(std::string perm)
                 times = perm[pos + 3] - '0';
             }
         }
-
-//        qDebug() << "IN2" << inverse << times;
 
         int *ptr;
         if (symbol == '3') {
@@ -839,21 +701,9 @@ std::vector<int *> SymHypers::parsePermutation(std::string perm)
             }
         }
 
-//        if (symbol == '1') {
-//            ptr = inverse ? m_genSymSd_1d_inv : m_genSymSd_1d;
-//        } else if (symbol == '2') {
-//            ptr = m_genSymSd_12;
-//        } else {
-//            ptr = m_genSymS2_12;
-//        }
-//        while (times > 0) {
-//            ret.push_back(ptr);
-//        }
-
         pos = perm.find('x', pos + 1);
     }
 
-//    qDebug() << "parsePermutation END";
     return ret;
 }
 

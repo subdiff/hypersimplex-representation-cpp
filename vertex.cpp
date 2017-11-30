@@ -22,8 +22,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <cmath>
 
-#include <QDebug>
-
 Vertex::Vertex(int combIndex, std::vector<int> comps, int k)
     : m_combIndex(combIndex),
       m_comps(comps),

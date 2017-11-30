@@ -65,6 +65,10 @@ static void combinadicComb(int k, int nInSet, int *comb)
     }
 }
 
+/*
+ * Calculates the associated number to the
+ * k-combination 'comb'.
+ */
 static int combinadicN(int d, const int *comb)
 {
     int n = 0;

@@ -28,8 +28,6 @@ BackEnd::BackEnd(QObject *parent) :
 
 BackEnd::~BackEnd()
 {
-    // TODO: Make sure running s_createHypersimplex calls are aborted
-
     if (::s_hypers) {
         delete ::s_hypers;
         ::s_hypers = nullptr;

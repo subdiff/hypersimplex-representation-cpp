@@ -16,6 +16,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************/
 
+#ifndef AUTGROUP_H
+#define AUTGROUP_H
+
 #include <vector>
 #include <string>
 
@@ -49,3 +52,5 @@ private:
     int m_writePipe;
     int m_readPipe;
 };
+
+#endif // AUTGROUP_H
